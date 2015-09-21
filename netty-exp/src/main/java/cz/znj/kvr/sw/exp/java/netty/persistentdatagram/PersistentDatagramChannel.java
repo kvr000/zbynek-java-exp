@@ -5,6 +5,7 @@ import cz.znj.kvr.sw.exp.java.netty.DatagramMessage;
 import cz.znj.kvr.sw.exp.java.netty.netty.MyEmbeddedEventLoop;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.AbstractChannel;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelMetadata;
 import io.netty.channel.ChannelOutboundBuffer;
@@ -25,7 +26,7 @@ import java.net.SocketAddress;
  */
 public class PersistentDatagramChannel extends AbstractChannel
 {
-	public PersistentDatagramChannel(DatagramChannel parentChannel, InetSocketAddress childPeerAddress)
+	public PersistentDatagramChannel(Channel parentChannel, InetSocketAddress childPeerAddress)
 	{
 		super(null);
 		this.parentChannel = parentChannel;
@@ -257,7 +258,7 @@ public class PersistentDatagramChannel extends AbstractChannel
 		return parentChannel.metadata();
 	}
 
-	protected DatagramChannel	parentChannel;
+	protected Channel		parentChannel;
 
 	protected InetSocketAddress	childPeerAddress;
 

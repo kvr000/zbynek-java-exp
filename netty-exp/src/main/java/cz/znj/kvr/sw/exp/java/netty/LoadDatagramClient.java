@@ -28,7 +28,7 @@ public class LoadDatagramClient
 	{
 		Stopwatch stopWatch = Stopwatch.createStarted();
 		LinkedList<Thread> threads = new LinkedList<>();
-		for (int i = 0; i < 1024; ++i) {
+		for (int i = 0; i < 256; ++i) {
 			int id = i;
 			Thread t = new Thread(() -> {
 				runClient(id);
@@ -53,7 +53,7 @@ public class LoadDatagramClient
 		try {
 			DatagramChannel ch = DatagramChannel.open();
 			ch.connect(serverAddress);
-			for (int i = 0; i < 16; ++i) {
+			for (int i = 0; i < 4096; ++i) {
 				ch.write(ByteBuffer.wrap(String.format("%d", id*1000000+i).getBytes()));
 				ch.read(ByteBuffer.allocate(1600));
 			}

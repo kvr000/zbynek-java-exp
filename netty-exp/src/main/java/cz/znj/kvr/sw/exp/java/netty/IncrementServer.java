@@ -106,5 +106,5 @@ public class IncrementServer
 		return 0;
 	}
 
-	int				port = 4300;
+	public static final int		port = 4200;
 }

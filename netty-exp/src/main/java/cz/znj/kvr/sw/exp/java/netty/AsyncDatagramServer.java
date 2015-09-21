@@ -66,11 +66,12 @@ public class AsyncDatagramServer
 				.channel(NioDatagramChannel.class)
 				.handler(new PersistentDatagramChannelDistributionHandler(workerGroup) {
 					@Override
-					public void initChildChannel(Channel childChannel) {
+					public Channel initChildChannel(Channel childChannel) {
 						childChannel.pipeline()
 							.addLast(new LongBytesAdapter())
 							.addLast(new IncrementServerHandler())
 						;
+						return childChannel;
 					}
 				})
 				.option(ChannelOption.SO_REUSEADDR, true);

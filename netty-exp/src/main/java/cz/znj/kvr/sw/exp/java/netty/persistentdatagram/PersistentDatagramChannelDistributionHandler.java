@@ -1,5 +1,6 @@
 package cz.znj.kvr.sw.exp.java.netty.persistentdatagram;
 
+import com.google.common.cache.CacheBuilder;
 import cz.znj.kvr.sw.exp.java.netty.netty.MyEmbeddedEventLoop;
 import cz.znj.kvr.sw.exp.java.netty.persistentdatagram.PersistentDatagramChannel;
 import io.netty.buffer.ByteBuf;
@@ -12,10 +13,14 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.DatagramPacket;
+import io.netty.util.ReferenceCountUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -32,21 +37,32 @@ public abstract class PersistentDatagramChannelDistributionHandler extends Chann
 	@Override
 	public void			channelRead(ChannelHandlerContext ctx, Object msg)
 	{
-		DatagramPacket packet = (DatagramPacket) msg;
-		PersistentDatagramChannel childChannel = new PersistentDatagramChannel((DatagramChannel)ctx.channel(), packet.sender());
-		initChildChannel(childChannel);
-		workersGroup.register(childChannel);
-		ByteBuf content = Unpooled.copiedBuffer(packet.content());
-		byte[] bytes = new byte[content.readableBytes()];
-		content.readBytes(bytes);
-//		executor.execute(() -> {
-//			logger.error("Got message "+msg);
-//			childChannel.pipeline().fireChannelRead(bytes);
-//		});
+		Channel childChannel;
+		byte[] bytes;
+		try {
+			DatagramPacket packet = (DatagramPacket) msg;
+			childChannel = getChildChannel(ctx.channel(), packet.sender());
+			workersGroup.register(childChannel);
+			ByteBuf content = Unpooled.copiedBuffer(packet.content());
+			bytes = new byte[content.readableBytes()];
+			content.readBytes(bytes);
+		}
+		finally {
+			ReferenceCountUtil.release(msg);
+		}
 		childChannel.pipeline().fireChannelRead(bytes);
 	}
 
-	public abstract void		initChildChannel(Channel childChannel);
+	public Channel			getChildChannel(Channel parentChannel, InetSocketAddress peerAddress)
+	{
+		return childChannels.computeIfAbsent(peerAddress, (InetSocketAddress peerAddress2) -> {
+			PersistentDatagramChannel channel = new PersistentDatagramChannel(parentChannel, peerAddress);
+			initChildChannel(channel);
+			return channel;
+		});
+	}
+
+	public abstract Channel		initChildChannel(Channel childChannel);
 
 	@Override
 	public void			exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
@@ -59,4 +75,10 @@ public abstract class PersistentDatagramChannelDistributionHandler extends Chann
 	protected EventLoopGroup	workersGroup;
 
 	protected Logger		logger = LogManager.getLogger();
+
+	protected Map<InetSocketAddress, Channel> childChannels =
+		CacheBuilder.newBuilder()
+			.expireAfterAccess(60000, TimeUnit.MILLISECONDS)
+			.<InetSocketAddress, Channel>build()
+			.asMap();
 }

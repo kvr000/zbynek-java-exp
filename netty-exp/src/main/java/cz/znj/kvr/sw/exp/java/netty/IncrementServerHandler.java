@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
 import org.apache.commons.io.Charsets;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.Charset;
 
@@ -19,7 +21,7 @@ public class IncrementServerHandler extends ChannelHandlerAdapter
 	{
 		Long input = (Long)msg;
 		try {
-			System.out.println("Got "+input);
+			logger.debug("Got {0}", input);
 			try {
 				Thread.sleep(0);
 			}
@@ -40,4 +42,6 @@ public class IncrementServerHandler extends ChannelHandlerAdapter
 		cause.printStackTrace();
 		ctx.close();
 	}
+
+	protected Logger		logger = LogManager.getLogger();
 }

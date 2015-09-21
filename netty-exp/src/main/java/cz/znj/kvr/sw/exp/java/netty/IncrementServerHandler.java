@@ -1,6 +1,7 @@
 package cz.znj.kvr.sw.exp.java.netty;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.ReferenceCountUtil;
@@ -14,6 +15,7 @@ import java.nio.charset.Charset;
 /**
  * Created by rat on 2015-09-20.
  */
+@ChannelHandler.Sharable
 public class IncrementServerHandler extends ChannelHandlerAdapter
 {
 	@Override
@@ -21,17 +23,23 @@ public class IncrementServerHandler extends ChannelHandlerAdapter
 	{
 		Long input = (Long)msg;
 		try {
-			logger.debug("Got {0}", input);
-			try {
-				Thread.sleep(0);
-			}
-			catch (InterruptedException ex) {
-				throw new RuntimeException(ex);
-			}
+			logger.debug("Got {}", input);
+			doSleep(0);
 			ctx.writeAndFlush(input+1);
 		}
 		finally {
 			ReferenceCountUtil.release(msg);
+		}
+	}
+
+	private void			doSleep(long ms)
+	{
+		try {
+			if (ms > 0)
+				Thread.sleep(ms);
+		}
+		catch (InterruptedException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 

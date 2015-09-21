@@ -1,6 +1,7 @@
 package cz.znj.kvr.sw.exp.java.netty;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.io.Charsets;
@@ -9,6 +10,7 @@ import org.apache.commons.io.Charsets;
 /**
  * Created by rat on 2015-09-20.
  */
+@ChannelHandler.Sharable
 public class StringToLongDecoder extends ChannelHandlerAdapter
 {
 	@Override

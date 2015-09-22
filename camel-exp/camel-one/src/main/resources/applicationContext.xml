@@ -12,11 +12,11 @@
 	default-lazy-init="false"
 	default-autowire="no">
 
-	<bean id="timingRoute" class="cz.znj.kvr.sw.camel.camone.TimingRoute"
+	<bean id="timingRoute" class="cz.znj.kvr.sw.exp.java.camel.camone.TimingRoute"
 		p:period="1000"
 	/>
 
-	<bean id="messageProcessor" class="cz.znj.kvr.sw.camel.camone.MessageProcessorImpl"
+	<bean id="messageProcessor" class="cz.znj.kvr.sw.exp.java.camel.camone.MessageProcessorImpl"
 	/>
 
 	<camel:camelContext id="camelContext"  xmlns="http://camel.apache.org/schema/spring" trace="false">

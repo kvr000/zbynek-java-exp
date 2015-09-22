@@ -4,8 +4,8 @@ import org.apache.camel.CamelException;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.Route;
-import org.apache.camel.impl.RoutePolicySupport;
 import org.apache.camel.spring.SpringRouteBuilder;
+import org.apache.camel.support.RoutePolicySupport;
 import org.springframework.stereotype.Component;
 
 
@@ -47,8 +47,8 @@ public class TimingRoute extends SpringRouteBuilder
 		from("seda:messageProcessorProcessed")
 			.process(new Processor() {
 				@Override
-				public void process(Exchange exch)
-				{
+				public void process(Exchange exch) {
+					System.out.println("id: "+exch.getIn().getHeader("id"));
 					System.out.println("tick: "+exch.getExchangeId());
 					exch.getOut().setBody(exch.getProperty("CamelTimerCounter"));
 					if (((Number)exch.getProperty("CamelTimerCounter")).longValue()%3 == 2)

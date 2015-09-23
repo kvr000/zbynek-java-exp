@@ -2,6 +2,7 @@ package cz.znj.kvr.sw.exp.java.netty;
 
 
 import cz.znj.kvr.sw.exp.java.netty.persistentdatagram.PersistentDatagramChannelDistributionHandler;
+import cz.znj.kvr.sw.exp.java.netty.persistentdatagram.PersistentDatagramDistributorHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -68,6 +69,16 @@ public class AsyncDatagramServer
 						return childChannel;
 					}
 				})
+//				.handler(new PersistentDatagramDistributorHandler(workerGroup) {
+//					@Override
+//					public Channel initChildChannel(Channel childChannel) {
+//						childChannel.pipeline()
+//							.addLast(new LongBytesCodec())
+//							.addLast(new IncrementServerHandler())
+//						;
+//						return childChannel;
+//					}
+//				})
 				.option(ChannelOption.SO_REUSEADDR, true);
 
 			// Bind and start to accept incoming connections.

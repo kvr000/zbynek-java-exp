@@ -5,19 +5,31 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cz.znj.kvr.sw.exp.java.netty</groupId>
-	<artifactId>netty-exp-base</artifactId>
+	<groupId>cz.znj.kvr.sw.exp.java.netty.netty5</groupId>
+	<artifactId>netty5-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
 
 	<parent>
-		<groupId>cz.znj.kvr.sw.exp.java</groupId>
-		<artifactId>java-exp</artifactId>
+		<groupId>cz.znj.kvr.sw.exp.java.netty</groupId>
+		<artifactId>netty-exp-base</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<properties>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>5.0.0.Alpha3</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
 
 </project>

@@ -24,7 +24,7 @@ public class IncrementServerHandler extends ChannelHandlerAdapter
 		Long input = (Long)msg;
 		try {
 			logger.debug("Got {}", input);
-			doSleep(0);
+			doSleep(5000);
 			ctx.writeAndFlush(input+1);
 		}
 		finally {

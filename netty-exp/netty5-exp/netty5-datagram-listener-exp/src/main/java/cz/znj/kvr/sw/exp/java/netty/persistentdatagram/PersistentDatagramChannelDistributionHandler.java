@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Created by rat on 2015-09-20.
- */
+* Created by rat on 2015-09-20.
+*/
 @ChannelHandler.Sharable
 public abstract class PersistentDatagramChannelDistributionHandler extends ChannelHandlerAdapter
 {
@@ -87,3 +87,5 @@ public abstract class PersistentDatagramChannelDistributionHandler extends Chann
 			.build()
 			.asMap();
 }
+
+

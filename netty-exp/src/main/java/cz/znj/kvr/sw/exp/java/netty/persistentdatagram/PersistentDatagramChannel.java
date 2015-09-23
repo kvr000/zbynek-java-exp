@@ -22,8 +22,8 @@ import java.net.SocketAddress;
 
 
 /**
- * Created by rat on 2015-09-20.
- */
+* Created by rat on 2015-09-20.
+*/
 public class PersistentDatagramChannel extends AbstractChannel
 {
 	public PersistentDatagramChannel(Channel parentChannel, InetSocketAddress childPeerAddress)

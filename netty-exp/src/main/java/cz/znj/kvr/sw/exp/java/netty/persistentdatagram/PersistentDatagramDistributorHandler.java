@@ -2,8 +2,6 @@ package cz.znj.kvr.sw.exp.java.netty.persistentdatagram;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalNotification;
-import cz.znj.kvr.sw.exp.java.netty.netty.MyEmbeddedEventLoop;
-import cz.znj.kvr.sw.exp.java.netty.persistentdatagram.PersistentDatagramChannel;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -11,26 +9,28 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+import io.netty.channel.DefaultChannelPromise;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.ReferenceCountUtil;
+import io.netty.util.concurrent.GenericFutureListener;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 
 /**
-* Created by rat on 2015-09-20.
-*/
+ * Created by rat on 2015-09-20.
+ */
 @ChannelHandler.Sharable
-public abstract class PersistentDatagramChannelDistributionHandler extends ChannelHandlerAdapter
+public abstract class PersistentDatagramDistributorHandler extends ChannelHandlerAdapter
 {
-	public PersistentDatagramChannelDistributionHandler(EventLoopGroup workersGroup)
+	public PersistentDatagramDistributorHandler(EventLoopGroup workersGroup)
 	{
 		this.workersGroup = workersGroup;
 	}
@@ -51,14 +51,35 @@ public abstract class PersistentDatagramChannelDistributionHandler extends Chann
 		finally {
 			ReferenceCountUtil.release(msg);
 		}
-		childChannel.pipeline().fireChannelRead(bytes);
+		workersGroup.execute(() -> childChannel.pipeline().fireChannelRead(bytes));
 	}
 
 	public Channel			getChildChannel(Channel parentChannel, InetSocketAddress peerAddress)
 	{
 		return childChannels.computeIfAbsent(peerAddress, (InetSocketAddress peerAddress2) -> {
-			PersistentDatagramChannel channel = new PersistentDatagramChannel(parentChannel, peerAddress);
+			Channel channel = new EmbeddedChannel() {
+				@Override
+				public SocketAddress remoteAddress() {
+					return peerAddress;
+				}
+			};
+			channel.pipeline().removeLast();
 			initChildChannel(channel);
+			channel.pipeline().addFirst(new ChannelHandlerAdapter() {
+				@Override
+				public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
+					parentChannel.writeAndFlush(new DatagramPacket(Unpooled.wrappedBuffer((byte[]) msg), peerAddress),
+						new DefaultChannelPromise(parentChannel)
+							.addListener(new GenericFutureListener<ChannelPromise>()
+							{
+								@Override
+								public void operationComplete(ChannelPromise future) throws Exception
+								{
+									promise.setSuccess();
+								}
+							}));
+				}
+			});
 			return channel;
 		});
 	}
@@ -87,5 +108,3 @@ public abstract class PersistentDatagramChannelDistributionHandler extends Chann
 			.build()
 			.asMap();
 }
-
-

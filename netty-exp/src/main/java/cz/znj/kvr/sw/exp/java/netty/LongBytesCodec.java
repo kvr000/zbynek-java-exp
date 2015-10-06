@@ -10,7 +10,7 @@ import org.apache.commons.io.Charsets;
 /**
  * Created by rat on 2015-09-20.
  */
-public class LongBytesAdapter extends ChannelHandlerAdapter
+public class LongBytesCodec extends ChannelHandlerAdapter
 {
 	@Override
 	public void			channelRead(ChannelHandlerContext ctx, Object msg)
@@ -28,7 +28,7 @@ public class LongBytesAdapter extends ChannelHandlerAdapter
 	public void			write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)
 	{
 		Long input = (Long)msg;
-		byte[] output = input.toString().getBytes();
+		byte[] output = (input.toString()+"\n").getBytes();
 		ctx.writeAndFlush(output);
 	}
 

@@ -1,7 +1,6 @@
 package cz.znj.kvr.sw.exp.java.netty;
 
 
-import com.google.common.util.concurrent.MoreExecutors;
 import cz.znj.kvr.sw.exp.java.netty.persistentdatagram.PersistentDatagramChannelDistributionHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -16,11 +15,6 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.util.concurrent.Future;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 
 /**
@@ -68,7 +62,7 @@ public class AsyncDatagramServer
 					@Override
 					public Channel initChildChannel(Channel childChannel) {
 						childChannel.pipeline()
-							.addLast(new LongBytesAdapter())
+							.addLast(new LongBytesCodec())
 							.addLast(new IncrementServerHandler())
 						;
 						return childChannel;
@@ -113,9 +107,5 @@ public class AsyncDatagramServer
 		return 0;
 	}
 
-	int				port = 4200;
-
-	Logger				logger = LogManager.getLogger(getClass());
-
-	Executor			executor = false ? MoreExecutors.newDirectExecutorService() : Executors.newCachedThreadPool();
+	protected int			port = 4200;
 }

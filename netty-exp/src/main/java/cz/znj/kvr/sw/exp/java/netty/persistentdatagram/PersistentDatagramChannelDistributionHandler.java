@@ -1,6 +1,7 @@
 package cz.znj.kvr.sw.exp.java.netty.persistentdatagram;
 
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalNotification;
 import cz.znj.kvr.sw.exp.java.netty.netty.MyEmbeddedEventLoop;
 import cz.znj.kvr.sw.exp.java.netty.persistentdatagram.PersistentDatagramChannel;
 import io.netty.buffer.ByteBuf;
@@ -77,8 +78,12 @@ public abstract class PersistentDatagramChannelDistributionHandler extends Chann
 	protected Logger		logger = LogManager.getLogger();
 
 	protected Map<InetSocketAddress, Channel> childChannels =
-		CacheBuilder.newBuilder()
+		CacheBuilder.<InetSocketAddress, Channel>newBuilder()
 			.expireAfterAccess(60000, TimeUnit.MILLISECONDS)
-			.<InetSocketAddress, Channel>build()
+			.removalListener((RemovalNotification<InetSocketAddress, Channel> notification) -> {
+				notification.getValue().pipeline().fireChannelInactive();
+				logger.error("Removed client from "+notification.getKey());
+			})
+			.build()
 			.asMap();
 }

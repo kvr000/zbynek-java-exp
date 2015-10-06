@@ -31,7 +31,6 @@ public class PersistentDatagramChannel extends AbstractChannel
 		super(null);
 		this.parentChannel = parentChannel;
 		this.childPeerAddress = childPeerAddress;
-		//eventLoop.register(this);
 		unsafe();
 	}
 
@@ -145,46 +144,6 @@ public class PersistentDatagramChannel extends AbstractChannel
 			return childPeerAddress;
 		}
 
-//		@Override
-//		public void register(EventLoop eventLoop, ChannelPromise promise)
-//		{
-//			if (eventLoop == null) {
-//				throw new NullPointerException("eventLoop");
-//			}
-//			if (promise == null) {
-//				throw new NullPointerException("promise");
-//			}
-//			if (isRegistered()) {
-//				promise.setFailure(new IllegalStateException("registered to an event loop already"));
-//				return;
-//			}
-//			if (!isCompatible(eventLoop)) {
-//				promise.setFailure(
-//					new IllegalStateException("incompatible event loop type: " + eventLoop.getClass().getName()));
-//				return;
-//			}
-//
-////			if (eventLoop.inEventLoop()) {
-////				register0(promise);
-////			} else {
-////				try {
-////					eventLoop.execute(new OneTimeTask() {
-////						@Override
-////						public void run() {
-////							register0(promise);
-////						}
-////					});
-////				} catch (Throwable t) {
-////					logger.warn(
-////						"Force-closing a io.netty.channel whose registration task was not accepted by an event loop: {}",
-////						AbstractChannel.this, t);
-////					closeForcibly();
-////					closeFuture.setClosed();
-////					safeSetFailure(promise, t);
-////				}
-////			}
-//		}
-
 		@Override
 		public void bind(SocketAddress localAddress, ChannelPromise promise)
 		{
@@ -265,6 +224,4 @@ public class PersistentDatagramChannel extends AbstractChannel
 	boolean				closed = false;
 
 	Unsafe				unsafe = null;
-
-	EventLoop			eventLoop = new DefaultEventLoop(MoreExecutors.directExecutor());
 }

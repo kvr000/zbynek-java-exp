@@ -11,7 +11,8 @@ import io.netty.util.ReferenceCountUtil;
 public class EchoServerHandler extends ChannelHandlerAdapter
 {
 	@Override
-	public void			channelRead(ChannelHandlerContext ctx, Object msg) { // (2)
+	public void			channelRead(ChannelHandlerContext ctx, Object msg)
+	{
 		try {
 			ctx.writeAndFlush(msg);
 		}
@@ -21,7 +22,8 @@ public class EchoServerHandler extends ChannelHandlerAdapter
 	}
 
 	@Override
-	public void			exceptionCaught(ChannelHandlerContext ctx, Throwable cause) { // (4)
+	public void			exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+	{
 		// Close the connection when an exception is raised.
 		cause.printStackTrace();
 		ctx.close();

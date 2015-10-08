@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.java.concurrencyexp.dynamicexecutor;
+package cz.znj.kvr.sw.exp.java.concurrencyexp.dynamicexecutor;
 
 import java.io.File;
 import java.util.concurrent.Executor;

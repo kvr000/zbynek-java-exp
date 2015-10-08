@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.java.concurrencyexp.syncfuture;
+package cz.znj.kvr.sw.exp.java.concurrencyexp.syncfuture;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;

@@ -25,7 +25,7 @@
 		<commons-collections.version>3.2.1</commons-collections.version>
 		<commons-io.version>2.4</commons-io.version>
 		<guava.version>18.0</guava.version>
-		<spring.version>4.1.6.RELEASE</spring.version>
+		<spring.version>4.2.1.RELEASE</spring.version>
 		<httpcomponents.version>4.5</httpcomponents.version>
 		<wagon.version>2.9</wagon.version>
 		<netty.version>5.0.0.Alpha3</netty.version>
@@ -50,6 +50,7 @@
 
 	<dependencyManagement>
 		<dependencies>
+
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
@@ -169,6 +170,13 @@
 				<version>${camel.version}</version>
 				<scope>test</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

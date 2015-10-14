@@ -16,6 +16,7 @@
 		<javac.version>1.8</javac.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>4.11</junit.version>
+		<jmh.version>1.11.1</jmh.version>
 		<jmock-junit4.version>2.5.1</jmock-junit4.version>
 		<log4j.version>2.2</log4j.version>
 		<slf4j.version>1.7.5</slf4j.version>
@@ -23,6 +24,7 @@
 		<commons-lang3.version>3.4</commons-lang3.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
+		<commons-csv.version>1.2</commons-csv.version>
 		<commons-io.version>2.4</commons-io.version>
 		<guava.version>18.0</guava.version>
 		<spring.version>4.2.1.RELEASE</spring.version>
@@ -59,6 +61,17 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.openjdk.jmh</groupId>
+				<artifactId>jmh-core</artifactId>
+				<version>${jmh.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.openjdk.jmh</groupId>
+				<artifactId>jmh-generator-annprocess</artifactId>
+				<version>${jmh.version}</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-api</artifactId>
 				<version>${log4j.version}</version>
@@ -78,6 +91,11 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>${commons-lang3.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-csv</artifactId>
+				<version>${commons-csv.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>

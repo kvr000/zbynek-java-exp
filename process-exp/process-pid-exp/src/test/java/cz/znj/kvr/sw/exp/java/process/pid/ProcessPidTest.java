@@ -21,7 +21,7 @@ public class ProcessPidTest
 	@Test
 	public void                     testGetPid() throws IOException, InterruptedException
 	{
-		Process process = Runtime.getRuntime().exec("cmd");
+		Process process = Runtime.getRuntime().exec("sleep 0.2");
 		System.out.println("Process pid: "+getPid(process));
 		process.waitFor();
 	}
@@ -91,6 +91,7 @@ public class ProcessPidTest
 	{
 		CLibrary INSTANCE = (CLibrary) Native.loadLibrary("c", CLibrary.class);
 		int getpid ();
+		int waitpid(int pid, long status, int options);
 	}
 
 	public interface Kernel32 extends StdCallLibrary

@@ -5,12 +5,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cz.znj.kvr.sw.exp.java.process</groupId>
-	<artifactId>process-exp-base</artifactId>
+	<groupId>cz.znj.kvr.sw.exp.java.javafx</groupId>
+	<artifactId>javafx-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Process experiments base</name>
-	<description>Parent of process experiments</description>
+	<name>JavaFX experiments</name>
+	<description>Parent of JavaFX experiments</description>
 
 	<parent>
 		<groupId>cz.znj.kvr.sw.exp.java</groupId>
@@ -23,7 +23,7 @@
 	</properties>
 
 	<modules>
-		<module>process-pid-exp</module>
+		<module>javafx-one-exp</module>
 	</modules>
 
 </project>

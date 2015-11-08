@@ -1,0 +1,169 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.javafx</groupId>
+	<artifactId>javafx-one-exp</artifactId>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java.javafx</groupId>
+		<artifactId>javafx-exp-base</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<javac.version>1.8</javac.version>
+		<javafx.version>2.2</javafx.version>
+	</properties>
+
+	<build>
+		<!-- Include FXML resources -->
+		<resources>
+			<resource>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/java</directory>
+				<includes>
+					<include>**/*.fxml</include>
+				</includes>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>**/*.*</include>
+				</includes>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${javac.version}</source>
+					<target>${javac.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<JavaFX-Version>2.0</JavaFX-Version>
+							<Main-Class>cz.znj.kvr.sw.exp.java.javafx.one.Main</Main-Class>
+							<implementation-vendor>zbynek</implementation-vendor>
+							<implementation-title>${project.name}</implementation-title>
+							<implementation-version>1.0</implementation-version>
+							<JavaFX-Application-Class>cz.znj.kvr.sw.exp.java.javafx.one.Main</JavaFX-Application-Class>
+							<JavaFX-Class-Path><!--
+								jaxb-api-2.2.1.jar stax-api-1.0-2.jar activation-1.1.jar
+								jaxb-impl-2.2.1.jar core-0.4.0-SNAPSHOT.jar
+								-->
+							</JavaFX-Class-Path>
+						</manifestEntries>
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo.webstart</groupId>
+				<artifactId>webstart-maven-plugin</artifactId>
+				<version>1.0-beta-2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jnlp</goal> <!-- use jnlp, jnlp-inline or jnlp-single as appropriate -->
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!--outputDirectory></outputDirectory --> <!-- not required?? -->
+
+					<!-- Set to true to exclude all transitive dependencies. Default is false. -->
+					<excludeTransitive>false</excludeTransitive>
+
+					<!-- The path where the libraries are stored within the jnlp structure. not required. by default the libraries are within the working directory -->
+					<!-- <libPath>lib</libPath> -->
+					<!-- [optional] transitive dependencies filter - if omitted, all transitive dependencies are included -->
+					<!-- <dependencies> Note that only groupId and artifactId must be specified here. because of a limitation of the Include/ExcludesArtifactFilter <includes> <include>cz.znj.kvr.sw.exp.java.javafx.one:presentation</include>
+						<include>cz.znj.kvr.sw.exp.java.javafx.one:core</include> </includes> excludes> <exclude></exclude> <excludes </dependencies> -->
+					<!--resourcesDirectory>${project.basedir}/src/main/jnlp/resources</resourcesDirectory --> <!-- default value -->
+
+					<!-- JNLP generation -->
+					<jnlp>
+						<!-- default values -->
+						<!--inputTemplateResourcePath>${project.basedir}</inputTemplateResourcePath -->
+						<!--inputTemplate>src/main/jnlp/template.vm</inputTemplate --> <!-- relative to inputTemplateResourcePath -->
+						<outputFile>Prez.jnlp</outputFile> <!-- defaults to launch.jnlp -->
+						<!-- used to automatically identify the jar containing the main class. -->
+						<!-- this is perhaps going to change -->
+						<mainClass>cz.znj.kvr.sw.exp.java.javafx.one.Main</mainClass>
+					</jnlp>
+
+					<!-- SIGNING -->
+					<!-- defining this will automatically sign the jar and its dependencies, if necessary -->
+					<sign>
+						<keystore>${basedir}/jrebirth.jks</keystore><!-- Used a pre-generated keystore -->
+						<keypass>gojava</keypass>  <!-- we need to override passwords easily from the command line. ${keypass} -->
+						<storepass>gojava</storepass> <!-- ${storepass} -->
+						<!--storetype>fillme</storetype -->
+						<alias>javafx-one</alias>
+
+						<!--validity>fillme</validity -->
+						<!-- only required for generating the keystore -->
+						<!--dnameCn>fillme</dnameCn> <dnameOu>fillme</dnameOu> <dnameO>fillme</dnameO> <dnameL>fillme</dnameL> <dnameSt>fillme</dnameSt> <dnameC>fillme</dnameC -->
+						<verify>true</verify> <!-- verify that the signing operation succeeded -->
+						<!-- KEYSTORE MANAGEMENT -->
+						<!-- <keystoreConfig> <delete>true</delete> delete the keystore <gen>true</gen> optional shortcut to generate the store. </keystoreConfig> -->
+					</sign>
+
+					<!-- BUILDING PROCESS -->
+					<pack200>false</pack200>
+					<gzip>false</gzip> <!-- default force when pack200 false, true when pack200 selected ?? -->
+					<!-- causes a version attribute to be output in each jar resource element, optional, default is false -->
+					<!-- <outputJarVersions>true</outputJarVersions> -->
+					<!--install>false</install --> <!-- not yet supported -->
+					<verbose>true</verbose>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>javafx</artifactId>
+			<version>${javafx.version}</version>
+			<systemPath>${java.home}/lib/ext/jfxrt.jar</systemPath>
+			<scope>system</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+	</dependencies>
+</project>

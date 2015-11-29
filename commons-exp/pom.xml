@@ -23,6 +23,7 @@
 	</properties>
 
 	<modules>
+		<module>commons-beanutils-exp</module>
 		<module>commons-csv-exp</module>
 	</modules>
 

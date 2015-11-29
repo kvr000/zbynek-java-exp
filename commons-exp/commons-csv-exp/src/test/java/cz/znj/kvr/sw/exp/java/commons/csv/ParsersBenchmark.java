@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class FutureBenchmark
+public class ParsersBenchmark
 {
 	protected static InputStream getInput()
 	{
@@ -29,7 +29,7 @@ public class FutureBenchmark
 		new Thread(() -> {
 			try {
 				out.write("col0,another,more,evenmore,col4,col5,col6,col7,col8,col9\n".getBytes());
-				for (int i = 0; i < 1000000; ++i) {
+				for (int i = 0; i < 100_000; ++i) {
 					out.write("val0,another,more,evenmore,val4,val5,val6,val7,val8,val9\n".getBytes());
 				}
 				out.close();
@@ -47,8 +47,8 @@ public class FutureBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 0)
-	@Measurement(iterations = 1, batchSize = 1)
+	@Warmup(iterations = 1)
+	@Measurement(iterations = 2, batchSize = 1)
 	@Fork(warmups = 1, value = 1)
 	public void                     benchmarkSplitRead() throws Exception
 	{
@@ -62,8 +62,8 @@ public class FutureBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 0)
-	@Measurement(iterations = 1, batchSize = 1)
+	@Warmup(iterations = 1)
+	@Measurement(iterations = 2, batchSize = 1)
 	@Fork(warmups = 1, value = 1)
 	public void                     benchmarkCsvRead() throws Exception
 	{

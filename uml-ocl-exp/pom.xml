@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.umlocl</groupId>
+	<artifactId>ocl-exp-base</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1</version>
+	<name>OCL experiments base</name>
+	<description>Parent of OCL experiments</description>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java</groupId>
+		<artifactId>java-exp</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<uml.version>5.0.0-v20140602-0749</uml.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.eclipse.uml2</groupId>
+				<artifactId>uml</artifactId>
+				<version>${uml.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<modules>
+		<module>ocl-one-exp</module>
+	</modules>
+
+</project>

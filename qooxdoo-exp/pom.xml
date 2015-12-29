@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.qooxdoo</groupId>
+	<artifactId>qooxdoo-exp-base</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1</version>
+	<name>Spring experiments base</name>
+	<description>Parent of qooxdoo experiments</description>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java</groupId>
+		<artifactId>java-exp</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<qooxdoo-maven-plugin.version>2.1.1</qooxdoo-maven-plugin.version>
+		<qooxdoo.version>5.0</qooxdoo.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.qooxdoo</groupId>
+				<artifactId>qooxdoo-maven-plugin</artifactId>
+				<version>${qooxdoo-maven-plugin.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.qooxdoo</groupId>
+				<artifactId>qooxdoo-sdk</artifactId>
+				<version>${qooxdoo.version}</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+
+</project>

@@ -12,8 +12,7 @@
 		"gulp": "^3.9.0",
 		"jspm": "~0.15.6",
 		"karma": "~0.12.0",
-		"karma-jasmine": "~0.1.5",
-		"karma-phantomjs-launcher": "~0.1.1"
+		"karma-jasmine": "~0.1.5"
 	},
 	"jspm": {
 		"dependencies": {

@@ -4,3 +4,6 @@
 /npm.tar.gz
 /npm-debug.log
 /bower_components
+/.tscache
+/src/main/typescript/**/*.js
+/src/main/typescript/**/*.js.map

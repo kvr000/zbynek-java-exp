@@ -55,95 +55,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<!-- Use the latest released version:
-				https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-				<version>0.0.26</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<configuration>
-							<nodeVersion>v4.2.4</nodeVersion>
-							<npmVersion>3.5.2</npmVersion>
-						</configuration>
-					</execution>
-
-					<execution>
-						<phase>validate</phase>
-						<id>npm install</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<!-- Optional configuration which provides for running any npm command -->
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<phase>validate</phase>
-						<id>npm run build</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<configuration>
-							<arguments>run build</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<phase>validate</phase>
-						<id>bower install</id>
-						<goals>
-							<goal>bower</goal>
-						</goals>
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<phase>validate</phase>
-						<id>jspm install</id>
-						<goals>
-							<goal>jspm</goal>
-						</goals>
-						<configuration>
-							<arguments>--version</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<phase>validate</phase>
-						<id>grunt build</id>
-						<goals>
-							<goal>grunt</goal>
-						</goals>
-						<configuration>
-							<arguments>--no-color</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<phase>validate</phase>
-						<id>javascript tests</id>
-						<goals>
-							<goal>karma</goal>
-						</goals>
-						<configuration>
-							<karmaConfPath>src/test/js/karma.conf.ci.js</karmaConfPath>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
-
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.10</version>
@@ -173,7 +84,7 @@
 
 			<!--
 			       Delegates build to "grunt" for several phases
-                        -->
+			-->
 			<plugin>
 				<groupId>pl.allegro</groupId>
 				<artifactId>grunt-maven-plugin</artifactId>
@@ -185,7 +96,7 @@
 
 					<!--
 					       Maven "validate" phase: Prepare everything that is required to run grunt
-					    -->
+					-->
 					<execution>
 						<id>validate</id>
 						<phase>validate</phase>
@@ -197,7 +108,7 @@
 
 					<!--
 					       Maven "compile" phase: Do the real stuff by running grunt with target "compile"
-					    -->
+					-->
 					<execution>
 						<id>compile</id>
 						<phase>compile</phase>
@@ -211,7 +122,7 @@
 
 					<!--
 						Maven "test" phase: Run grunt with target "test"
-					    -->
+					-->
 					<execution>
 						<id>test</id>
 						<phase>test</phase>
@@ -225,7 +136,7 @@
 
 					<!--
 						Maven "(prepare-)package" phase: Run grunt with target "package"
-					    -->
+					-->
 					<execution>
 						<id>prepare-package</id>
 						<phase>prepare-package</phase>
@@ -243,7 +154,7 @@
 
 			<!--
 			       prepare distribution by copying files in a maven compliant structure
-			    -->
+			-->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.6</version>
@@ -309,6 +220,105 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<id>devinit</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<!-- Use the latest released version:
+						https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
+						<version>0.0.26</version>
+						<executions>
+							<execution>
+								<phase>validate</phase>
+								<id>install node and npm</id>
+								<goals>
+									<goal>install-node-and-npm</goal>
+								</goals>
+								<configuration>
+									<nodeVersion>v4.2.4</nodeVersion>
+									<npmVersion>3.5.2</npmVersion>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>npm install</id>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<!-- Optional configuration which provides for running any npm command -->
+								<configuration>
+									<arguments>install</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>npm run build</id>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>run build</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>bower install</id>
+								<goals>
+									<goal>bower</goal>
+								</goals>
+								<configuration>
+									<arguments>install</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>jspm install</id>
+								<goals>
+									<goal>jspm</goal>
+								</goals>
+								<configuration>
+									<arguments>--version</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>grunt build</id>
+								<goals>
+									<goal>grunt</goal>
+								</goals>
+								<configuration>
+									<arguments>--no-color</arguments>
+								</configuration>
+							</execution>
+
+							<!--
+							<execution>
+								<phase>validate</phase>
+								<id>javascript tests</id>
+								<goals>
+									<goal>karma</goal>
+								</goals>
+								<configuration>
+									<karmaConfPath>src/test/js/karma.conf.ci.js</karmaConfPath>
+								</configuration>
+							</execution>
+							-->
+
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
 		<profile>
 			<id>source-qx</id>
 			<build>

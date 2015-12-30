@@ -2,32 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-	<script type="text/javascript" src="/resources/_test/q-5.0.1.js"></script>
+	<script type="text/javascript" src="/resources/script/qooxdoo_basic.js"></script>
 </head>
 <body>
 <script>
-	q.define("my.A", {
-		extend: q.Object,
-		construct: function () {
-			this.name = "xy";
-		},
-		members: {
-			greet: function () {
-				alert("Hello" + this.name);
-			},
-		}
-	});
-	q.define("my.B", {
-		extend: my.A,
-		construct: function () {
-			this.base("ab");
-		},
-		members: {
-			greet: function () {
-				alert("Hello " + this.name);
-			},
-		}
-	});
+	alert("ok");
 	(new my.B()).greet();
 </script>
 </body>

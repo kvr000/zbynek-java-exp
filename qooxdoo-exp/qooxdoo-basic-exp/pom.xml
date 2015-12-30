@@ -68,8 +68,8 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
-							<nodeVersion>v0.12.2</nodeVersion>
-							<npmVersion>2.7.6</npmVersion>
+							<nodeVersion>v4.2.4</nodeVersion>
+							<npmVersion>3.5.2</npmVersion>
 						</configuration>
 					</execution>
 
@@ -136,7 +136,7 @@
 							<goal>karma</goal>
 						</goals>
 						<configuration>
-							<karmaConfPath>src/test/javascript/karma.conf.ci.js</karmaConfPath>
+							<karmaConfPath>src/test/js/karma.conf.ci.js</karmaConfPath>
 						</configuration>
 					</execution>
 

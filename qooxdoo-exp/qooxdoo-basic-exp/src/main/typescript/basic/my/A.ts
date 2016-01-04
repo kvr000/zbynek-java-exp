@@ -1,4 +1,4 @@
-module basic.my {
+export module basic.my {
 
 export class A
 {

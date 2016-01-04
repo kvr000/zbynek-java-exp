@@ -1,7 +1,5 @@
 module basic.my {
 
-import A = require("basic.my.A");
-
 
 export class B extends basic.my.A
 {

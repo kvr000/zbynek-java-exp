@@ -1,6 +1,9 @@
 module basic.my {
 
-export class B extends A
+import A = require("basic.my.A");
+
+
+export class B extends basic.my.A
 {
 	public greet(): String
 	{

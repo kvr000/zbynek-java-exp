@@ -29,13 +29,19 @@
 		<log4j.version>2.2</log4j.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<mockito.version>1.9.5</mockito.version>
+
+		<reflections.version>0.9.10</reflections.version>
+
 		<commons-lang3.version>3.4</commons-lang3.version>
 		<commons-beanutils.version>1.9.2</commons-beanutils.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
 		<commons-csv.version>1.2</commons-csv.version>
 		<commons-io.version>2.4</commons-io.version>
+
 		<guava.version>18.0</guava.version>
+		<gson.version>2.5</gson.version>
+
 		<spring.version>4.2.1.RELEASE</spring.version>
 		<spring.boot.version>1.2.1.RELEASE</spring.boot.version>
 		<spring.security.version>4.0.1.RELEASE</spring.security.version>
@@ -97,6 +103,12 @@
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-core</artifactId>
 				<version>${log4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>${reflections.version}</version>
 			</dependency>
 
 			<dependency>
@@ -177,6 +189,12 @@
 				<groupId>com.google.protobuf</groupId>
 				<artifactId>protobuf-java</artifactId>
 				<version>${protobuf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>${gson.version}</version>
 			</dependency>
 
 			<dependency>

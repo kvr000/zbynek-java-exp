@@ -1,7 +1,7 @@
-export module basic {
+module basic {
 
 
-	export class BasicB extends basic.BasicA {
+	export class BasicB extends BasicA {
 		public getName(): String {
 			return this.name;
 		}

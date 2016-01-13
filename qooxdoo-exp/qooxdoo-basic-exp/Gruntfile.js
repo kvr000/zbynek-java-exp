@@ -10,12 +10,12 @@ module.exports = function(grunt) {
 
 		typescript: {
 			base: {
-				src: ['src/main/typescript/**/*.ts'],
+				src: ['src/main/ts/**/*.ts'],
 				dest: 'src/main/js/',
 				options: {
 					module: 'amd', //or commonjs 
 					target: 'es5', //or es3 
-					//basePath: 'src/main/typescript',
+					basePath: 'src/main/ts',
 					sourceMap: true,
 					declaration: true
 				}
@@ -24,12 +24,12 @@ module.exports = function(grunt) {
 
 		ts: {
 			base: {
-				src: [ 'src/main/typescript/**/*.ts' ],
+				src: [ 'src/main/ts/**/*.ts' ],
 				dest: 'target/tsjs/',
 				options: {
-					baseDir: 'src/main/typescript/',
+					baseDir: 'src/main/ts/',
 					outDir: "target/tsjs/",
-					rootDir: "src/main/typescript/",
+					rootDir: "src/main/ts/",
 					module: 'amd',
 					target: 'es5',
 					sourceMap: true,

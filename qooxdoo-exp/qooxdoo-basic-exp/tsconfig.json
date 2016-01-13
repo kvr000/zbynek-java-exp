@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"module": "amd",
+		"noImplicitAny": true,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"outDir": "target/tsjs/",
+		"sourceMap": true
+	}
+}

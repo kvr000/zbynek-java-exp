@@ -1,6 +1,6 @@
-export module basic.my {
+module basic.my {
 
-export class Ts extends B
+export class Ts extends basic.my.B
 {
 	public greet(): String
 	{

@@ -5,13 +5,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cz.znj.kvr.sw.exp.java</groupId>
-	<artifactId>niofilesystem-exp</artifactId>
+	<groupId>cz.znj.kvr.sw.exp.java.nio</groupId>
+	<artifactId>nio-socket-exp</artifactId>
 	<version>0.0.1</version>
 
 	<parent>
-		<groupId>cz.znj.kvr.sw.exp.java</groupId>
-		<artifactId>java-exp</artifactId>
+		<groupId>cz.znj.kvr.sw.exp.java.nio</groupId>
+		<artifactId>nio-exp-base</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
@@ -29,6 +29,11 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 	</dependencies>
 

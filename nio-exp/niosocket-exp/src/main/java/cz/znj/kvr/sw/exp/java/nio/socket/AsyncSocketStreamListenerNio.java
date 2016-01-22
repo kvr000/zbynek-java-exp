@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.nio;
+package cz.znj.kvr.sw.exp.java.nio.socket;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by rat on 2015-09-20.
  */
-public class AsyncSocketStreamListenerNioWriter
+public class AsyncSocketStreamListenerNio
 {
 	public static void		main(String[] args) throws Exception
 	{
-		System.exit(new AsyncSocketStreamListenerNioWriter().run(args));
+		System.exit(new AsyncSocketStreamListenerNio().run(args));
 	}
 
 	public int			run(String[] args)
@@ -74,13 +74,10 @@ public class AsyncSocketStreamListenerNioWriter
 
 	public void			startClient(final AsynchronousSocketChannel client)
 	{
-		final ByteBuffer buffer = ByteBuffer.allocate(200000000);
-		buffer.limit(buffer.capacity());
-		client.write(buffer, 5, TimeUnit.SECONDS, buffer, new CompletionHandler<Integer, ByteBuffer>()
-		{
+		final ByteBuffer buffer = ByteBuffer.allocate(4096);
+		client.read(buffer, 5, TimeUnit.SECONDS, buffer, new CompletionHandler<Integer, ByteBuffer >() {
 			@Override
-			public void completed(Integer result, ByteBuffer buffer)
-			{
+			public void completed(Integer result, ByteBuffer buffer) {
 				try {
 					if (result < 0) {
 						try {
@@ -91,18 +88,12 @@ public class AsyncSocketStreamListenerNioWriter
 						}
 						return;
 					}
-					if (buffer.remaining() > 0) {
-						client.write(buffer, 5000, TimeUnit.MILLISECONDS, buffer, this);
-					}
-					else {
-						try {
-							client.shutdownOutput();
-							client.close();
-						}
-						catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-					}
+					byte[] packet = new byte[buffer.position()];
+					System.arraycopy(buffer.array(), 0, packet, 0, packet.length);
+					System.out.println("Got data from client ("+result+"): "+new String(packet));
+					if (buffer.remaining() == 0)
+						throw new IllegalArgumentException("Ran out of buffer");
+					client.read(buffer, 120, TimeUnit.SECONDS, buffer, this);
 				}
 				catch (RuntimeException ex) {
 					failed(ex, buffer);
@@ -110,8 +101,7 @@ public class AsyncSocketStreamListenerNioWriter
 			}
 
 			@Override
-			public void failed(Throwable exc, ByteBuffer buffer)
-			{
+			public void failed(Throwable exc, ByteBuffer buffer) {
 				exc.printStackTrace();
 				try {
 					client.close();
@@ -122,7 +112,7 @@ public class AsyncSocketStreamListenerNioWriter
 			}
 		});
 		try {
-			System.out.println("started write on client "+client.getRemoteAddress().toString());
+			System.out.println("started read on client "+client.getRemoteAddress().toString());
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);

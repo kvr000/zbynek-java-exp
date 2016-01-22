@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.concurrencyexp.scheduled;
+package cz.znj.kvr.sw.exp.java.concurrencyexp.primitives.scheduled;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;

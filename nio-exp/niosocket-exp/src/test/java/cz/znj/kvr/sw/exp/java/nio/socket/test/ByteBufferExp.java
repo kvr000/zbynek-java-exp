@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.nio.test;
+package cz.znj.kvr.sw.exp.java.nio.socket.test;
 
 import org.junit.Assert;
 import org.junit.Test;

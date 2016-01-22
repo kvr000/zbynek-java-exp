@@ -1,28 +1,22 @@
-package cz.znj.kvr.sw.exp.java.nio;
-
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+package cz.znj.kvr.sw.exp.java.nio.socket;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.CompletionHandler;
-import java.nio.channels.DatagramChannel;
 import java.util.concurrent.TimeUnit;
 
 
 /**
  * Created by rat on 2015-09-20.
  */
-public class AsyncSocketStreamListenerNio
+public class AsyncSocketStreamListenerNioWriter
 {
 	public static void		main(String[] args) throws Exception
 	{
-		System.exit(new AsyncSocketStreamListenerNio().run(args));
+		System.exit(new AsyncSocketStreamListenerNioWriter().run(args));
 	}
 
 	public int			run(String[] args)
@@ -80,10 +74,13 @@ public class AsyncSocketStreamListenerNio
 
 	public void			startClient(final AsynchronousSocketChannel client)
 	{
-		final ByteBuffer buffer = ByteBuffer.allocate(4096);
-		client.read(buffer, 5, TimeUnit.SECONDS, buffer, new CompletionHandler<Integer, ByteBuffer >() {
+		final ByteBuffer buffer = ByteBuffer.allocate(200000000);
+		buffer.limit(buffer.capacity());
+		client.write(buffer, 5, TimeUnit.SECONDS, buffer, new CompletionHandler<Integer, ByteBuffer>()
+		{
 			@Override
-			public void completed(Integer result, ByteBuffer buffer) {
+			public void completed(Integer result, ByteBuffer buffer)
+			{
 				try {
 					if (result < 0) {
 						try {
@@ -94,12 +91,18 @@ public class AsyncSocketStreamListenerNio
 						}
 						return;
 					}
-					byte[] packet = new byte[buffer.position()];
-					System.arraycopy(buffer.array(), 0, packet, 0, packet.length);
-					System.out.println("Got data from client ("+result+"): "+new String(packet));
-					if (buffer.remaining() == 0)
-						throw new IllegalArgumentException("Ran out of buffer");
-					client.read(buffer, 120, TimeUnit.SECONDS, buffer, this);
+					if (buffer.remaining() > 0) {
+						client.write(buffer, 5000, TimeUnit.MILLISECONDS, buffer, this);
+					}
+					else {
+						try {
+							client.shutdownOutput();
+							client.close();
+						}
+						catch (IOException e) {
+							throw new RuntimeException(e);
+						}
+					}
 				}
 				catch (RuntimeException ex) {
 					failed(ex, buffer);
@@ -107,7 +110,8 @@ public class AsyncSocketStreamListenerNio
 			}
 
 			@Override
-			public void failed(Throwable exc, ByteBuffer buffer) {
+			public void failed(Throwable exc, ByteBuffer buffer)
+			{
 				exc.printStackTrace();
 				try {
 					client.close();
@@ -118,7 +122,7 @@ public class AsyncSocketStreamListenerNio
 			}
 		});
 		try {
-			System.out.println("started read on client "+client.getRemoteAddress().toString());
+			System.out.println("started write on client "+client.getRemoteAddress().toString());
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);

@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.nio;
+package cz.znj.kvr.sw.exp.java.nio.socket;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

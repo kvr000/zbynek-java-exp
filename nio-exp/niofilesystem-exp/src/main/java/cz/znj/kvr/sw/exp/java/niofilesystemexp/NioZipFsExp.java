@@ -20,7 +20,7 @@ public class NioZipFsExp
 {
 	public static void              main(String[] args)
 	{
-		System.exit(new NioFsExp().run(args));
+		System.exit(new NioZipFsExp().run(args));
 	}
 
 	public int                      run(String[] args)

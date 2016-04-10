@@ -1,0 +1,421 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.qooxdoo</groupId>
+	<artifactId>qooxdoo-basic-exp</artifactId>
+	<version>0.0.1</version>
+	<packaging>war</packaging>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java.qooxdoo</groupId>
+		<artifactId>qooxdoo-exp-base</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${javac.version}</source>
+					<target>${javac.version}</target>
+					<compilerArgs>
+						<arg>-Xlint:all</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>unpack-dependencies</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.qooxdoo</groupId>
+									<artifactId>qooxdoo-sdk</artifactId>
+									<version>${qooxdoo.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/qooxdoo-sdk/</outputDirectory>
+									<includes>**</includes>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!--
+			       Delegates build to "grunt" for several phases
+			-->
+			<plugin>
+				<groupId>pl.allegro</groupId>
+				<artifactId>grunt-maven-plugin</artifactId>
+				<version>1.0.2</version>
+				<configuration>
+					<gruntBuildDirectory>${project.build.directory}/grunt</gruntBuildDirectory>
+				</configuration>
+				<executions>
+
+					<!--
+					       Maven "validate" phase: Prepare everything that is required to run grunt
+					-->
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<!--<goal>create-resources</goal>-->
+							<goal>npm</goal><!-- setup grunt and plugin -->
+						</goals>
+					</execution>
+
+					<!--
+					       Maven "compile" phase: Do the real stuff by running grunt with target "compile"
+					-->
+					<execution>
+						<id>compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>grunt</goal>
+						</goals>
+						<configuration>
+							<target>compile</target>
+						</configuration>
+					</execution>
+
+					<!--
+						Maven "test" phase: Run grunt with target "test"
+					-->
+					<execution>
+						<id>test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>grunt</goal>
+						</goals>
+						<configuration>
+							<target>test</target>
+						</configuration>
+					</execution>
+
+					<!--
+						Maven "(prepare-)package" phase: Run grunt with target "package"
+					-->
+					<execution>
+						<id>prepare-package</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>grunt</goal>
+						</goals>
+						<configuration>
+							<target>package</target>
+						</configuration>
+					</execution>
+
+				</executions>
+
+			</plugin>
+
+			<!--
+			       prepare distribution by copying files in a maven compliant structure
+			-->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>prepare-package-javascript</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<!-- Copy all generated javascript files into the final directory structure -->
+							<outputDirectory>${project.build.outputDirectory}/${project.artifactId}</outputDirectory>
+							<resources>
+								<resource>
+									<!-- the directory that is populated by Grunt -->
+									<directory>${project.build.directory}/js</directory>
+									<includes>
+										<include>**/*.js</include>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>prepare-package-typescript</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<!-- Optional: Put all generated typescript definition files (*.d.ts) into the JAR as well -->
+							<outputDirectory>${project.build.outputDirectory}/META-INF/typescript/${project.artifactId}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/js</directory>
+									<includes>
+										<include>**/*.d.ts</include>
+									</includes>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${maven-war-plugin.version}</version>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>${project.basedir}/src/main/webapp/</directory>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>devinit</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.github.eirslett</groupId>
+						<artifactId>frontend-maven-plugin</artifactId>
+						<!-- Use the latest released version:
+						https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
+						<version>0.0.26</version>
+						<executions>
+							<execution>
+								<phase>validate</phase>
+								<id>install node and npm</id>
+								<goals>
+									<goal>install-node-and-npm</goal>
+								</goals>
+								<configuration>
+									<nodeVersion>v4.2.4</nodeVersion>
+									<npmVersion>3.5.2</npmVersion>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>npm install</id>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<!-- Optional configuration which provides for running any npm command -->
+								<configuration>
+									<arguments>install</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>npm run build</id>
+								<goals>
+									<goal>npm</goal>
+								</goals>
+								<configuration>
+									<arguments>run build</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>bower install</id>
+								<goals>
+									<goal>bower</goal>
+								</goals>
+								<configuration>
+									<arguments>install</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>jspm install</id>
+								<goals>
+									<goal>jspm</goal>
+								</goals>
+								<configuration>
+									<arguments>--version</arguments>
+								</configuration>
+							</execution>
+
+							<execution>
+								<phase>validate</phase>
+								<id>grunt build</id>
+								<goals>
+									<goal>grunt</goal>
+								</goals>
+								<configuration>
+									<arguments>--no-color</arguments>
+								</configuration>
+							</execution>
+
+							<!--
+							<execution>
+								<phase>validate</phase>
+								<id>javascript tests</id>
+								<goals>
+									<goal>karma</goal>
+								</goals>
+								<configuration>
+									<karmaConfPath>src/test/js/karma.conf.ci.js</karmaConfPath>
+								</configuration>
+							</execution>
+							-->
+
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>source-qx</id>
+			<build>
+				<defaultGoal>validate</defaultGoal>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>${exec-maven-plugin.version}</version>
+						<executions>
+							<!--Compile qooxdoo code -->
+							<execution>
+								<id>compile-qooxdoo</id>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<phase>compile</phase>
+								<configuration>
+									<executable>${python2.executable}</executable>
+									<workingDirectory>${project.basedir}/src/main/qx/basic</workingDirectory>
+									<arguments>
+										<argument>${project.build.directory}/qooxdoo-sdk/qooxdoo-sdk/tool/bin/generator.py</argument>
+										<argument>source-all</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>build-qx</id>
+			<build>
+				<defaultGoal>validate</defaultGoal>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>${exec-maven-plugin.version}</version>
+						<executions>
+							<!--Compile qooxdoo code -->
+							<execution>
+								<id>compile-qooxdoo</id>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<phase>compile</phase>
+								<configuration>
+									<executable>${python2.executable}</executable>
+									<workingDirectory>${project.basedir}/src/main/qx/basic</workingDirectory>
+									<arguments>
+										<argument>${project.build.directory}/qooxdoo-sdk/qooxdoo-sdk/tool/bin/generator.py</argument>
+										<argument>build</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.qooxdoo</groupId>
+			<artifactId>qooxdoo-sdk</artifactId>
+		</dependency>
+
+	</dependencies>
+
+</project>

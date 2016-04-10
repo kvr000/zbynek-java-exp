@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns:xsi			="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns				="http://www.springframework.org/schema/beans"
+	xmlns:context			="http://www.springframework.org/schema/context"
+	xmlns:mvc			="http://www.springframework.org/schema/mvc"
+	xmlns:p				="http://www.springframework.org/schema/p"
+	xmlns:task			="http://www.springframework.org/schema/task"
+	xmlns:tx			="http://www.springframework.org/schema/tx"
+	xmlns:util			="http://www.springframework.org/schema/util"
+	xmlns:security			="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc		http://www.springframework.org/schema/context/spring-mvc.xsd
+		http://www.springframework.org/schema/tx		http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/task		http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/util		http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/security		http://www.springframework.org/schema/security/spring-security.xsd
+		"
+	>
+
+	<context:annotation-config />
+	<context:spring-configured/>
+
+	<context:component-scan base-package="cz.znj.kvr.sw.exp.java.jmx.jminixexp" />
+
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+	<bean id="applicationProperties"
+	      class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:config/jminixexp.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="propertyConfigurer"
+	      class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties" ref="applicationProperties" />
+		<property name="searchSystemEnvironment" value="true" />
+	</bean>
+
+	<bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
+
+	<context:mbean-export/>
+
+	<bean id="greetingManager" class="cz.znj.kvr.sw.exp.java.jmx.jminixexp.bo.GreetingManager" />
+
+	<!-- Expose JMX over JMXMP -->
+	<!--<bean id="serverConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean" />
+	-->
+	<!-- Client connector to JMX over JMXMP -->
+	<!--<bean id="clientConnector" class="org.springframework.jmx.support.MBeanServerConnectionFactoryBean"
+	      p:serviceUrl="service:jmx:jmxmp://localhost:9875" />
+	-->
+	<!-- Client ServerManager proxy to JMX over JMXMP -->
+	<!--<bean id="serverManagerProxy" class="org.springframework.jmx.access.MBeanProxyFactoryBean"
+	      p:objectName="org.springbyexample.jmx:name=ServerManager"
+	      p:proxyInterface="org.springbyexample.jmx.ServerManager"
+	      p:server-ref="clientConnector" />
+	-->
+
+	<security:http auto-config="true">
+		<security:csrf disabled="true" />
+	</security:http>
+
+	<bean id="saltSource" class="org.springframework.security.authentication.dao.ReflectionSaltSource" >
+		<property name="userPropertyToUse" value="username" />
+	</bean>
+
+	<bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder">
+		<constructor-arg value="256"/>
+	</bean>
+
+	<bean id="authenticationProvider" class="org.springframework.security.authentication.TestingAuthenticationProvider" />
+
+	<security:authentication-manager>
+		<!--
+		<security:authentication-provider user-service-ref="serviceUserAccount">
+			<security:password-encoder ref="passwordEncoder">
+				<security:salt-source ref="saltSource"/>
+			</security:password-encoder>
+		</security:authentication-provider>
+		-->
+	</security:authentication-manager>
+
+</beans>

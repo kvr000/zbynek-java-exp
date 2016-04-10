@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="cz.znj.kvr.sw.exp.java.javafx.one.MainApp">
+</BorderPane>
+<!--<fx:root type="javafx.scene.layout.VBox" xmlns:fx="http://javafx.com/fxml">
+	<TextField fx:id="textField"/>
+	<Button text="Click Me" onAction="#doSomething"/>
+</fx:root>
+-->

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util	http://www.springframework.org/schema/util/spring-util.xsd
+		http://camel.apache.org/schema/spring		http://camel.apache.org/schema/spring/camel-spring.xsd
+		"
+	default-lazy-init="false"
+	default-autowire="no">
+
+	<bean id="timingRoute" class="cz.znj.kvr.sw.exp.java.camel.camone.TimingRoute"
+		p:period="1000"
+	/>
+
+	<bean id="messageProcessor" class="cz.znj.kvr.sw.exp.java.camel.camone.MessageProcessorImpl"
+	/>
+
+	<camel:camelContext id="camelContext"  xmlns="http://camel.apache.org/schema/spring" trace="false">
+		<jmxAgent id="agent" statisticsLevel="All"/>
+		<routeBuilder ref="timingRoute" />
+	</camel:camelContext>       
+
+</beans>

@@ -1,0 +1,10 @@
+/src/main/qx/basic/build
+/node
+/node_modules
+/npm.tar.gz
+/npm-debug.log
+/bower_components
+/.tscache
+/**/.baseDir.ts
+/src/main/ts/**/*.js
+/src/main/ts/**/*.js.map

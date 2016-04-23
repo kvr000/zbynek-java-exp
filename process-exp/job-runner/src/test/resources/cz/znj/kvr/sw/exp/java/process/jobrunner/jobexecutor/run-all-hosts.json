@@ -1,0 +1,37 @@
+{
+	tasks: {
+		runall: {
+			command: [ "sleep", 3 ],
+			memoryMinimum: 256,
+			cpuPortion: 0.6,
+			machineGroups: [ "local" ],
+			runAllHosts: true
+		},
+		end: {
+			command: [ "echo", "end" ],
+			dependencies: [ "runall" ],
+			memoryMinimum: 512,
+			cpuPortion: 0.5,
+			machineGroups: [ "local" ]
+		}
+	},
+	machines: {
+		local1: {
+			agent: "local",
+			address: "localhost",
+			cpus: 2,
+			memory: 1024
+		},
+		local2: {
+			agent: "local",
+			address: "localhost",
+			cpus: 2,
+			memory: 1024
+		}
+	},
+	machineGroups: {
+		local: {
+			machines: [ "local1", "local2" ]
+		}
+	}
+}

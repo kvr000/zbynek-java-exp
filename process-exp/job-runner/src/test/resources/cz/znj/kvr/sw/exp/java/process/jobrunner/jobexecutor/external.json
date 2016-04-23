@@ -1,0 +1,46 @@
+{
+	tasks: {
+		first: {
+			command: [ "sleep", 2 ],
+			memoryMinimum: 512,
+			cpuPortion: 0.6
+		},
+		second: {
+			command: [ "sleep", 2 ],
+			memoryMinimum: 512,
+			cpuPortion: 0.5
+		},
+		third: {
+			command: [ "sleep", 1 ],
+			memoryMinimum: 512,
+			cpuMinimum: 1
+		},
+		group: {
+			command: [ "sleep", 3 ],
+			memoryMinimum: 512,
+			cpuMinimum: 1,
+			dependencies: [ "first", "second" ]
+		},
+		last: {
+			command: [ "sleep", 1 ],
+			dependencies: [ "group", "third" ]
+		},
+		end: {
+			command: [ "echo", "hello" ],
+			dependencies: [ "last" ]
+		}
+	},
+	machines: {
+		local: {
+			agent: "local",
+			address: "localhost",
+			cpus: 2,
+			memory: 1024
+		}
+	},
+	machineGroups: {
+		local: {
+			machines: [ "local" ]
+		}
+	}
+}

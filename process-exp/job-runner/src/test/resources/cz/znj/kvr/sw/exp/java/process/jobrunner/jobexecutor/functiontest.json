@@ -1,0 +1,60 @@
+{
+	tasks: {
+		first: {
+			command: [ "cz.znj.kvr.sw.exp.java.process.jobrunner.jobexecutor.functions.SleepFunction", 0.002 ],
+			memory: 512,
+			cpu: 1,
+			machineGroup: "function"
+		},
+		second: {
+			command: [ "cz.znj.kvr.sw.exp.java.process.jobrunner.jobexecutor.functions.SleepFunction", 0.002 ],
+			memory: 512,
+			cpu: 1,
+			machineGroup: "function"
+		},
+		third: {
+			command: [ "cz.znj.kvr.sw.exp.java.process.jobrunner.jobexecutor.functions.SleepFunction", 0.001 ],
+			memory: 512,
+			cpu: 1,
+			machineGroup: "function"
+		},
+		group: {
+			command: [ "cz.znj.kvr.sw.exp.java.process.jobrunner.jobexecutor.functions.SleepFunction", 0.003 ],
+			memory: 512,
+			cpu: 1,
+			dependencies: [ "first", "second" ],
+			machineGroup: "function"
+		},
+		last: {
+			command: [ "cz.znj.kvr.sw.exp.java.process.jobrunner.jobexecutor.functions.SleepFunction", 0.001 ],
+			dependencies: [ "group", "third" ],
+			machineGroup: "function"
+		},
+		end: {
+			command: [ "cz.znj.kvr.sw.exp.java.process.jobrunner.jobexecutor.functions.EchoFunction", "hello" ],
+			dependencies: [ "last" ],
+			"machineGroup": "function"
+		}
+	},
+	machines: {
+		function: {
+			agent: "function",
+			cpus: 2,
+			memory: 1024
+		},
+		local: {
+			agent: "local",
+			address: "localhost",
+			cpus: 2,
+			memory: 1024
+		}
+	},
+	machineGroups: {
+		function: {
+			machines: [ "function" ]
+		},
+		local: {
+			machines: [ "local" ]
+		}
+	}
+}

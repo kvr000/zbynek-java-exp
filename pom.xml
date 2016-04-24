@@ -26,6 +26,8 @@
 		<python2.executable>python</python2.executable>
 
 		<javax.inject.version>1</javax.inject.version>
+		<jsr305.version>3.0.0</jsr305.version>
+
 		<testng.version>6.9.10</testng.version>
 
 		<junit.version>4.11</junit.version>
@@ -44,7 +46,9 @@
 		<commons-csv.version>1.2</commons-csv.version>
 		<commons-io.version>2.4</commons-io.version>
 
-		<guava.version>18.0</guava.version>
+		<guava.version>19.0</guava.version>
+
+		<guice.version>4.0</guice.version>
 
 		<jackson.version>2.7.4</jackson.version>
 
@@ -124,6 +128,11 @@
 				<artifactId>javax.inject</artifactId>
 				<version>${javax.inject.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.google.code.findbugs</groupId>
+				<artifactId>jsr305</artifactId>
+				<version>${jsr305.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.testng</groupId>
@@ -136,6 +145,12 @@
 				<artifactId>junit</artifactId>
 				<version>${junit.version}</version>
 				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
 			</dependency>
 
 			<dependency>
@@ -171,6 +186,13 @@
 				<artifactId>guava</artifactId>
 				<version>${guava.version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+
 
 			<dependency>
 				<groupId>org.apache.commons</groupId>

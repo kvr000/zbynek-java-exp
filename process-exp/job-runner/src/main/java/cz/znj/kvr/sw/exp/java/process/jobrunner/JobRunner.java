@@ -27,6 +27,8 @@ import net.dryuf.cmdline.app.guice.GuiceBeanFactory;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,6 +38,7 @@ import java.util.Arrays;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,13 +67,15 @@ public class JobRunner extends AbstractCommand
 	private String machinesGroupsFile;
 	private String fullFile;
 
-	public static void main(String[] args) throws Exception
+	public static void main(String[] args)
 	{
-		AppContext appContext = new CommonAppContext(Guice.createInjector(new GuiceModule()).getInstance(BeanFactory.class));
-		System.exit(appContext.getBeanFactory().getBean(JobRunner.class).run(
-			new RootCommandContext(appContext).createChild(null, "jobrunner", null),
-			Arrays.asList(args)
-		));
+		runMain(args, (args0) -> {
+			AppContext appContext = new CommonAppContext(Guice.createInjector(new GuiceModule()).getInstance(BeanFactory.class));
+			return appContext.getBeanFactory().getBean(JobRunner.class).run(
+				new RootCommandContext(appContext).createChild(null, "jobrunner", null),
+				Arrays.asList(args0)
+			);
+		});
 	}
 
 	@Override
@@ -137,12 +142,41 @@ public class JobRunner extends AbstractCommand
 		}
 		else {
 			specification = Specification.builder()
-				.tasks(readSingleElement(tasksFile, "tasks", new TypeReference<Map<String, JobTask>>() {}))
-				.machines(readSingleElement(machinesFile, "machines", new TypeReference<Map<String, Machine>>() {}))
-				.machineGroups(readSingleElement(machinesGroupsFile, "machineGroups", new TypeReference<Map<String, MachineGroup>>() {}))
+				.tasks(readSingleElement(tasksFile, "tasks", new TypeReference<Map<String, JobTask>>()
+				{
+				}))
+				.machines(readSingleElement(machinesFile, "machines", new TypeReference<Map<String, Machine>>()
+				{
+				}))
+				.machineGroups(readSingleElement(machinesGroupsFile, "machineGroups", new TypeReference<Map<String, MachineGroup>>()
+				{
+				}))
 				.build();
 		}
-		return Optional.ofNullable(jobExecutor.execute(specification).get())
+		CompletableFuture<Integer> future = jobExecutor.execute(specification);
+
+		Signal.handle(new Signal("TERM"), new SignalHandler()
+			{
+				@Override
+				public void handle(Signal sig)
+				{
+					log.info("Got TERM signal");
+					future.cancel(true);
+				}
+			}
+		);
+		Signal.handle(new Signal("INT"), new SignalHandler()
+			{
+				@Override
+				public void handle(Signal sig)
+				{
+					log.info("Got INT signal");
+					future.cancel(true);
+				}
+			}
+		);
+
+		return Optional.ofNullable(future.get())
 			.orElse(EXIT_FAILURE);
 	}
 

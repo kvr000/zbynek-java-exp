@@ -1,0 +1,28 @@
+{
+	processes: {
+		first: {
+			"command": [ "sleep", 20 ],
+			"startTimeMs": 1000
+		},
+		second: {
+			"command": [ "sleep", 8 ],
+			"startTimeMs": 2000,
+			"restartDelayMs": 10000
+		},
+		third: {
+			"command": [ "sleep", 30 ],
+			"dependencies": [ "first", "second" ]
+		},
+		filedisabled: {
+			"command": [ "sleep", 300 ],
+			"disableFile": "target/disabled"
+		},
+		depdisabled: {
+			"command": [ "sleep", 200 ],
+			"dependencies": [ "filedisabled" ]
+		},
+		noterm: {
+			"command": [ "perl", "-e", "$SIG{TERM} = sub {}; for (;;) { select(undef, undef, undef, undef); }" ]
+		}
+	}
+}

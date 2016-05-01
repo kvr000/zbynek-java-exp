@@ -33,7 +33,12 @@
 		<jmock-junit4.version>2.5.1</jmock-junit4.version>
 		<log4j.version>2.2</log4j.version>
 		<slf4j.version>1.7.5</slf4j.version>
-		<mockito.version>1.9.5</mockito.version>
+
+		<hamcrest.version>2.1</hamcrest.version>
+
+		<xmlunit.version>2.6.3</xmlunit.version>
+
+		<mockito.version>2.0.52-beta</mockito.version>
 
 		<reflections.version>0.9.10</reflections.version>
 
@@ -133,6 +138,49 @@
 				<artifactId>junit</artifactId>
 				<version>${junit.version}</version>
 				<scope>test</scope>
+			</dependency>
+
+                        <dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest</artifactId>
+				<version>${hamcrest.version}</version>
+                        </dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-core</artifactId>
+				<version>${hamcrest.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-library</artifactId>
+				<version>${hamcrest.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.xmlunit</groupId>
+				<artifactId>xmlunit-core</artifactId>
+				<version>${xmlunit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.xmlunit</groupId>
+				<artifactId>xmlunit-matchers</artifactId>
+				<version>${xmlunit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.xmlunit</groupId>
+				<artifactId>xmlunit-assertj</artifactId>
+				<version>${xmlunit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.xmlunit</groupId>
+				<artifactId>xmlunit-placeholders</artifactId>
+				<version>${xmlunit.version}</version>
 			</dependency>
 
 			<dependency>

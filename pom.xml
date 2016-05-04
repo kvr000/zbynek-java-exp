@@ -22,6 +22,8 @@
 
 		<lombok.version>1.16.8</lombok.version>
 
+		<lombok.version>1.16.8</lombok.version>
+
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 

@@ -3,25 +3,26 @@ package cz.znj.kvr.sw.exp.java.nio.socket.forward;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
-import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 
 /**
  * PortForwarder failure simulator.
  */
-public class PortForwarderFail
+public class PortForwarderFailTest
 {
-	@Test(expected = IOException.class)
+	@Test(expected = UncheckedIOException.class, timeout = 1000L)
 	public void runForwards_doubleBind_fail() throws Throwable
 	{
 		try {
-			new PortForwarder()
+			new PortForwarder(Executors.newCachedThreadPool())
 				.runForwards(ImmutableList.of(
 					PortForwarder.ForwardConfig.builder()
 						.bindProto("tcp4")
 						.bindHost("localhost")
-						.bindPort(7777)
+						.bindPort(46667)
 						.connectProto("tcp4")
 						.connectHost("localhost")
 						.connectPort(4444)
@@ -29,7 +30,7 @@ public class PortForwarderFail
 					PortForwarder.ForwardConfig.builder()
 						.bindProto("tcp4")
 						.bindHost("localhost")
-						.bindPort(7777)
+						.bindPort(46667)
 						.connectProto("tcp4")
 						.connectHost("localhost")
 						.connectPort(4444)

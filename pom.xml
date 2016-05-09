@@ -22,8 +22,6 @@
 
 		<lombok.version>1.16.8</lombok.version>
 
-		<lombok.version>1.16.8</lombok.version>
-
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 
@@ -56,6 +54,8 @@
 		<guava.version>19.0</guava.version>
 
 		<guice.version>4.0</guice.version>
+
+		<junixsocket.version>2.0.4</junixsocket.version>
 
 		<jackson.version>2.7.4</jackson.version>
 
@@ -263,6 +263,17 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>${commons-io.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.kohlschutter.junixsocket</groupId>
+				<artifactId>junixsocket-common</artifactId>
+				<version>${junixsocket.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.kohlschutter.junixsocket</groupId>
+				<artifactId>junixsocket-native-common</artifactId>
+				<version>${junixsocket.version}</version>
 			</dependency>
 
 			<dependency>

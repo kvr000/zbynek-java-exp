@@ -15,12 +15,11 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * Test closed connection asynchronous read behavior.
+ *
+ * Does not work as expected, no way to distinguish between shutdown and connection reset by peer.
  */
 public class AsyncSocketStreamPeerClosedTest
 {
-	/**
-	 * This does not work, no way to distinguish Connection Reset By Peer in Java AsynchronousSocketChannel .
-	 */
 	@Test
 	public void testPeerReset() throws Exception
 	{
@@ -31,7 +30,7 @@ public class AsyncSocketStreamPeerClosedTest
 		socket.connect(new InetSocketAddress("localhost", port));
 		socket.close();
 
-		Assert.assertEquals(-1, (int) future.get()); // no, this returns 0 too
+		Assert.assertEquals(-1, (int) future.get()); // this returns -1
 	}
 
 	@Test
@@ -45,7 +44,7 @@ public class AsyncSocketStreamPeerClosedTest
 		socket.shutdownOutput();
 		socket.close();
 
-		Assert.assertEquals(0, (int) future.get());
+		Assert.assertEquals(-1, (int) future.get()); // this returns -1 too
 	}
 
 	private int createListener(CompletableFuture<Integer> future) throws IOException

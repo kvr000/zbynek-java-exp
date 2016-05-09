@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -300,6 +299,7 @@ public class HttpProxyFactoryTest
 			.writeAndShutdown(eq(f.client), any());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test(timeout = 1000L)
 	public void requestParsing_connectToHost_connect() throws ExecutionException, InterruptedException
 	{
@@ -313,11 +313,11 @@ public class HttpProxyFactoryTest
 			})
 			.when(f.client).read(any(ByteBuffer.class), anyLong(), any(), any(), any(CompletionHandler.class));
 		Mockito.doAnswer(answer -> {
-			((Consumer<AsynchronousSocketChannel>) answer.getArgument(1)).accept(f.server);
-			((CompletionHandler<Void, Integer>) answer.getArgument(2)).completed(null, 0);
+			((Consumer<AsynchronousSocketChannel>) answer.getArgument(2)).accept(f.server);
+			((CompletionHandler<Void, Integer>) answer.getArgument(3)).completed(null, 0);
 			return null;
 		})
-			.when(f.portForwarder).connect(eq(new InetSocketAddress("localhost", 443)), any(), any());
+			.when(f.portForwarder).connect(any(), any(), any(), any());
 		when(f.portForwarder.writeFully(eq(f.client), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		when(f.portForwarder.writeFully(eq(f.server), any()))
@@ -345,11 +345,11 @@ public class HttpProxyFactoryTest
 			})
 			.when(f.client).read(any(ByteBuffer.class), anyLong(), any(), any(), any(CompletionHandler.class));
 		Mockito.doAnswer(answer -> {
-				((Consumer<AsynchronousSocketChannel>) answer.getArgument(1)).accept(f.server);
-				((CompletionHandler<Void, Integer>) answer.getArgument(2)).completed(null, 0);
+				((Consumer<AsynchronousSocketChannel>) answer.getArgument(2)).accept(f.server);
+				((CompletionHandler<Void, Integer>) answer.getArgument(3)).completed(null, 0);
 				return null;
 			})
-			.when(f.portForwarder).connect(eq(new InetSocketAddress("localhost", 123)), any(), any());
+			.when(f.portForwarder).connect(any(), any(), any(), any());
 		when(f.portForwarder.writeFully(eq(f.client), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		when(f.portForwarder.writeFully(eq(f.server), any()))
@@ -377,11 +377,11 @@ public class HttpProxyFactoryTest
 			})
 			.when(f.client).read(any(ByteBuffer.class), anyLong(), any(), any(), any(CompletionHandler.class));
 		Mockito.doAnswer(answer -> {
-				((Consumer<AsynchronousSocketChannel>) answer.getArgument(1)).accept(f.server);
-				((CompletionHandler<Void, Integer>) answer.getArgument(2)).completed(null, 0);
+				((Consumer<AsynchronousSocketChannel>) answer.getArgument(2)).accept(f.server);
+				((CompletionHandler<Void, Integer>) answer.getArgument(3)).completed(null, 0);
 				return null;
 			})
-			.when(f.portForwarder).connect(eq(new InetSocketAddress("localhost", 80)), any(), any());
+			.when(f.portForwarder).connect(any(), any(), any(), any());
 		when(f.portForwarder.writeFully(eq(f.client), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		when(f.portForwarder.writeFully(eq(f.server), any()))

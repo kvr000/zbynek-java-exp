@@ -5,6 +5,7 @@ import cz.znj.kvr.sw.exp.java.nio.socket.forward.HttpProxyFactory;
 import cz.znj.kvr.sw.exp.java.nio.socket.forward.PortForwarder;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -14,7 +15,7 @@ public class HttpProxyRunner
 {
 	public static void main(String[] args) throws Exception
 	{
-		new HttpProxyFactory(new PortForwarder())
+		new HttpProxyFactory(new PortForwarder(Executors.newCachedThreadPool()))
 			.runProxy(
 				HttpProxyFactory.Config.builder()
 					.listenAddress(new InetSocketAddress("localhost", 4444))

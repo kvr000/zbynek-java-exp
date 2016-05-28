@@ -1,9 +1,9 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.server.forward;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
 
 import com.google.common.base.Ascii;
 import com.google.common.primitives.Bytes;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.common.NettyFutures;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.common.NettyRuntime;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyFutures;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -11,6 +11,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ServerChannel;
 import io.netty.channel.socket.DuplexChannel;
 import io.netty.util.ReferenceCountUtil;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 				")",
 			Pattern.CASE_INSENSITIVE|Pattern.DOTALL);
 	private static final byte[] CONNECTION_HEADER = "connection".getBytes(StandardCharsets.UTF_8);
+	private static final byte[] PROXY_CONNECTION_HEADER = "proxy-connection".getBytes(StandardCharsets.UTF_8);
 	private static final byte[] HOST_HEADER = "host".getBytes(StandardCharsets.UTF_8);
 	private static final byte[] CLOSE = "close".getBytes(StandardCharsets.UTF_8);
 
@@ -58,9 +60,11 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 	{
 		try {
 			return new CompletableFuture<CompletableFuture<Void>>() {
+				CompletableFuture<ServerChannel> listenFuture;
+
 				{
-					nettyRuntime.listen(
-						null,
+					listenFuture = nettyRuntime.listen(
+							config.getProto(),
 							config.getListenAddress(),
 							new ChannelInitializer<DuplexChannel>()
 							{
@@ -79,6 +83,13 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 								complete(NettyFutures.toCompletable(v.closeFuture()));
 							}
 						});
+				}
+
+				@Override
+				public boolean cancel(boolean interrupt)
+				{
+					listenFuture.cancel(true);
+					return super.cancel(interrupt);
 				}
 			};
 		}
@@ -118,10 +129,11 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 			});
 	}
 
-	static int findHeader(ByteBuf buffer, byte[] needle, int start, int end) {
+	static int findHeader(ByteBuf buffer, byte[] needle) {
+		int end = buffer.writerIndex();
 		if (needle.length == 0)
 			return 0;
-		OUT: for (int i = start; i < end-needle.length; ++i) {
+		OUT: for (int i = 0; i < end-needle.length; ++i) {
 			if (buffer.getByte(i) != '\n')
 				continue;
 			int s = i+1;
@@ -153,18 +165,27 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 		return -1;
 	}
 
-	static int findNextLine(ByteBuf buffer, int offset) {
-		int length = buffer.writerIndex();
-		for (int i = offset; i < length; ++i) {
-			if (buffer.getByte(i) == '\n')
+	static int findNextLine(ContinuousByteBuf buffer, int offset) {
+		for (int i = offset; ; ++i) {
+			int c = buffer.get(i);
+			if (c < 0)
+				return -1;
+			if (c == '\n')
 				return i+1;
 		}
-		return -1;
 	}
 
-	static ByteBuf replaceHeaderValue(ByteBuf in, int start, int end, byte[] headerName, Function<byte[], byte[]> replacer)
+	static ByteBuf replaceHeaderValue(ByteBuf in, byte[] headerName, Function<byte[], byte[]> replacer)
 	{
-		int p = findHeader(in, headerName, start, end);
+		int end = in.writerIndex();
+		if (in.getByte(end-1) != '\n') {
+			throw new IllegalArgumentException("Expected \\n at end of header buffer");
+		}
+		--end;
+		if (in.getByte(end-1) == '\r') {
+			--end;
+		}
+		int p = findHeader(in, headerName);
 		if (p >= 0) {
 			int valueStart;
 			for (valueStart = p; in.getByte(valueStart) != ':'; ++valueStart) ;
@@ -193,7 +214,7 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 		}
 	}
 
-	static ByteBuf replaceHttpMethodHost(ByteBuf in, int headerEnd, byte[] host)
+	static ByteBuf replaceHttpMethodHost(ByteBuf in, byte[] host)
 	{
 		int p;
 		for (p = 0; isSpace(in.getByte(p)); ++p) ;
@@ -282,15 +303,13 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 
 		private final CompletableFuture<Void> finish;
 
-		private ByteBuf buffer = Unpooled.buffer(1024, 32768);
+		private ByteBuf header = Unpooled.buffer(512, 32768);
 
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-			buffer.writeBytes((ByteBuf) msg);
-			ReferenceCountUtil.release(msg);
 			try {
-				if (!processHeader(ctx, buffer)) {
-					if (buffer.readableBytes() >= buffer.maxCapacity()) {
+				if (!processHeader(ctx, (ByteBuf) msg)) {
+					if (header.readableBytes() >= header.maxCapacity()) {
 						respondAndClose(ctx, "400 Bad Request", new IOException("Failed to read HTTP request headers, exceeded 32768"));
 					}
 				}
@@ -298,23 +317,27 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 			catch (Throwable ex) {
 				respondAndClose(ctx, "500 Internal Server Error", new IOException("Internal error processing request", ex));
 			}
+			finally {
+				ReferenceCountUtil.release(msg);
+			}
 		}
 
-		private boolean processHeader(ChannelHandlerContext ctx, ByteBuf header)
+		private boolean processHeader(ChannelHandlerContext ctx, ByteBuf pending)
 		{
+			ContinuousByteBuf reader = new ContinuousByteBuf(header, pending);
 			int endHeader = 0; // points after end of last header, before headers and body delimiter
 			for (;;) {
-				endHeader = findNextLine(header, endHeader);
+				endHeader = findNextLine(reader, endHeader);
 				if (endHeader < 0)
 					return false;
-				if (endHeader < header.writerIndex() && header.getByte(endHeader) == '\n') {
+				if (reader.get(endHeader) == '\n') {
 					break;
 				}
-				else if (endHeader+1 < header.writerIndex() && header.getByte(endHeader) == '\r' && header.getByte(endHeader+1) == '\n') {
+				else if (reader.get(endHeader) == '\r' && reader.get(endHeader+1) == '\n') {
 					break;
 				}
 			}
-			String stringHeader = header.toString(0, endHeader, StandardCharsets.UTF_8);
+			String stringHeader = header.toString(StandardCharsets.UTF_8);
 			Matcher m = HOST_PATTERN.matcher(stringHeader);
 			if (!m.find()) {
 				respondAndClose(ctx, "400 Bad Request", new IOException("Missing host header or connect request"));
@@ -325,10 +348,9 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 			ByteBuf output;
 			ByteBuf clientOutput;
 			if (m.group(2) != null) {
+				// CONNECT request
 				remapped = remappedHost(config, m.group(2), Optional.ofNullable(m.group(3)).orElse("443"));
-				int added = header.getByte(endHeader) == '\r' ? 2 : 1;
-				output = header;
-				output.readerIndex(endHeader+added);
+				output = Unpooled.EMPTY_BUFFER;
 				clientOutput = Unpooled.wrappedBuffer((m.group(4)+" 200 OK\r\n\r\n").getBytes(StandardCharsets.UTF_8));
 			}
 			else {
@@ -339,20 +361,22 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 				String host = m.group(6) != null ? m.group(6) : m.group(8);
 				String port = Optional.ofNullable(m.group(7) != null ? m.group(7) : m.group(9)).orElse("80");
 				remapped = remappedHost(config, host, port);
-				int oldLength = header.writerIndex();
-				header = replaceHeaderValue(header, 0, endHeader, CONNECTION_HEADER, (old) -> CLOSE);
-				endHeader += header.writerIndex()-oldLength;
-				oldLength = header.writerIndex();
-				header = replaceHeaderValue(header, 0, endHeader, HOST_HEADER, (old) -> remapped.getBytes(StandardCharsets.UTF_8));
-				endHeader += header.writerIndex()-oldLength;
+				header = replaceHeaderValue(header, CONNECTION_HEADER, (old) -> CLOSE);
+				header = replaceHeaderValue(header, PROXY_CONNECTION_HEADER, (old) -> old != null ? CLOSE : null);
+				header = replaceHeaderValue(header, HOST_HEADER, (old) -> remapped.getBytes(StandardCharsets.UTF_8));
 				for (Map.Entry<String, String> entry: Optional.ofNullable(config.getAddedHeaders()).orElse(Collections.emptyMap()).entrySet()) {
-					oldLength = header.writerIndex();
-					header = replaceHeaderValue(header, 0, endHeader, entry.getKey().getBytes(StandardCharsets.UTF_8), (old) -> entry.getValue().getBytes(StandardCharsets.UTF_8));
-					endHeader += header.writerIndex()-oldLength;
+					header = replaceHeaderValue(header, entry.getKey().getBytes(StandardCharsets.UTF_8), (old) -> entry.getValue().getBytes(StandardCharsets.UTF_8));
 				}
-				header = replaceHttpMethodHost(header, endHeader, remapped.getBytes(StandardCharsets.UTF_8));
+				header = replaceHttpMethodHost(header, remapped.getBytes(StandardCharsets.UTF_8));
 				output = header;
 				clientOutput = Unpooled.EMPTY_BUFFER;
+			}
+			final ByteBuf serverOutput;
+			if (pending.isReadable()) {
+				ReferenceCountUtil.retain(serverOutput = pending);
+			}
+			else {
+				serverOutput = Unpooled.EMPTY_BUFFER;
 			}
 			remote = getServerAddress(config, remapped);
 			ctx.channel().config().setAutoRead(false);
@@ -369,11 +393,13 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 				)
 					.whenComplete((server, ex) -> {
 						if (ex != null) {
+							ReferenceCountUtil.release(serverOutput);
 							respondAndClose(ctx, "503 Cannot connect", new IOException("Failed to connect to "+remote+" : "+ex.getMessage(), ex));
 						}
 						else {
 							DuplexChannel client = (DuplexChannel) ctx.channel();
-							ChannelFuture serverFuture = server.writeAndFlush(output);
+							server.write(output);
+							ChannelFuture serverFuture = server.writeAndFlush(serverOutput);
 							ChannelFuture clientFuture = client.writeAndFlush(clientOutput);
 							NettyFutures.join(serverFuture, clientFuture)
 								.thenCompose((v) ->
@@ -397,6 +423,27 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 				.whenComplete((v, ex) ->
 					finish.completeExceptionally(new IOException(response))
 				);
+		}
+	}
+
+	@RequiredArgsConstructor
+	private static class ContinuousByteBuf
+	{
+		private final ByteBuf content;
+
+		private final ByteBuf source;
+
+		public int get(int position)
+		{
+			while (position >= content.writerIndex()) {
+				try {
+					content.writeByte(source.readByte());
+				}
+				catch (IndexOutOfBoundsException ex) {
+					return -1;
+				}
+			}
+			return content.getByte(position);
 		}
 	}
 }

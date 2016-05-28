@@ -1,26 +1,23 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.server.forward;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
 
 import com.google.common.base.Preconditions;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.common.NettyFutures;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.common.NettyRuntime;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyFutures;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.socket.DuplexChannel;
 
 import io.netty.channel.unix.DomainSocketAddress;
-import io.netty.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.concurrent.FutureUtil;
 
 import javax.inject.Inject;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 
@@ -37,7 +34,7 @@ public class NettyPortForwarder implements PortForwarder
 	public CompletableFuture<CompletableFuture<Void>> runForwards(List<ForwardConfig> forwards)
 	{
 		List<CompletableFuture<CompletableFuture<Void>>> futures = forwards.stream().map(this::runForward).collect(Collectors.toList());
-		return allOrCancelNestedFutures(futures);
+		return NettyFutures.nestedAllOrCancel(futures);
 	}
 
 	@Override
@@ -207,69 +204,5 @@ public class NettyPortForwarder implements PortForwarder
 	@Override
 	public void close()
 	{
-	}
-
-	public static <T> CompletableFuture<CompletableFuture<T>> allOrCancelNestedFutures(List<CompletableFuture<CompletableFuture<T>>> futures)
-	{
-		AtomicInteger remaining = new AtomicInteger(futures.size());
-
-		return new CompletableFuture<CompletableFuture<T>>() {
-			{
-				futures.forEach(f -> {
-					f.whenComplete((v, ex) -> {
-						if (ex != null) {
-							completeExceptionally(ex);
-						}
-						if (remaining.decrementAndGet() == 0) {
-							stepInner();
-						}
-					});
-				});
-				whenComplete((v, ex) -> {
-					if (ex != null) {
-						futures.forEach(f -> {
-							f.cancel(true);
-							CompletableFuture<T> inner = f.getNow(null);
-							if (inner != null)
-								inner.cancel(true);
-						});
-					}
-				});
-			}
-
-			private void stepInner()
-			{
-				complete(new CompletableFuture<T>() {
-					{
-						futures.forEach(f -> {
-							CompletableFuture<T> inner = f.getNow(null);
-							inner.whenComplete((v, ex) -> {
-								if (ex != null) {
-									completeExceptionally(ex);
-								}
-								else {
-									complete(v);
-								}
-							});
-						});
-						whenComplete((v, ex) -> {
-							futures.forEach(f -> {
-								CompletableFuture<T> inner = f.getNow(null);
-								inner.cancel(true);
-							});
-						});
-					}
-
-					public synchronized boolean cancel(boolean interrupt)
-					{
-						futures.forEach(f -> {
-							CompletableFuture<T> inner = f.getNow(null);
-							inner.cancel(true);
-						});
-						return super.cancel(interrupt);
-					}
-				});
-			}
-		};
 	}
 }

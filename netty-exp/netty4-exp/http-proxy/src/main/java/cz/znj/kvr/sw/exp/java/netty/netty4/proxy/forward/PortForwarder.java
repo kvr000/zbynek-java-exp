@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.server.forward;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
 
 import lombok.Builder;
 import lombok.Value;

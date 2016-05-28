@@ -1,7 +1,6 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.server.forward;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
 
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.common.NettyRuntime;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.common.pipeline.ForwarderHandler;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelConfig;
@@ -69,25 +68,25 @@ public class HttpProxyFactoryTest
 	@Test
 	public void replaceHeaderValue_existWithExist_update()
 	{
-		ByteBuf in = createByteBuf("GET / HTTP/1.0\r\nConnection: keep-alive\r\nHost: hello.example.com\r\n\r\nsome body data", -1);
-		ByteBuf out = NettyHttpProxyFactory.replaceHeaderValue(in, 0, 64, "connection".getBytes(StandardCharsets.UTF_8), (old) -> { Assert.assertEquals("keep-alive".getBytes(StandardCharsets.UTF_8), old); return "close".getBytes(StandardCharsets.UTF_8); });
-		MatcherAssert.assertThat(out, new BufToPosEquals("GET / HTTP/1.0\r\nConnection: close\r\nHost: hello.example.com\r\n\r\nsome body data"));
+		ByteBuf in = createByteBuf("GET / HTTP/1.0\r\nConnection: keep-alive\r\nHost: hello.example.com\r\n\r\n", -1);
+		ByteBuf out = NettyHttpProxyFactory.replaceHeaderValue(in, "connection".getBytes(StandardCharsets.UTF_8), (old) -> { Assert.assertEquals("keep-alive".getBytes(StandardCharsets.UTF_8), old); return "close".getBytes(StandardCharsets.UTF_8); });
+		MatcherAssert.assertThat(out, new BufToPosEquals("GET / HTTP/1.0\r\nConnection: close\r\nHost: hello.example.com\r\n\r\n"));
 	}
 
 	@Test
 	public void replaceHeaderValue_notExistWithExist_add()
 	{
-		ByteBuf in = createByteBuf("GET / HTTP/1.0\r\nHost: hello.example.com\r\n\r\nsome body data", -1);
-		ByteBuf out = NettyHttpProxyFactory.replaceHeaderValue(in, 0, 41, "connection".getBytes(StandardCharsets.UTF_8), (old) -> { Assert.assertEquals(null, old); return "close".getBytes(StandardCharsets.UTF_8); });
-		MatcherAssert.assertThat(out, new BufToPosEquals("GET / HTTP/1.0\r\nHost: hello.example.com\r\nconnection: close\r\n\r\nsome body data"));
+		ByteBuf in = createByteBuf("GET / HTTP/1.0\r\nHost: hello.example.com\r\n\r\n", -1);
+		ByteBuf out = NettyHttpProxyFactory.replaceHeaderValue(in, "connection".getBytes(StandardCharsets.UTF_8), (old) -> { Assert.assertEquals(null, old); return "close".getBytes(StandardCharsets.UTF_8); });
+		MatcherAssert.assertThat(out, new BufToPosEquals("GET / HTTP/1.0\r\nHost: hello.example.com\r\nconnection: close\r\n\r\n"));
 	}
 
 	@Test
 	public void replaceHeaderValue_matchInBody_untouched()
 	{
-		ByteBuf in = createByteBuf("GET / HTTP/1.0\r\nHost: hello.example.com\r\n\r\nBodyHeader: xyz\r\n\r\nsome body data", -1);
-		ByteBuf out = NettyHttpProxyFactory.replaceHeaderValue(in, 0, 41, "bodyheader".getBytes(StandardCharsets.UTF_8), (old) -> { Assert.assertEquals(null, old); return null; });
-		MatcherAssert.assertThat(out, new BufToPosEquals("GET / HTTP/1.0\r\nHost: hello.example.com\r\n\r\nBodyHeader: xyz\r\n\r\nsome body data"));
+		ByteBuf in = createByteBuf("GET / HTTP/1.0\r\nHost: hello.example.com\r\n\r\n", -1);
+		ByteBuf out = NettyHttpProxyFactory.replaceHeaderValue(in, "bodyheader".getBytes(StandardCharsets.UTF_8), (old) -> { Assert.assertEquals(old, null); return null; });
+		MatcherAssert.assertThat(out, new BufToPosEquals("GET / HTTP/1.0\r\nHost: hello.example.com\r\n\r\n"));
 	}
 
 	@Test
@@ -102,7 +101,7 @@ public class HttpProxyFactoryTest
 	public void replaceHttpMethodHost_noHost_untouched()
 	{
 		ByteBuf in = createByteBuf("GET /hello HTTP/1.0\r\n\r\n", -1);
-		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, in.writerIndex(), "example.com".getBytes(StandardCharsets.UTF_8));
+		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, "example.com".getBytes(StandardCharsets.UTF_8));
 		MatcherAssert.assertThat(out, new BufToPosEquals("GET /hello HTTP/1.0\r\n\r\n"));
 	}
 
@@ -110,7 +109,7 @@ public class HttpProxyFactoryTest
 	public void replaceHttpMethodHost_wrongProto_untouched()
 	{
 		ByteBuf in = createByteBuf("GET https://example.com/hello HTTP/1.0\r\n\r\n", -1);
-		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, in.writerIndex(), "localhost".getBytes(StandardCharsets.UTF_8));
+		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, "localhost".getBytes(StandardCharsets.UTF_8));
 		MatcherAssert.assertThat(out, new BufToPosEquals("GET https://example.com/hello HTTP/1.0\r\n\r\n"));
 	}
 
@@ -118,7 +117,7 @@ public class HttpProxyFactoryTest
 	public void replaceHttpMethodHost_withoutPort_updated()
 	{
 		ByteBuf in = createByteBuf("GET http://example.com/hello HTTP/1.0\r\n\r\n", -1);
-		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, in.writerIndex(), "localhost".getBytes(StandardCharsets.UTF_8));
+		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, "localhost".getBytes(StandardCharsets.UTF_8));
 		MatcherAssert.assertThat(out, new BufToPosEquals("GET http://localhost/hello HTTP/1.0\r\n\r\n"));
 	}
 
@@ -126,7 +125,7 @@ public class HttpProxyFactoryTest
 	public void replaceHttpMethodHost_withPort_updated()
 	{
 		ByteBuf in = createByteBuf("GET http://example.com:80/hello HTTP/1.0\r\n\r\n", -1);
-		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, in.writerIndex(), "localhost:1234".getBytes(StandardCharsets.UTF_8));
+		ByteBuf out = NettyHttpProxyFactory.replaceHttpMethodHost(in, "localhost:1234".getBytes(StandardCharsets.UTF_8));
 		MatcherAssert.assertThat(out, new BufToPosEquals("GET http://localhost:1234/hello HTTP/1.0\r\n\r\n"));
 	}
 
@@ -356,7 +355,9 @@ public class HttpProxyFactoryTest
 		verify(f.client, times(1))
 			.writeAndFlush(Unpooled.EMPTY_BUFFER);
 		verify(f.server, times(1))
-			.writeAndFlush(Unpooled.wrappedBuffer("POST /path HTTP/1.0\nhost: localhost:80\nconnection: close\n\nsome body".getBytes(StandardCharsets.UTF_8)));
+			.write(Unpooled.wrappedBuffer("POST /path HTTP/1.0\nhost: localhost:80\nconnection: close\n\n".getBytes(StandardCharsets.UTF_8)));
+		verify(f.server, times(1))
+			.writeAndFlush(Unpooled.wrappedBuffer("some body".getBytes(StandardCharsets.UTF_8)));
 		verify(f.clientPipeline, times(1))
 			.remove(NettyHttpProxyFactory.RequestReaderHandler.class);
 		verify(f.nettyRuntime, times(1)).forwardDuplex(f.client, f.server);

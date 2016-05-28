@@ -1,9 +1,9 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.server.forward.test;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.test;
 
 import com.google.common.collect.ImmutableList;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.common.NettyRuntime;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.forward.NettyPortForwarder;
-import cz.znj.kvr.sw.exp.java.netty.netty4.server.forward.PortForwarder;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.NettyPortForwarder;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.PortForwarder;
 
 
 /**
@@ -20,12 +20,23 @@ public class PortForwarderRunner
 						.bind(PortForwarder.ForwardConfig.AddressSpec.builder()
 							.proto("tcp4")
 							.host("localhost")
-							.port(3333)
+							.port(3300)
 							.build())
 						.connect(PortForwarder.ForwardConfig.AddressSpec.builder()
 							.proto("tcp4")
 							.host("localhost")
-							.port(2222)
+							.port(3301)
+							.build())
+						.build(),
+					PortForwarder.ForwardConfig.builder()
+						.bind(PortForwarder.ForwardConfig.AddressSpec.builder()
+							.proto("tcp4")
+							.host("localhost")
+							.port(3301)
+							.build())
+						.connect(PortForwarder.ForwardConfig.AddressSpec.builder()
+							.proto("unix")
+							.path("target/forward.socket")
 							.build())
 						.build(),
 					PortForwarder.ForwardConfig.builder()
@@ -36,21 +47,11 @@ public class PortForwarderRunner
 						.connect(PortForwarder.ForwardConfig.AddressSpec.builder()
 							.proto("tcp4")
 							.host("localhost")
-							.port(4444)
-							.build())
-						.build(),
-					PortForwarder.ForwardConfig.builder()
-						.bind(PortForwarder.ForwardConfig.AddressSpec.builder()
-							.proto("tcp4")
-							.host("localhost")
-							.port(2222)
-							.build())
-						.connect(PortForwarder.ForwardConfig.AddressSpec.builder()
-							.proto("unix")
-							.path("target/forward.socket")
+							.port(3302)
 							.build())
 						.build()
 				)).get().get();
+			throw new IllegalStateException("Unreachable");
 		}
 	}
 }

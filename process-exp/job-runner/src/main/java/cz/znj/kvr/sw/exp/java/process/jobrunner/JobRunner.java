@@ -72,7 +72,7 @@ public class JobRunner extends AbstractCommand
 		runMain(args, (args0) -> {
 			AppContext appContext = new CommonAppContext(Guice.createInjector(new GuiceModule()).getInstance(BeanFactory.class));
 			return appContext.getBeanFactory().getBean(JobRunner.class).run(
-				new RootCommandContext(appContext).createChild(null, "jobrunner", null),
+				new RootCommandContext(appContext).createChild(null, "job-runner", null),
 				Arrays.asList(args0)
 			);
 		});

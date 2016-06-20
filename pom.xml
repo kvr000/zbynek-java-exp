@@ -19,6 +19,7 @@
 		<exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
 		<maven-war-plugin.version>2.6</maven-war-plugin.version>
 		<maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
+		<dryuf-executable-jar-maven-plugin.version>0.0.1</dryuf-executable-jar-maven-plugin.version>
 
 		<lombok.version>1.16.8</lombok.version>
 
@@ -114,6 +115,12 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>${exec-maven-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>net.dryuf.maven.plugin</groupId>
+					<artifactId>dryuf-executable-jar-maven-plugin</artifactId>
+					<version>${dryuf-executable-jar-maven-plugin.version}</version>
 				</plugin>
 
 			</plugins>

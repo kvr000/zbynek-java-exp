@@ -68,7 +68,7 @@ public class ProcessWatcher extends AbstractCommand
 		runMain(args, (args0) -> {
 			AppContext appContext = new CommonAppContext(Guice.createInjector(new GuiceModule()).getInstance(BeanFactory.class));
 			return appContext.getBeanFactory().getBean(ProcessWatcher.class).run(
-				new RootCommandContext(appContext).createChild(null, "processrunner", null),
+				new RootCommandContext(appContext).createChild(null, "process-watcher", null),
 				Arrays.asList(args0)
 			);
 		});

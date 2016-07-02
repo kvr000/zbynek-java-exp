@@ -24,6 +24,8 @@
 
 		<lombok.version>1.16.8</lombok.version>
 
+		<lombok.version>1.16.8</lombok.version>
+
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 
@@ -57,6 +59,8 @@
 
 		<guice.version>4.0</guice.version>
 
+		<junixsocket.version>2.0.4</junixsocket.version>
+
 		<jackson.version>2.7.4</jackson.version>
 
 		<gson.version>2.5</gson.version>
@@ -66,7 +70,7 @@
 		<spring.security.version>4.0.1.RELEASE</spring.security.version>
 		<httpcomponents.version>4.5</httpcomponents.version>
 		<wagon.version>2.9</wagon.version>
-		<netty.version>5.0.0.Alpha3</netty.version>
+		<netty.version>4.0.33.Final</netty.version>
 		<protobuf.version>3.0.0-beta-1</protobuf.version>
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
 		<camel.version>2.15.3</camel.version>
@@ -263,6 +267,17 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>${commons-io.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.kohlschutter.junixsocket</groupId>
+				<artifactId>junixsocket-common</artifactId>
+				<version>${junixsocket.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.kohlschutter.junixsocket</groupId>
+				<artifactId>junixsocket-native-common</artifactId>
+				<version>${junixsocket.version}</version>
 			</dependency>
 
 			<dependency>

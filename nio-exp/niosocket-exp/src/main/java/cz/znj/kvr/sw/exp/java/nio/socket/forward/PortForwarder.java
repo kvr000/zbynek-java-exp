@@ -1,7 +1,6 @@
 package cz.znj.kvr.sw.exp.java.nio.socket.forward;
 
 import com.google.common.base.Preconditions;
-import com.google.common.io.Closeables;
 import lombok.Builder;
 import lombok.Value;
 import net.dryuf.concurrent.FutureUtil;
@@ -11,6 +10,7 @@ import org.newsclub.net.unix.AFUNIXSocket;
 import org.newsclub.net.unix.AFUNIXSocketAddress;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +32,8 @@ import java.nio.channels.CompletionHandler;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -40,15 +42,18 @@ import java.util.stream.Stream;
 
 
 /**
- * Port forwarding component.  Simple implementation using threads instead of selectors.
+ * Port forwarding component.
  */
 public class PortForwarder implements AutoCloseable
 {
-	private AtomicLong channelCount = new AtomicLong();
+	private final AtomicLong channelCount = new AtomicLong();
+
+	private final ExecutorService blockingExecutor;
 
 	@Inject
-	public PortForwarder()
+	public PortForwarder(@Named("blockingExecutor") ExecutorService blockingExecutor)
 	{
+		this.blockingExecutor = blockingExecutor;
 	}
 
 	public void createdChannel(Channel channel)
@@ -142,20 +147,83 @@ public class PortForwarder implements AutoCloseable
 		return future;
 	}
 
+	public CompletableFuture<SocketAddress> resolve(SocketAddress address)
+	{
+		if (address instanceof InetSocketAddress && ((InetSocketAddress) address).isUnresolved()) {
+			return FutureUtil.submitAsync(() -> {
+					InetSocketAddress address1 = (InetSocketAddress) address;
+					return new InetSocketAddress(InetAddress.getByName(address1.getHostName()), address1.getPort());
+				},
+				blockingExecutor
+			);
+		}
+		else {
+			return CompletableFuture.completedFuture(address);
+		}
+	}
+
+	private CompletableFuture<SocketAddress> resolve(String proto, SocketAddress address)
+	{
+		if (!(address instanceof InetSocketAddress))
+			return CompletableFuture.completedFuture(address);
+
+		InetSocketAddress address1 = (InetSocketAddress) address;
+		if (!address1.isUnresolved())
+			return CompletableFuture.completedFuture(address1);
+		return FutureUtil.submitAsync(() ->
+				new InetSocketAddress(
+					Stream.of(Inet4Address.getAllByName(address1.getHostName()))
+						.filter(proto.equals("tcp4") ?
+							Inet4Address.class::isInstance :
+							Inet6Address.class::isInstance
+						)
+						.findFirst()
+						.orElseThrow(() -> new UnknownHostException("Cannot find "+proto+" " +
+							"host for: "+address)),
+					address1.getPort()
+				),
+			blockingExecutor
+		);
+	}
+
 	public void connect(SocketAddress address, Consumer<AsynchronousSocketChannel> initializer, CompletionHandler<Void, Integer> handler)
 	{
-		AsynchronousSocketChannel socket = null;
-		try {
-			socket = AsynchronousSocketChannel.open();
-			createdChannel(socket);
-			initializer.accept(socket);
-			socket.connect(address, 0, handler);
-		}
-		catch (Throwable e) {
-			closeChannel(null, socket);
-			handler.failed(new IOException("Failed to connect to: "+address, e), 0);
-			return;
-		}
+		connect(this::resolve, address, initializer, handler);
+	}
+
+	public void connect(Function<SocketAddress, CompletableFuture<SocketAddress>> resolver, SocketAddress address, Consumer<AsynchronousSocketChannel> initializer, CompletionHandler<Void, Integer> handler)
+	{
+		resolver.apply(address)
+			.thenApply(address1 -> {
+				AsynchronousSocketChannel socket = null;
+				try {
+					try {
+						socket = AsynchronousSocketChannel.open();
+						createdChannel(socket);
+						initializer.accept(socket);
+						socket.connect(address1, 0, handler);
+						return socket;
+					}
+					catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+				}
+				catch (Throwable ex) {
+					if (socket != null)
+						closeChannel(null, socket);
+					throw ex;
+				}
+			})
+			.whenComplete((socket, ex) -> {
+				if (ex != null) {
+					if (ex instanceof IOException) {
+						handler.failed(new UncheckedIOException("Failed to connect to: "+address, (IOException)ex), 0);
+					}
+					else {
+						handler.failed(ex, 0);
+					}
+				}
+			});
 	}
 
 	public CompletableFuture<Void> writeFully(AsynchronousSocketChannel socket, ByteBuffer buffer)
@@ -195,7 +263,7 @@ public class PortForwarder implements AutoCloseable
 				@Override
 				public void failed(Throwable exc, Integer attachment)
 				{
-					future.completeExceptionally(exc);
+					future.completeExceptionally(new IOException("Failed to write to: "+getRemoteAddressSafe(socket), exc));
 				}
 			});
 		}
@@ -245,8 +313,7 @@ public class PortForwarder implements AutoCloseable
 			});
 	}
 
-	@Override
-	public void close() throws InterruptedException
+	public void close()
 	{
 	}
 
@@ -258,6 +325,7 @@ public class PortForwarder implements AutoCloseable
 		// For unix sockets which don't support asynchronous interface, use old-school accept and fork pattern:
 		CompletableFuture<Void> result = new CompletableFuture<Void>() {
 			private ServerSocket listener;
+			private CompletableFuture<Void> this0 = this;
 
 			@Override
 			public synchronized boolean cancel(boolean interrupt) {
@@ -274,60 +342,67 @@ public class PortForwarder implements AutoCloseable
 				return true;
 			}
 
+			private synchronized boolean setListener(ServerSocket listener) {
+				if (isDone()) {
+					return false;
+				}
+				this.listener = listener;
+				return true;
+			}
+
 			public CompletableFuture<Void> initialize()
 			{
 				try {
+					CompletableFuture<ServerSocket> listenerFuture;
 					switch (config.bindProto) {
 					case "tcp4":
 					case "tcp6":
-						InetSocketAddress address = null;
-						try {
-							address = new InetSocketAddress(
-								Optional.ofNullable(config.bindHost)
-									.map(name -> {
-											try {
-												return getHost(config.bindProto, name);
-											}
-											catch (UnknownHostException e) {
-												throw new UncheckedIOException(e);
-											}
-										}
-									)
-									.orElse(null),
-								config.bindPort
+						InetSocketAddress address0 = Optional.ofNullable(config.bindHost)
+							.map(name -> InetSocketAddress.createUnresolved(name, config.bindPort))
+							.orElseGet(() -> new InetSocketAddress(config.bindPort));
+						listenerFuture = resolve(config.bindProto, address0)
+							.thenApplyAsync(address -> {
+									try {
+										return new ServerSocket(
+											((InetSocketAddress)address).getPort(),
+											0,
+											((InetSocketAddress)address).getAddress()
+										);
+									}
+									catch (IOException e) {
+										throw new UncheckedIOException("Failed to create listener on: "+address, e);
+									}
+								},
+								blockingExecutor
 							);
-							listener = new ServerSocket(
-								address.getPort(),
-								0,
-								address.getAddress()
-							);
-						}
-						catch (IOException ex) {
-							throw new IOException("Failed to create listener on "+address, ex);
-						}
 						break;
 
 					case "unix":
-						try {
-							listener = AFUNIXServerSocket.bindOn(new AFUNIXSocketAddress(new File(config.bindPath)));
-						}
-						catch (IOException ex) {
-							throw new IOException("Failed to create listener on "+config.bindPath, ex);
-						}
+						listenerFuture = FutureUtil.submitAsync(() -> {
+								try {
+									return AFUNIXServerSocket.bindOn(new AFUNIXSocketAddress(new File(config.bindPath)));
+								}
+								catch (IOException ex) {
+									throw new IOException("Failed to create listener on "+config.bindPath, ex);
+								}
+							},
+							blockingExecutor
+						);
 						break;
 
 					default:
-						throw new IllegalStateException("Improperly validated config: "+config);
+						throw new IllegalStateException("Improperly validated config, expected tcp4, tcp6 or unix on bindProto: "+config);
 					}
-					new Thread(() -> {
-						try {
-							loopListener(listener, config);
-							complete(null);
-						}
-						catch (Throwable ex) {
-							completeExceptionally(ex);
-						}
-					}).start();
+					listenerFuture.thenAcceptAsync((listener1) -> {
+								if (!setListener(listener1)) {
+									IOUtils.closeQuietly(listener1);
+									return;
+								}
+								loopListener(listener1, config);
+							},
+							blockingExecutor
+						)
+						.whenComplete((v, ex) -> FutureUtil.completeOrFail(this0, v, ex));
 				}
 				catch (Throwable ex) {
 					completeExceptionally(ex);
@@ -346,7 +421,6 @@ public class PortForwarder implements AutoCloseable
 				server = listener.accept();
 			}
 			catch (IOException e) {
-				e.printStackTrace();
 				throw new UncheckedIOException(e);
 			}
 			runConnectionForward(server, config)
@@ -356,56 +430,54 @@ public class PortForwarder implements AutoCloseable
 
 	private CompletableFuture<Void> runConnectionForward(Socket server, ForwardConfig config)
 	{
-		Socket client = null;
+		CompletableFuture<Socket> clientFuture;
 		try {
 			switch (config.connectProto) {
 			case "tcp4":
 			case "tcp6":
-				try {
-					client = new Socket(getHost(config.connectProto, config.connectHost), config.connectPort);
-				}
-				catch (IOException ex) {
-					throw new IOException("Failed to connect to: "+config.connectHost+":"+config.connectPort, ex);
-				}
+				InetSocketAddress address0 = InetSocketAddress.createUnresolved(config.connectHost, config.connectPort);
+				clientFuture = resolve(config.connectProto, InetSocketAddress.createUnresolved(config.connectHost, config.connectPort))
+					.thenApplyAsync(address -> {
+							try {
+								return new Socket(((InetSocketAddress)address).getAddress(), ((InetSocketAddress)address).getPort());
+							}
+							catch (IOException e) {
+								throw new UncheckedIOException("Failed to connect to: "+address0, e);
+							}
+						},
+						blockingExecutor
+					);
 				break;
 
 			case "unix":
-				try {
-					client = AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File(config.connectPath)));
-				}
-				catch (IOException ex) {
-					throw new IOException("Failed to connect to: "+config.connectPath, ex);
-				}
+				clientFuture = FutureUtil.submitAsync(() -> {
+						try {
+							return AFUNIXSocket.connectTo(new AFUNIXSocketAddress(new File(config.connectPath)));
+						}
+						catch (IOException ex) {
+							throw new UncheckedIOException("Failed to connect to: "+config.connectPath, ex);
+						}
+					},
+					blockingExecutor
+				);
 				break;
 
 			default:
 				throw new IllegalStateException("Improperly validated config: "+config);
 			}
-			return runServerClient(server, client);
+			return clientFuture
+				.whenComplete(FutureUtil.whenException(ex -> IOUtils.closeQuietly(server)))
+				.thenCompose(client -> runServerClient(server, client));
 		}
 		catch (Throwable e) {
-			try {
-				try {
-					server.shutdownInput();
-					server.shutdownOutput();
-				}
-				finally {
-					Closeables.close(client, true);
-					Closeables.close(server, true);
-				}
-			}
-			catch (IOException ex) {
-				// ignore inner exception
-			}
+			IOUtils.closeQuietly(server);
 			return FutureUtil.exception(e);
 		}
 	}
 
 	private CompletableFuture<Void> runOneForward(Socket one, Socket two)
 	{
-		CompletableFuture<Void> result = new CompletableFuture<>();
-		new Thread(() -> {
-			try {
+		return FutureUtil.submitAsync(() -> {
 				InputStream oneInput = one.getInputStream();
 				OutputStream twoOutput = two.getOutputStream();
 				int size;
@@ -421,19 +493,16 @@ public class PortForwarder implements AutoCloseable
 				}
 				two.shutdownOutput();
 				one.shutdownInput();
-			}
-			catch (Throwable ex) {
-				IOUtils.closeQuietly(two);
-				result.completeExceptionally(ex);
-			}
-			result.complete(null);
-		}).start();
-		return result;
+				return (Void)null;
+			},
+			blockingExecutor
+		);
 	}
 
 	private CompletableFuture<Void> runListenerAsync(ForwardConfig config)
 	{
 		CompletableFuture<Void> future = new CompletableFuture<Void>() {
+			private CompletableFuture<Void> this0 = this;
 			private AsynchronousServerSocketChannel listener;
 
 			@Override
@@ -444,71 +513,87 @@ public class PortForwarder implements AutoCloseable
 				return true;
 			}
 
-			public synchronized void setListener(AsynchronousServerSocketChannel listener) {
+			public synchronized boolean setListener(AsynchronousServerSocketChannel listener) {
+				if (isDone()) {
+					return false;
+				}
 				this.listener = listener;
+				return true;
+			}
+
+			private void fail(Throwable ex)
+			{
+				closeChannel(this, listener);
+				completeExceptionally(ex);
 			}
 
 			public CompletableFuture<Void> initialize()
 			{
 				try {
 					Preconditions.checkArgument(!config.bindProto.equals("unix") && !config.connectProto.equals("unix"));
+					CompletableFuture<AsynchronousServerSocketChannel> listenerFuture;
 					switch (config.bindProto) {
 					case "tcp4":
 					case "tcp6":
-						InetSocketAddress address = null;
-						try {
-							address = new InetSocketAddress(
-								Optional.ofNullable(config.bindHost)
-									.map(name -> {
-											try {
-												return getHost(config.bindProto, config.bindHost);
-											}
-											catch (UnknownHostException e) {
-												throw new RuntimeException(e);
-											}
-										}
-									)
-									.orElse(null),
-								config.bindPort
-							);
-							AsynchronousServerSocketChannel listener = AsynchronousServerSocketChannel.open();
-							createdChannel(listener);
-							listener.bind(address);
-							this.setListener(listener);
-						}
-						catch (IOException ex) {
-							throw new IOException("Failed to create listener on: "+address, ex);
-						}
+						listenerFuture = createListenerTcp(config);
 						break;
 
 					default:
-						throw new IllegalStateException("Improperly validated config: "+config);
+						throw new IllegalStateException("Improperly validated config, expected tcp4 or tcp6 for bindProto: "+config);
 					}
-					listener.accept(
-						0,
-						new CompletionHandler<AsynchronousSocketChannel, Integer>()
-						{
-							@Override
-							public void completed(AsynchronousSocketChannel result, Integer attachment)
-							{
-								createdChannel(result);
-								listener.accept(0, this);
-								runConnectionForward(result, config)
-									.whenComplete(FutureUtil.whenException(Throwable::printStackTrace));
+					listenerFuture.thenAccept(listener0 -> {
+							if (!setListener(listener0)) {
+								closeChannel(this0, listener0);
+								return;
 							}
+							listener0.accept(
+								0,
+								new CompletionHandler<AsynchronousSocketChannel, Integer>()
+								{
+									@Override
+									public void completed(AsynchronousSocketChannel result, Integer attachment)
+									{
+										createdChannel(result);
+										listener.accept(0, this);
+										runConnectionForward(result, config)
+											.whenComplete(FutureUtil.whenException(Throwable::printStackTrace));
+									}
 
-							@Override
-							public void failed(Throwable exc, Integer attachment)
-							{
-								completeExceptionally(exc);
-							}
-						}
-					);
+									@Override
+									public void failed(Throwable exc, Integer attachment)
+									{
+										this0.completeExceptionally(exc);
+									}
+								}
+							);
+						})
+						.whenComplete(FutureUtil.whenException(this::fail));
 				}
 				catch (Throwable ex) {
-					this.completeExceptionally(ex);
+					fail(ex);
 				}
 				return this;
+			}
+
+			private CompletableFuture<AsynchronousServerSocketChannel> createListenerTcp(ForwardConfig config)
+			{
+				SocketAddress address0 = Optional.ofNullable(config.bindHost)
+					.map(name -> InetSocketAddress.createUnresolved(name, config.bindPort))
+					.orElseGet(() -> new InetSocketAddress(config.bindPort));
+				return resolve(config.bindProto, address0)
+					.thenApply(address -> {
+						AsynchronousServerSocketChannel listener = null;
+						try {
+							listener = AsynchronousServerSocketChannel.open();
+							createdChannel(listener);
+							listener.bind(address);
+							return listener;
+						}
+						catch (IOException ex) {
+							closeChannel(null, listener);
+							throw new UncheckedIOException("Failed to create listener on: "+address, ex);
+						}
+					});
 			}
 		}.initialize();
 		return future;
@@ -536,12 +621,11 @@ public class PortForwarder implements AutoCloseable
 					switch (config.connectProto) {
 					case "tcp4":
 					case "tcp6":
-						server = AsynchronousSocketChannel.open();
-						createdChannel(server);
-						InetSocketAddress address = new InetSocketAddress(getHost(config.connectProto, config.connectHost), config.connectPort);
-						server.connect(
-							address,
-							0,
+						InetSocketAddress address0 = InetSocketAddress.createUnresolved(config.connectHost, config.connectPort);
+						connect(
+							(address) -> resolve(config.connectProto, address),
+							address0,
+							(socket) -> server = socket,
 							new CompletionHandler<Void, Integer>()
 							{
 								@Override
@@ -554,7 +638,7 @@ public class PortForwarder implements AutoCloseable
 								@Override
 								public void failed(Throwable exc, Integer attachment)
 								{
-									this0.completeExceptionally(new IOException("Failed to connect to: "+address, exc));
+									this0.completeExceptionally(new IOException("Failed to connect to: "+address0, exc));
 								}
 							}
 						);
@@ -628,7 +712,7 @@ public class PortForwarder implements AutoCloseable
 								exc.addSuppressed(e);
 							}
 							finally {
-								future.completeExceptionally(exc);
+								future.completeExceptionally(new IOException("Failed to write to: "+getRemoteAddressSafe(writer), exc));
 							}
 						}
 					});
@@ -647,25 +731,27 @@ public class PortForwarder implements AutoCloseable
 		return future;
 	}
 
-	private InetAddress getHost(String proto, String name) throws UnknownHostException
+	private SocketAddress getRemoteAddressSafe(AsynchronousSocketChannel socket)
 	{
-		return Stream.of(Inet4Address.getAllByName(name))
-			.filter(proto.equals("tcp4") ?
-				Inet4Address.class::isInstance :
-				Inet6Address.class::isInstance
-			)
-			.findFirst()
-			.orElseThrow(() -> new UnknownHostException("Cannot find "+proto+" host for: "+name));
+		try {
+			return socket.getRemoteAddress();
+		}
+		catch (IOException e) {
+			return null;
+		}
 	}
 
 	@Builder(builderClassName = "Builder")
 	@Value
 	public static class ForwardConfig
 	{
+		/** One of tcp4, tcp6, unix: */
 		String bindProto;
 		String bindHost;
 		String bindPath;
 		int bindPort;
+
+		/** One of tcp4, tcp6, unix: */
 		String connectProto;
 		String connectHost;
 		String connectPath;

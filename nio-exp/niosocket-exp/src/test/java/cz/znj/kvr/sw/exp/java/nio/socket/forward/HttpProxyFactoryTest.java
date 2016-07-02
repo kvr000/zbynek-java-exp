@@ -317,7 +317,7 @@ public class HttpProxyFactoryTest
 			((CompletionHandler<Void, Integer>) answer.getArgument(2)).completed(null, 0);
 			return null;
 		})
-			.when(f.portForwarder).connect(eq(new InetSocketAddress("localhost", 443)), any(), any());
+			.when(f.portForwarder).connect(eq(InetSocketAddress.createUnresolved("localhost", 443)), any(), any());
 		when(f.portForwarder.writeFully(eq(f.client), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		when(f.portForwarder.writeFully(eq(f.server), any()))
@@ -349,7 +349,7 @@ public class HttpProxyFactoryTest
 				((CompletionHandler<Void, Integer>) answer.getArgument(2)).completed(null, 0);
 				return null;
 			})
-			.when(f.portForwarder).connect(eq(new InetSocketAddress("localhost", 123)), any(), any());
+			.when(f.portForwarder).connect(eq(InetSocketAddress.createUnresolved("localhost", 123)), any(), any());
 		when(f.portForwarder.writeFully(eq(f.client), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		when(f.portForwarder.writeFully(eq(f.server), any()))
@@ -381,7 +381,7 @@ public class HttpProxyFactoryTest
 				((CompletionHandler<Void, Integer>) answer.getArgument(2)).completed(null, 0);
 				return null;
 			})
-			.when(f.portForwarder).connect(eq(new InetSocketAddress("localhost", 80)), any(), any());
+			.when(f.portForwarder).connect(eq(InetSocketAddress.createUnresolved("localhost", 80)), any(), any());
 		when(f.portForwarder.writeFully(eq(f.client), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		when(f.portForwarder.writeFully(eq(f.server), any()))

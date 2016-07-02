@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * Simple HTTP proxy implementation, old school thread fork based.
+ * Simple HTTP proxy implementation.
  */
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class HttpProxyFactory
@@ -64,34 +65,45 @@ public class HttpProxyFactory
 					portForwarder.closeChannel(this, listener);
 					return true;
 				}
-			};
 
-			try {
-				listener.accept(
-					0,
-					new CompletionHandler<AsynchronousSocketChannel, Integer>()
-					{
-						@Override
-						public void completed(AsynchronousSocketChannel client, Integer attachment)
-						{
-							portForwarder.createdChannel(client);
-							listener.accept(0, this);
-							runServer(client, config)
-								.whenComplete(FutureUtil.whenException(Throwable::printStackTrace));
-						}
+				private void fail(Throwable ex)
+				{
+					completeExceptionally(ex);
+					portForwarder.closeChannel(null, listener);
+				}
 
-						@Override
-						public void failed(Throwable exc, Integer attachment)
-						{
-							future.completeExceptionally(exc);
-						}
+				public CompletableFuture<Void> initialize()
+				{
+					try {
+						listener.accept(
+							0,
+							new CompletionHandler<AsynchronousSocketChannel, Integer>()
+							{
+								@Override
+								public void completed(AsynchronousSocketChannel client, Integer attachment)
+								{
+									portForwarder.createdChannel(client);
+									listener.accept(0, this);
+									runServer(client, config)
+										.whenComplete(FutureUtil.whenException(Throwable::printStackTrace));
+								}
+
+								@Override
+								public void failed(Throwable exc, Integer attachment)
+								{
+									fail(new IOException("Failed to accept on: "+config.listenAddress, exc));
+								}
+							}
+						);
 					}
-				);
-			}
-			catch (Throwable ex) {
-				future.completeExceptionally(ex);
-			}
-			return future.whenComplete((v, ex) -> portForwarder.closeChannel(null, listener));
+					catch (Throwable ex) {
+						fail(new IOException("Failed to accept on: "+config.listenAddress, ex));
+					}
+					return this;
+				}
+			}.initialize();
+
+			return future;
 		});
 	}
 
@@ -204,7 +216,11 @@ public class HttpProxyFactory
 								clientOutput = ByteBuffer.allocate(0);
 							}
 							remote = getServerAddress(config, remapped);
-							portForwarder.connect(remote, (serverArg) -> server = serverArg, new CompletionHandler<Void, Integer>()
+							portForwarder.connect(
+								(remote0) -> resolveServer(client, remote0),
+								remote,
+								(serverArg) -> server = serverArg,
+								new CompletionHandler<Void, Integer>()
 								{
 									@Override
 									public void completed(Void result, Integer attachment)
@@ -218,6 +234,8 @@ public class HttpProxyFactory
 									@Override
 									public void failed(Throwable exc, Integer attachment)
 									{
+										ByteBuffer response = ByteBuffer.wrap(("HTTP/1.0 503 Cannot connect\r\ncontent-type: text/plain\r\nconnection: close\r\n\r\nFailed to connect to "+remote+" : "+exc.getMessage()+"\n").getBytes(StandardCharsets.UTF_8));
+										portForwarder.writeAndShutdown(client, response);
 										completeExceptionally(new IOException("Failed to connect to: "+remote, exc));
 									}
 								}
@@ -237,6 +255,22 @@ public class HttpProxyFactory
 			}
 		}.initialize();
 		return future;
+	}
+
+	CompletableFuture<SocketAddress> resolveServer(AsynchronousSocketChannel client, SocketAddress unresolved)
+	{
+		return portForwarder.resolve(unresolved)
+			.thenApply((v) -> {
+				try {
+					if (v.equals(client.getLocalAddress())) {
+						throw new IOException("Request connecting to same proxy");
+					}
+					return v;
+				}
+				catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			});
 	}
 
 	static int findHeader(ByteBuffer buffer, byte[] needle, int start, int end) {
@@ -399,7 +433,7 @@ public class HttpProxyFactory
 	static InetSocketAddress getServerAddress(Config config, String hostWithPort)
 	{
 		int colon = hostWithPort.lastIndexOf(':');
-		InetSocketAddress address = new InetSocketAddress(hostWithPort.substring(0, colon), Integer.parseInt(hostWithPort.substring(colon+1)));
+		InetSocketAddress address = InetSocketAddress.createUnresolved(hostWithPort.substring(0, colon), Integer.parseInt(hostWithPort.substring(colon+1)));
 		return address;
 	}
 

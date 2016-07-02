@@ -1,7 +1,10 @@
 package cz.znj.kvr.sw.exp.java.nio.socket.util;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -43,21 +46,110 @@ public class FutureUtil
 	 */
 	public static <T> CompletableFuture<T> anyAndCancel(List<CompletableFuture<T>> futures)
 	{
-		Consumer<Boolean> doCancel = (interrupt) -> futures.forEach(future -> future.cancel(interrupt));
+		AtomicBoolean cancelledStatus = new AtomicBoolean();
+
 		CompletableFuture<T> result = new CompletableFuture<T>() {
 			@Override
 			public boolean cancel(boolean interrupt)
 			{
-				if (!super.cancel(interrupt))
-					return false;
-				doCancel.accept(interrupt);
-				return true;
+				if (cancelledStatus.compareAndSet(false, true)) {
+					futures.forEach(future -> future.cancel(true));
+					return super.cancel(interrupt);
+				}
+				return false;
 			}
 		};
-		for (CompletableFuture<T> future: futures) {
-			future.whenComplete((v, ex) -> completeOrFail(result, v, ex));
+		BiConsumer<T, Throwable> completor = (v, ex) -> {
+			if (cancelledStatus.compareAndSet(false, true)) {
+				futures.forEach(future -> future.cancel(true));
+				completeOrFail(result, v, ex);
+			}
+		};
+		futures.forEach(future -> future.whenComplete(completor));
+		return result;
+	}
+
+	/**
+	 * Submits callable directly.  Executes the Callable and creates a CompletableFuture from the result.
+	 *
+	 * @param callable
+	 * 	code to execute
+	 * @param <T>
+	 *      type of result
+	 *
+	 * @return
+	 * 	the future for result
+	 */
+	public static <T> CompletableFuture<T> submitDirect(Callable<T> callable)
+	{
+		try {
+			return CompletableFuture.completedFuture(callable.call());
 		}
-		return result.whenComplete((v, ex) -> doCancel.accept(true));
+		catch (Throwable ex) {
+			return exception(ex);
+		}
+	}
+
+	/**
+	 * Submits callable asynchronously.  The method reports failure via future even when executor is closed.
+	 *
+	 * @param callable
+	 * 	code to execute
+	 * @param <T>
+	 *      type of result
+	 *
+	 * @return
+	 * 	the future for result
+	 */
+	public static <T> CompletableFuture<T> submitAsync(Callable<T> callable)
+	{
+		CompletableFuture<T> future = new CompletableFuture<>();
+		try {
+			CompletableFuture.runAsync(() -> {
+				try {
+					future.complete(callable.call());
+				}
+				catch (Throwable ex) {
+					future.completeExceptionally(ex);
+				}
+			});
+		}
+		catch (Throwable ex) {
+			return exception(ex);
+		}
+		return future;
+	}
+
+	/**
+	 * Submits callable asynchronously.  The method reports failure via future even when executor is closed.
+	 *
+	 * @param callable
+	 * 	code to execute
+	 * @param executor
+	 * 	executor to execute the code
+	 * @param <T>
+	 *      type of result
+	 *
+	 * @return
+	 * 	the future for result
+	 */
+	public static <T> CompletableFuture<T> submitAsync(Callable<T> callable, Executor executor)
+	{
+		CompletableFuture<T> future = new CompletableFuture<>();
+		try {
+			executor.execute(() -> {
+				try {
+					future.complete(callable.call());
+				}
+				catch (Throwable ex) {
+					future.completeExceptionally(ex);
+				}
+			});
+		}
+		catch (Throwable ex) {
+			return exception(ex);
+		}
+		return future;
 	}
 
 	/**

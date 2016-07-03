@@ -19,6 +19,8 @@
 		<exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
 		<maven-war-plugin.version>2.6</maven-war-plugin.version>
 
+		<lombok.version>1.16.8</lombok.version>
+
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 
@@ -43,6 +45,8 @@
 		<commons-collections.version>3.2.1</commons-collections.version>
 		<commons-csv.version>1.2</commons-csv.version>
 		<commons-io.version>2.4</commons-io.version>
+
+		<junixsocket.version>2.0.4</junixsocket.version>
 
 		<guava.version>18.0</guava.version>
 		<gson.version>2.5</gson.version>
@@ -74,6 +78,13 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+                        <!-- lombok -->
+                        <dependency>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                        </dependency>
 
 			<dependency>
 				<groupId>javax.inject</groupId>
@@ -184,6 +195,12 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>${commons-io.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.kohlschutter.junixsocket</groupId>
+				<artifactId>junixsocket-common</artifactId>
+				<version>${junixsocket.version}</version>
 			</dependency>
 
 			<dependency>

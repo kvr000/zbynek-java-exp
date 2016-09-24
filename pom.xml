@@ -19,6 +19,8 @@
 		<exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
 		<maven-war-plugin.version>2.6</maven-war-plugin.version>
 
+		<lombok.version>1.16.10</lombok.version>
+
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 
@@ -55,7 +57,7 @@
 		<netty.version>5.0.0.Alpha3</netty.version>
 		<protobuf.version>3.0.0-beta-1</protobuf.version>
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
-		<camel.version>2.15.3</camel.version>
+		<camel.version>2.17.1</camel.version>
 	</properties>
 
 	<build>
@@ -74,6 +76,13 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<!-- lombok -->
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>${lombok.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>javax.inject</groupId>
@@ -263,6 +272,21 @@
 			<dependency>
 				<groupId>org.apache.camel</groupId>
 				<artifactId>camel-protobuf</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-jackson</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-spark-rest</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-swagger-java</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
 			<dependency>

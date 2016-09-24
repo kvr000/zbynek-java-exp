@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.dynamodb</groupId>
+	<artifactId>dynamodb-exp-base</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1</version>
+	<name>DynamoDb experiments base</name>
+	<description>Parent of DynamoDb experiments</description>
+
+	<!--
+		Few notes about running:
+		Please remember to pass -Dsqlite4java.library.path=${project.build.directory}/native-libs/
+	-->
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java</groupId>
+		<artifactId>java-exp</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<dynamodb.version>1.11.2</dynamodb.version>
+		<dynamodb-local.version>1.11.0.1</dynamodb-local.version>
+		<sqlite4java.version>1.0.392</sqlite4java.version>
+	</properties>
+
+	<modules>
+		<module>dynamodb-basic-exp</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeScope>test</includeScope>
+							<includeTypes>so,dll,dylib</includeTypes>
+							<outputDirectory>${project.build.directory}/native-libs
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>-Dsqlite4java.library.path=${project.build.directory}/native-libs/</argLine>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-dynamodb</artifactId>
+				<version>${dynamodb.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>DynamoDBLocal</artifactId>
+				<version>${dynamodb-local.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.almworks.sqlite4java</groupId>
+				<artifactId>sqlite4java</artifactId>
+				<version>${sqlite4java.version}</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+	<repositories>
+		<repository>
+			<id>dynamodblocal</id>
+			<name>AWS DynamoDB Local Release Repository</name>
+			<url>http://dynamodb-local.s3-website-us-west-2.amazonaws.com/release</url>
+		</repository>
+	</repositories>
+
+</project>

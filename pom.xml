@@ -31,6 +31,7 @@
 
 		<javax.inject.version>1</javax.inject.version>
 		<jsr305.version>3.0.0</jsr305.version>
+		<javax.cache.version>1.0.0</javax.cache.version>
 
 		<junit.version>4.12</junit.version>
 		<testng.version>6.9.13.6</testng.version>
@@ -142,6 +143,11 @@
 				<groupId>com.google.code.findbugs</groupId>
 				<artifactId>jsr305</artifactId>
 				<version>${jsr305.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.cache</groupId>
+				<artifactId>cache-api</artifactId>
+				<version>${javax.cache.version}</version>
 			</dependency>
 
 			<dependency>

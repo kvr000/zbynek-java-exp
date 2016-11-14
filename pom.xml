@@ -32,6 +32,7 @@
 
 		<junit.version>4.12</junit.version>
 		<testng.version>6.9.13.6</testng.version>
+		<xmlunit.version>2.3.0</xmlunit.version>
 		<jmh.version>1.11.1</jmh.version>
 		<jmock-junit4.version>2.5.1</jmock-junit4.version>
 		<log4j.version>2.2</log4j.version>

@@ -35,6 +35,7 @@
 
 		<junit.version>4.12</junit.version>
 		<testng.version>6.9.13.6</testng.version>
+		<xmlunit.version>2.3.0</xmlunit.version>
 		<jmh.version>1.11.1</jmh.version>
 		<jmock-junit4.version>2.5.1</jmock-junit4.version>
 		<log4j.version>2.2</log4j.version>
@@ -205,13 +206,6 @@
 				<artifactId>xmlunit-placeholders</artifactId>
 				<version>${xmlunit.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>${mockito.version}</version>
-			</dependency>
-
 
 			<dependency>
 				<groupId>org.openjdk.jmh</groupId>

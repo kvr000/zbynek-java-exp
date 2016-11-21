@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cz.znj.kvr.sw.exp.java.spring</groupId>
-	<artifactId>spring-importdi-exp</artifactId>
+	<artifactId>spring-di-exp</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
 

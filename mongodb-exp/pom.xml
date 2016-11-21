@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.mongodb</groupId>
+	<artifactId>mongodb-exp-base</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1</version>
+	<name>MongoDb experiments base</name>
+	<description>Parent of MongoDb experiments</description>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java</groupId>
+		<artifactId>java-exp</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<mongodb.version>3.3.0</mongodb.version>
+		<fongodb.version>2.0.10</fongodb.version>
+	</properties>
+
+	<modules>
+		<module>mongodb-basic-exp</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>3.3.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.fakemongo</groupId>
+				<artifactId>fongo</artifactId>
+				<version>2.0.10</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.flapdoodle.embed</groupId>
+				<artifactId>de.flapdoodle.embed.mongo</artifactId>
+				<version>1.50.5</version>
+			</dependency>
+
+			<!-- spring boot is not good solution as the port is hardcoded -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-mongodb</artifactId>
+				<version>1.4.2.RELEASE</version>
+			</dependency>
+
+		</dependencies>
+	</dependencyManagement>
+
+</project>

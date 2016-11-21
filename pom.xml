@@ -18,6 +18,7 @@
 
 		<exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
 		<maven-war-plugin.version>2.6</maven-war-plugin.version>
+		<maven-surefire-plugin.version>2.19</maven-surefire-plugin.version>
 
 		<lombok.version>1.16.10</lombok.version>
 
@@ -27,7 +28,7 @@
 		<javax.inject.version>1</javax.inject.version>
 		<javax.cache.version>1.0.0</javax.cache.version>
 		<junit.version>4.12</junit.version>
-		<testng.version>6.9.13.6</testng.version>
+		<testng.version>6.9.10</testng.version>
 		<xmlunit.version>2.3.0</xmlunit.version>
 		<jmh.version>1.11.1</jmh.version>
 		<jmock-junit4.version>2.5.1</jmock-junit4.version>
@@ -74,6 +75,13 @@
 					<target>${javac.version}</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+			</plugin>
+
 		</plugins>
 	</build>
 

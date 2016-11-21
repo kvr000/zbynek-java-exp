@@ -1,5 +1,6 @@
-package cz.znj.kvr.sw.exp.java.spring.importdi;
+package cz.znj.kvr.sw.exp.java.spring.di.overridedi;
 
+import cz.znj.kvr.sw.exp.java.spring.di.common.MyBean;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,41 +13,37 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.inject.Inject;
 
 
-@ContextConfiguration(classes = ImportDiTest.MainConfig.class)
+@ContextConfiguration(classes = {OverrideImportTest.MainConfig.class })
 @RunWith(SpringJUnit4ClassRunner.class)
-public class ImportDiTest
+public class OverrideImportTest
 {
 	@Inject
-	private String childBean;
+	private MyBean myBean;
 
 	@Test
-	public void testImport()
+	public void testOverride()
 	{
-		Assert.assertNotNull(childBean);
-		Assert.assertEquals("Hello World", childBean);
+		Assert.assertEquals(0, myBean.getId());
 	}
 
 	@Configuration
-	@Import(ChildConfig.class)
+	@Import(ImportedConfig.class)
 	public static class MainConfig
 	{
 		@Bean
-		public String mainBean()
+		public MyBean myBean()
 		{
-			return "Hello";
+			return new MyBean(0);
 		}
 	}
 
 	@Configuration
-	public static class ChildConfig
+	public static class ImportedConfig
 	{
-		@Inject
-		private String mainBean;
-
 		@Bean
-		public String childBean()
+		public MyBean myBean()
 		{
-			return mainBean+" World";
+			return new MyBean(1);
 		}
 	}
 }

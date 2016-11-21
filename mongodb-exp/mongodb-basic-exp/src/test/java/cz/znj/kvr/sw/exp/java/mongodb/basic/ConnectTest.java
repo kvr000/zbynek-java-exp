@@ -23,9 +23,9 @@ import java.net.UnknownHostException;
  * 	Zbyněk Vyškovský
  */
 @Log4j2
-@Test
-@Import(value = ConnectExperiment.MongoEmbeddedConfig.class)
-public class ConnectExperiment extends AbstractTestNGSpringContextTests
+@Test(groups =  "unit")
+@Import(value = ConnectTest.MongoEmbeddedConfig.class)
+public class ConnectTest extends AbstractTestNGSpringContextTests
 {
 	@Inject
 	private MongoClient mongoClient;

@@ -1,0 +1,44 @@
+package cz.znj.kvr.sw.exp.java.guice.di.inject;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import cz.znj.kvr.sw.exp.java.guice.di.common.First;
+import cz.znj.kvr.sw.exp.java.guice.di.common.Second;
+import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
+import org.junit.Assert;
+import org.junit.Test;
+
+import javax.inject.Inject;
+
+
+public class FieldInjectTest
+{
+	@Test
+	public void testInject()
+	{
+		Module module = new TestModule();
+		Injector injector = Guice.createInjector(module);
+		Second bean = injector.getInstance(Second.class);
+		Assert.assertEquals(1, bean.getSecondValue());
+	}
+
+	public class TestModule extends AbstractModule
+	{
+		@Override
+		protected void configure() {
+			bind(First.class).to(FirstImpl.class);
+			bind(Second.class).to(MyBean.class);
+		}
+	}
+
+	public static class MyBean implements Second {
+		@Inject
+		private First first;
+
+		public int getSecondValue() {
+			return first.getFirstValue();
+		}
+	}
+}

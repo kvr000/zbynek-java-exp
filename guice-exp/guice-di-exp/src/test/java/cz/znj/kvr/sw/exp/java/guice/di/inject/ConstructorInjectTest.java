@@ -12,7 +12,7 @@ import org.junit.Test;
 import javax.inject.Inject;
 
 
-public class InjectTest
+public class ConstructorInjectTest
 {
 	@Test
 	public void testInject()

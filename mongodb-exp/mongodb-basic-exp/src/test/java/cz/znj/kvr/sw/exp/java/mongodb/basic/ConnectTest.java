@@ -3,7 +3,6 @@ package cz.znj.kvr.sw.exp.java.mongodb.basic;
 import com.mongodb.MongoClient;
 import cz.znj.kvr.sw.exp.java.mongodb.basic.config.MongoEmbeddedConfig;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;

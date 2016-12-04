@@ -1,6 +1,5 @@
 package cz.znj.kvr.sw.exp.java.mongodb.basic.config;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.mongo.tests.MongodForTestsFactory;

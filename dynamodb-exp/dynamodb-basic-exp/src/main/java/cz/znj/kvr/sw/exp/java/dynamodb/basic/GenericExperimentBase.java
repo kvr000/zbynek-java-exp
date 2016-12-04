@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.collect.ImmutableMap;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -115,6 +116,7 @@ public abstract class GenericExperimentBase extends TableExperimentBase {
 				.withPrimaryKey("productId", 1)
 				.withString("sin", "SIN1000")
 				.withString("title", "Hello")
+				.with("value", new BigDecimal("1.1"))
 				.withDouble("price", 5.0)
 				.withMap("validity", ImmutableMap.<String, Object>builder().put("effectiveDate", "2015-01-01T00:00:00Z").put("untilDate", "2016-01-01T00:00:00Z").build())
 		);

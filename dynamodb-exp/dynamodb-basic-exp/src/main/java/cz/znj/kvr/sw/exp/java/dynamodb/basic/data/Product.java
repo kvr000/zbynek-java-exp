@@ -5,6 +5,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 
 /**
  * Product data
@@ -19,6 +21,8 @@ public class Product implements Productable {
 	private String sin;
 
 	private String title;
+
+	private BigDecimal value;
 
 	private Validity validity;
 }

@@ -24,6 +24,7 @@
 
 	<modules>
 		<module>testng-parallel-exp</module>
+		<module>testng-multifw-exp</module>
 	</modules>
 
 </project>

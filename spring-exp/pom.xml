@@ -26,7 +26,7 @@
 		<module>spring-cache-exp</module>
 		<module>spring-concurrent-exp</module>
 		<module>spring-lifecycle-exp</module>
-		<module>spring-di-exp</module>
+		<module>spring-importdi-exp</module>
 	</modules>
 
 </project>

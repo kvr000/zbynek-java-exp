@@ -3,12 +3,10 @@ package cz.znj.kvr.sw.exp.java.mongodb.basic.springdata;
 import com.google.common.collect.Iterables;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.ReflectionDBObject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
-import com.mongodb.client.model.Filters;
 import cz.znj.kvr.sw.exp.java.mongodb.basic.config.MongoEmbeddedConfig;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -56,8 +54,11 @@ public class SpringTemplateTest extends AbstractTestNGSpringContextTests
 		table = db.getCollection("SpringTable", BasicDBObject.class);
 	}
 
+	/**
+	 * Tests Spring template POJO serialization. No issues at all.
+	 */
 	@Test
-	public void testReadWrite()
+	public void testWrite()
 	{
 		BasicDBObject query = new BasicDBObject();
 		query.put("myId", 1);
@@ -67,11 +68,20 @@ public class SpringTemplateTest extends AbstractTestNGSpringContextTests
 		sample1.setMyId(1).setName("Hello");
 		mongoTemplate.insert(sample1);
 		FindIterable<BasicDBObject> rs1 = table.find(query);
-		for (Object myTable: rs1) {
+		for (BasicDBObject myTable: rs1) {
 			System.out.println(myTable);
 		}
 		Assert.assertEquals(1, Iterables.size(rs1));
 		Assert.assertEquals(1L, Iterables.getFirst(rs1, null).get("myId"));
+	}
+
+	/**
+	 * Tests Spring template POJO deserialization.
+	 */
+	@Test
+	public void testRead()
+	{
+
 	}
 
 	@Document(collection = "SpringTable")

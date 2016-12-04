@@ -15,7 +15,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.Assert;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -49,6 +48,12 @@ public class DbObjectTableTest extends AbstractTestNGSpringContextTests
 		table = db.getCollection("SpringTable", MyTable.class);
 	}
 
+	/**
+	 * Tests POJO serialization.
+	 *
+	 * The issue with native MongoDb POJO serialization is that first it does not deserialize into POJO, and
+	 * secondly it does not follow lower camelCase convention.
+	 */
 	@Test
 	public void testTable()
 	{
@@ -59,7 +64,7 @@ public class DbObjectTableTest extends AbstractTestNGSpringContextTests
 		MyTable sample1 = new MyTable();
 		sample1.setMyId(1).setName("Hello");
 		table.insertOne(sample1);
-		FindIterable<MyTable> rs1 = true ? table.find() : table.find(Filters.eq("myId", 1));
+		FindIterable<MyTable> rs1 = false ? table.find() : table.find(Filters.eq("MyId", 1));
 		for (Object myTable: rs1) {
 			System.out.println(myTable);
 		}

@@ -4,3 +4,4 @@ target
 tags
 .*.swp
 .*.swo
+.~lock.*.odt#

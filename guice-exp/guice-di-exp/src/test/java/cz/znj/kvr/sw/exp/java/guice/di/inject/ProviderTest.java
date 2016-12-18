@@ -1,6 +1,10 @@
 package cz.znj.kvr.sw.exp.java.guice.di.inject;
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.Provides;
 import cz.znj.kvr.sw.exp.java.guice.di.common.Facade;
 import cz.znj.kvr.sw.exp.java.guice.di.common.First;
 import cz.znj.kvr.sw.exp.java.guice.di.common.Second;
@@ -8,7 +12,6 @@ import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FacadeImpl;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.SecondImpl;
 import lombok.Getter;
-import lombok.Setter;
 import org.junit.Assert;
 import org.junit.Test;
 

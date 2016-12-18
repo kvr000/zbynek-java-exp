@@ -54,5 +54,19 @@
 			<artifactId>guice</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-assistedinject</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mycila.guice.extensions</groupId>
+			<artifactId>mycila-guice-injection</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.mycila.guice.extensions</groupId>
+			<artifactId>mycila-guice-jsr250</artifactId>
+		</dependency>
+
 	</dependencies>
 </project>

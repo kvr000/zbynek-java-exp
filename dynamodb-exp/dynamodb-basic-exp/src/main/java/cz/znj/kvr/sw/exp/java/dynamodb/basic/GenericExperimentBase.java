@@ -119,16 +119,19 @@ public abstract class GenericExperimentBase extends TableExperimentBase {
 				.with("value", new BigDecimal("1.1"))
 				.withDouble("price", 5.0)
 				.withMap("validity", ImmutableMap.<String, Object>builder().put("effectiveDate", "2015-01-01T00:00:00Z").put("untilDate", "2016-01-01T00:00:00Z").build())
+				.withLong("version", 1)
 		);
 		productTable.putItem(new Item()
 				.withPrimaryKey("productId", 2)
 				.withString("sin", "SIN1001")
 				.withString("title", "World")
 				.withDouble("price", 6.0)
+				.withLong("version", 1)
 		);
 		productItemTable.putItem(new Item()
 				.withPrimaryKey("productId", 2, "itemCode", "Zbynek")
 				.withString("title", "World")
+				.withLong("version", 1)
 		);
 	}
 

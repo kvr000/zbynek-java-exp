@@ -23,13 +23,15 @@ import java.util.List;
 
 public class ParsersBenchmark
 {
+	public static final int DOCUMENT_LENGTH = 100_000;
+
 	protected static InputStream getInput()
 	{
 		PipedOutputStream out = new PipedOutputStream();
 		new Thread(() -> {
 			try {
 				out.write("col0,another,more,evenmore,col4,col5,col6,col7,col8,col9\n".getBytes());
-				for (int i = 0; i < 100_000; ++i) {
+				for (int i = 0; i < DOCUMENT_LENGTH; ++i) {
 					out.write("val0,another,more,evenmore,val4,val5,val6,val7,val8,val9\n".getBytes());
 				}
 				out.close();

@@ -14,14 +14,15 @@
 	</parent>
 
 	<properties>
-		<mapdb.version>3.0.0-M6</mapdb.version>
+		<mapdb.version>3.0.0</mapdb.version>
+		<chronicle-map.version>3.13.0</chronicle-map.version>
+		<one-nio.version>1.0</one-nio.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.16.0</version>
 		</dependency>
 
 		<dependency>
@@ -61,6 +62,20 @@
 			<artifactId>mapdb</artifactId>
 			<version>${mapdb.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>net.openhft</groupId>
+			<artifactId>chronicle-map</artifactId>
+			<version>${chronicle-map.version}</version>
+		</dependency>
+
+		<!--
+		<dependency>
+			<groupId>ru.odnoklassniki</groupId>
+			<artifactId>one-nio</artifactId>
+			<version>${one-nio.version}</version>
+		</dependency>
+		-->
 
 	</dependencies>
 </project>

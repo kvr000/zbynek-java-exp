@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.commons.compress;
+package cz.znj.kvr.sw.exp.java.commons.compress.benchmark;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
@@ -25,7 +25,7 @@ import java.util.zip.ZipException;
 
 
 @State(value = Scope.Benchmark)
-public class ReadBenchmark
+public class ZipFileParallelReadBenchmark
 {
 	public static final int FILE_SIZE = 100_000_000;
 

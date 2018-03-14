@@ -2,8 +2,8 @@ package cz.znj.kvr.sw.exp.java.jackson.builder;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -20,8 +20,8 @@ public class LombokBuilderTest
 	public void                     testObject() throws IOException
 	{
 		TestObject o = objectMapper.readValue("{ testId: 1, name: \"hello\" }", TestObject.class);
-		Assert.assertEquals(1, o.getTestId());
-		Assert.assertEquals("hello", o.getName());
+		AssertJUnit.assertEquals(1, o.getTestId());
+		AssertJUnit.assertEquals("hello", o.getName());
 		TestObject.builder().build();
 	}
 }

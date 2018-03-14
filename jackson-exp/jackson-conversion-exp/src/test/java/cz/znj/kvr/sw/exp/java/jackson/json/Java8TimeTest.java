@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -30,7 +30,7 @@ public class Java8TimeTest
 				.time(LocalTime.of(06, 05, 04))
 				.build();
 		String s = objectMapper.writeValueAsString(o);
-		Assert.assertEquals("{\"date\":[1977,3,12],\"time\":[6,5,4]}", s);
+		AssertJUnit.assertEquals("{\"date\":[1977,3,12],\"time\":[6,5,4]}", s);
 	}
 
 	@lombok.Builder(builderClassName = "Builder")

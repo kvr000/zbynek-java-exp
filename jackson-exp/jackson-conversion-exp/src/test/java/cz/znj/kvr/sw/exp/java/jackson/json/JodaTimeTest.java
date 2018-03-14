@@ -8,8 +8,8 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import lombok.Getter;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class JodaTimeTest
 				.time(LocalTime.parse("06:05:04"))
 				.build();
 		String s = objectMapper.writeValueAsString(o);
-		Assert.assertEquals("{\"date\":[1977,3,12],\"time\":[6,5,4,0]}", s);
+		AssertJUnit.assertEquals("{\"date\":[1977,3,12],\"time\":[6,5,4,0]}", s);
 	}
 
 	@lombok.Builder(builderClassName = "Builder")

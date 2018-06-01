@@ -6,17 +6,12 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import cz.znj.kvr.sw.exp.java.guice.di.common.Facade;
 import cz.znj.kvr.sw.exp.java.guice.di.common.First;
 import cz.znj.kvr.sw.exp.java.guice.di.common.Second;
-import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FacadeImpl;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.SecondImpl;
-import lombok.Getter;
-import org.junit.Assert;
-import org.junit.Test;
-
-import javax.inject.Inject;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 
 /**
@@ -24,13 +19,13 @@ import javax.inject.Inject;
  */
 public class ProvideSubModuleTest
 {
-	@Test(expected = Exception.class)
+	@Test(expectedExceptions = Exception.class)
 	public void testInject()
 	{
 		Module module = new TestModule();
 		Injector injector = Guice.createInjector(module);
 		Second bean = injector.getInstance(Second.class);
-		Assert.assertNotNull(bean);
+		AssertJUnit.assertNotNull(bean);
 	}
 
 	public class TestModule extends AbstractModule

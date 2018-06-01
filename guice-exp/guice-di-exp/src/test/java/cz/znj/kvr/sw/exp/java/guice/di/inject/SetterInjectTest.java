@@ -7,11 +7,8 @@ import com.google.inject.Module;
 import cz.znj.kvr.sw.exp.java.guice.di.common.First;
 import cz.znj.kvr.sw.exp.java.guice.di.common.Second;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 
@@ -24,7 +21,7 @@ public class SetterInjectTest
 		Module module = new TestModule();
 		Injector injector = Guice.createInjector(module);
 		Second bean = injector.getInstance(Second.class);
-		Assert.assertEquals(1, bean.getSecondValue());
+		AssertJUnit.assertEquals(1, bean.getSecondValue());
 	}
 
 	public class TestModule extends AbstractModule

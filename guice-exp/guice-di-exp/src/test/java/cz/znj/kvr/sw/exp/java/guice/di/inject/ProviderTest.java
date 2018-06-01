@@ -12,8 +12,8 @@ import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FacadeImpl;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.SecondImpl;
 import lombok.Getter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 
@@ -26,7 +26,7 @@ public class ProviderTest
 		Module module = new TestModule();
 		Injector injector = Guice.createInjector(module);
 		MyBean bean = injector.getInstance(MyBean.class);
-		Assert.assertEquals(2, bean.getFacade().getSecond().getSecondValue());
+		AssertJUnit.assertEquals(2, bean.getFacade().getSecond().getSecondValue());
 	}
 
 	public class TestModule extends AbstractModule

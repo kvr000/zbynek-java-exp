@@ -6,8 +6,8 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 
@@ -20,7 +20,7 @@ public class ConstructorInjectTest
 		Module module = new TestModule();
 		Injector injector = Guice.createInjector(module);
 		Bean bean = injector.getInstance(Bean.class);
-		Assert.assertNotNull(bean.getInjector());
+		AssertJUnit.assertNotNull(bean.getInjector());
 	}
 
 	public class TestModule extends AbstractModule

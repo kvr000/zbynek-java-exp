@@ -3,12 +3,11 @@ package cz.znj.kvr.sw.exp.java.guice.di.inject;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 import cz.znj.kvr.sw.exp.java.guice.di.common.First;
 import cz.znj.kvr.sw.exp.java.guice.di.common.Second;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 
@@ -20,7 +19,7 @@ public class MultiModuleTest
 	{
 		Injector injector = Guice.createInjector(new FirstTestModule(), new SecondTestModule());
 		Second bean = injector.getInstance(Second.class);
-		Assert.assertEquals(1, bean.getSecondValue());
+		AssertJUnit.assertEquals(1, bean.getSecondValue());
 	}
 
 	public class FirstTestModule extends AbstractModule

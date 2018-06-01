@@ -9,7 +9,7 @@
 	<artifactId>guice-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Spring experiments base</name>
+	<name>Guice experiments base</name>
 	<description>Parent of guice experiments</description>
 
 	<parent>

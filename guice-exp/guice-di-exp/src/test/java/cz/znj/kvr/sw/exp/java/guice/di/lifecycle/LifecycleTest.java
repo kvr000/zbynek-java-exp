@@ -4,16 +4,18 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.mycila.guice.ext.closeable.CloseableInjector;
 import com.mycila.guice.ext.closeable.CloseableModule;
 import com.mycila.guice.ext.jsr250.Jsr250Module;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 
 /**
@@ -25,9 +27,12 @@ public class LifecycleTest
 	public void testLifecycle()
 	{
 		Module module = new TestModule();
-		Injector injector = Guice.createInjector(module, new Jsr250Module(), new CloseableModule());
+		CloseableInjector injector = Guice.createInjector(new CloseableModule(), new Jsr250Module(), module)
+			.getInstance(CloseableInjector.class);
 		Bean bean = injector.getInstance(Bean.class);
-		Assert.assertEquals(2, bean.getState());
+		AssertJUnit.assertEquals(2, bean.getState());
+		injector.close();
+		AssertJUnit.assertEquals(3, bean.getState());
 	}
 
 	public class TestModule extends AbstractModule
@@ -40,6 +45,7 @@ public class LifecycleTest
 
 	@Getter
 	@NoArgsConstructor()
+	@Singleton
 	public static class Bean
 	{
 		private int state = 0;
@@ -49,7 +55,7 @@ public class LifecycleTest
 		@Inject
 		public void setInjector(Injector injector)
 		{
-			Assert.assertEquals(0, state);
+			AssertJUnit.assertEquals(0, state);
 			state = 1;
 			this.injector = injector;
 		}
@@ -57,8 +63,14 @@ public class LifecycleTest
 		@PostConstruct
 		public void init()
 		{
-			Assert.assertEquals(1, state);
+			AssertJUnit.assertEquals(1, state);
 			state = 2;
+		}
+
+		@PreDestroy
+		public void destroy()
+		{
+			state = 3;
 		}
 	}
 }

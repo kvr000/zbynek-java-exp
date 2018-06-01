@@ -9,10 +9,8 @@ import cz.znj.kvr.sw.exp.java.guice.di.common.First;
 import cz.znj.kvr.sw.exp.java.guice.di.common.Second;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
 import cz.znj.kvr.sw.exp.java.guice.di.common.impl.SecondImpl;
-import org.junit.Assert;
-import org.junit.Test;
-
-import javax.inject.Inject;
+import org.testng.AssertJUnit;
+import org.testng.annotations.Test;
 
 
 public class SingletonTest
@@ -25,11 +23,11 @@ public class SingletonTest
 
 		First first0 = injector.getInstance(First.class);
 		First first1 = injector.getInstance(First.class);
-		Assert.assertTrue("Non-singleton instances must be the same", first0 != first1);
+		AssertJUnit.assertTrue("Non-singleton instances must be the same", first0 != first1);
 
 		Second second0 = injector.getInstance(Second.class);
 		Second second1 = injector.getInstance(Second.class);
-		Assert.assertTrue("Singleton instances must be the same", second0 == second1);
+		AssertJUnit.assertTrue("Singleton instances must be the same", second0 == second1);
 	}
 
 	public class TestModule extends AbstractModule

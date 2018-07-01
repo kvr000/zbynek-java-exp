@@ -16,33 +16,41 @@
 		<javac.version>1.8</javac.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
 		<exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
+		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
+		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
 		<maven-war-plugin.version>2.6</maven-war-plugin.version>
 		<maven-shade-plugin.version>2.4.3</maven-shade-plugin.version>
 		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+		<spring-boot-maven-plugin.version>2.0.3.RELEASE</spring-boot-maven-plugin.version>
 
 		<lombok.version>1.16.10</lombok.version>
 
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 
+		<jmh.version>1.11.1</jmh.version>
+
 		<javax.inject.version>1</javax.inject.version>
 		<jsr305.version>3.0.0</jsr305.version>
 		<javax.cache.version>1.0.0</javax.cache.version>
 
-		<junit.version>4.12</junit.version>
 		<testng.version>6.9.10</testng.version>
-		<xmlunit.version>2.3.0</xmlunit.version>
-		<jmh.version>1.11.1</jmh.version>
+
+		<junit.version>4.12</junit.version>
 		<jmock-junit4.version>2.5.1</jmock-junit4.version>
-		<log4j.version>2.2</log4j.version>
-		<slf4j.version>1.7.5</slf4j.version>
 
 		<hamcrest.version>2.1</hamcrest.version>
 
 		<xmlunit.version>2.6.3</xmlunit.version>
 
 		<mockito.version>2.0.52-beta</mockito.version>
+
+		<log4j.version>2.11.0</log4j.version>
+		<slf4j.version>1.7.5</slf4j.version>
+
+		<joda-time.version>2.9.9</joda-time.version>
 
 		<reflections.version>0.9.10</reflections.version>
 
@@ -61,23 +69,37 @@
 
 		<guava.version>20.0</guava.version>
 
-		<jackson.version>2.7.4</jackson.version>
-		<gson.version>2.5</gson.version>
-
 		<jackson.version>2.9.0.pr2</jackson.version>
 
-		<spring.version>4.3.3.RELEASE</spring.version>
-		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
-		<spring.security.version>4.0.1.RELEASE</spring.security.version>
+		<gson.version>2.5</gson.version>
+
+		<spring.version>5.0.7.RELEASE</spring.version>
+		<spring-boot.version>2.0.3.RELEASE</spring-boot.version>
+		<spring-security.version>5.0.6.RELEASE</spring-security.version>
+
 		<httpcomponents.version>4.5</httpcomponents.version>
+
 		<wagon.version>2.9</wagon.version>
+
 		<netty.version>4.0.33.Final</netty.version>
+
 		<protobuf.version>3.0.0-beta-1</protobuf.version>
-		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+
 		<camel.version>2.17.1</camel.version>
 
 		<dryuf-concurrent.version>0.0.1</dryuf-concurrent.version>
 		<dryuf-cmdline.version>0.0.1</dryuf-cmdline.version>
+
+		<bootstrap.version>4.1.1</bootstrap.version>
+
+		<jquery.version>3.3.1-1</jquery.version>
+
+		<sockjs-client.version>1.1.2</sockjs-client.version>
+
+		<stomp-websocket.version>2.3.3-1</stomp-websocket.version>
+
+		<react.version>16.3.2</react.version>
+
 	</properties>
 
 	<build>
@@ -164,9 +186,9 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.testng</groupId>
-				<artifactId>testng</artifactId>
-				<version>${testng.version}</version>
+				<groupId>javax.servlet</groupId>
+				<artifactId>jstl</artifactId>
+				<version>1.2</version>
 			</dependency>
 
 			<dependency>
@@ -472,32 +494,85 @@
 				<artifactId>spring-webmvc</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-websocket</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-messsaging</artifactId>
+				<version>${spring.version}</version>
+			</dependency>
 
 			<!-- Spring Security -->
 			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-core</artifactId>
-				<version>${spring.security.version}</version>
+				<version>${spring-security.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-web</artifactId>
-				<version>${spring.security.version}</version>
+				<version>${spring-security.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-taglibs</artifactId>
-				<version>${spring.security.version}</version>
+				<version>${spring-security.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-config</artifactId>
-				<version>${spring.security.version}</version>
+				<version>${spring-security.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.security</groupId>
 				<artifactId>spring-security-openid</artifactId>
-				<version>${spring.security.version}</version>
+				<version>${spring-security.version}</version>
+			</dependency>
+
+			<!-- Spring boot -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-autoconfigure</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-tools</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-web</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-websocket</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-reactor-netty</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-tomcat</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-devtools</artifactId>
+				<version>${spring-boot.version}</version>
+				<optional>true</optional>
 			</dependency>
 
 			<!-- dryuf -->
@@ -510,6 +585,36 @@
 				<groupId>net.dryuf</groupId>
 				<artifactId>dryuf-cmdline</artifactId>
 				<version>${dryuf-cmdline.version}</version>
+			</dependency>
+
+			<!-- Web Jars -->
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>bootstrap</artifactId>
+				<version>${bootstrap.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>jquery</artifactId>
+				<version>${jquery.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>react</artifactId>
+				<version>${react.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>sockjs-client</artifactId>
+				<version>${sockjs-client.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.webjars</groupId>
+				<artifactId>stomp-websocket</artifactId>
+				<version>${stomp-websocket.version}</version>
 			</dependency>
 
 		</dependencies>

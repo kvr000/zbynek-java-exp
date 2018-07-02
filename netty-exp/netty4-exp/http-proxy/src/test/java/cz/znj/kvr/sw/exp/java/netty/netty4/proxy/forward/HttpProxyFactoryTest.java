@@ -341,7 +341,7 @@ public class HttpProxyFactoryTest
 		verify(f.nettyRuntime, times(1)).forwardDuplex(f.client, f.server);
 	}
 
-	@Test(timeOut = 1000L)
+	@Test(timeOut = 10000L)
 	public void requestParsing_methodToHost_forward() throws Exception
 	{
 		ServerFixture f = new ServerFixture();

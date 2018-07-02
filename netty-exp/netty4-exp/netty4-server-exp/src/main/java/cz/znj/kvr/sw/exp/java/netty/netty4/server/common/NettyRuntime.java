@@ -19,6 +19,12 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerDomainSocketChannel;
 import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.epoll.EpollSocketChannel;
+import io.netty.channel.kqueue.KQueueDatagramChannel;
+import io.netty.channel.kqueue.KQueueDomainSocketChannel;
+import io.netty.channel.kqueue.KQueueEventLoopGroup;
+import io.netty.channel.kqueue.KQueueServerDomainSocketChannel;
+import io.netty.channel.kqueue.KQueueServerSocketChannel;
+import io.netty.channel.kqueue.KQueueSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.DuplexChannel;
@@ -72,7 +78,8 @@ public class NettyRuntime implements Closeable
 	private EventLoopGroup workerGroup = configAdapter.createEventLoopGroup();
 
 	@Getter
-	private final InetNameResolver inetNameResolver = new DnsNameResolverBuilder(workerGroup.next())
+	private final InetNameResolver inetNameResolver = new DnsNameResolverBuilder()
+		.eventLoop(workerGroup.next())
 		.channelType(configAdapter.getDatagramChannel())
 		.build();
 
@@ -288,6 +295,9 @@ public class NettyRuntime implements Closeable
 			if (SystemUtils.IS_OS_LINUX) {
 				return new EpollConfigAdapter();
 			}
+			else if (SystemUtils.IS_OS_MAC_OSX) {
+				return new KqueueConfigAdapter();
+			}
 		}
 		catch (Throwable ex) {
 			log.error("Cannot create expected ConfigAdapter, falling back to Nio", ex);
@@ -351,6 +361,54 @@ public class NettyRuntime implements Closeable
 		public Class<? extends DatagramChannel> getDatagramChannel()
 		{
 			return EpollDatagramChannel.class;
+		}
+	}
+
+	public static class KqueueConfigAdapter implements ConfigAdapter
+	{
+		static {
+			KQueueEventLoopGroup events = new KQueueEventLoopGroup();
+			events.shutdownGracefully(0, 0, TimeUnit.SECONDS);
+		}
+
+		@Override
+		public EventLoopGroup createEventLoopGroup()
+		{
+			return new KQueueEventLoopGroup();
+		}
+
+		@Override
+		public Class<? extends ServerChannel> getServerChannel(SocketAddress address)
+		{
+			if (address instanceof InetSocketAddress) {
+				return KQueueServerSocketChannel.class;
+			}
+			else if (address instanceof DomainSocketAddress) {
+				return KQueueServerDomainSocketChannel.class;
+			}
+			else {
+				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
+			}
+		}
+
+		@Override
+		public Class<? extends Channel> getClientChannel(SocketAddress address)
+		{
+			if (address instanceof InetSocketAddress) {
+				return KQueueSocketChannel.class;
+			}
+			else if (address instanceof DomainSocketAddress) {
+				return KQueueDomainSocketChannel.class;
+			}
+			else {
+				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
+			}
+		}
+
+		@Override
+		public Class<? extends DatagramChannel> getDatagramChannel()
+		{
+			return KQueueDatagramChannel.class;
 		}
 	}
 

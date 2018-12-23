@@ -19,7 +19,7 @@
 	<description>PdfBox basic experiment</description>
 
 	<properties>
-		<pdfbox.version>2.0.3</pdfbox.version>
+		<pdfbox.version>2.0.12</pdfbox.version>
 	</properties>
 
 	<dependencies>

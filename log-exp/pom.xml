@@ -5,12 +5,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cz.znj.kvr.sw.exp.java.corejava</groupId>
-	<artifactId>corejava-exp-base</artifactId>
+	<groupId>cz.znj.kvr.sw.exp.java.logexp</groupId>
+	<artifactId>log-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Core Java experiments base</name>
-	<description>Parent of corejava experiments</description>
+	<name>Log experiments base</name>
+	<description>Parent of log experiments</description>
 
 	<parent>
 		<groupId>cz.znj.kvr.sw.exp.java</groupId>
@@ -21,18 +21,5 @@
 
 	<properties>
 	</properties>
-
-	<modules>
-		<module>corejava-annotation-exp</module>
-		<module>corejava-math-exp</module>
-		<module>corejava-reflection-exp</module>
-		<module>corejava-stream-exp</module>
-	</modules>
-
-	<dependencyManagement>
-		<dependencies>
-
-		</dependencies>
-	</dependencyManagement>
 
 </project>

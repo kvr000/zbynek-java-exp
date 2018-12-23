@@ -28,7 +28,6 @@
 		<dynamodb.version>1.11.76</dynamodb.version>
 		<dynamodb-local.version>1.11.0.1</dynamodb-local.version>
 		<sqlite4java.version>1.0.392</sqlite4java.version>
-		<jackson.version>2.6.6</jackson.version>
 	</properties>
 
 	<modules>

@@ -9,7 +9,7 @@
 	<artifactId>nio-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Spring experiments base</name>
+	<name>Nio experiments base</name>
 	<description>Parent of nio experiments</description>
 
 	<parent>

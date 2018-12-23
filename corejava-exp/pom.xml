@@ -9,7 +9,7 @@
 	<artifactId>corejava-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Spring experiments base</name>
+	<name>Core Java experiments base</name>
 	<description>Parent of corejava experiments</description>
 
 	<parent>
@@ -24,7 +24,10 @@
 
 	<modules>
 		<module>corejava-annotation-exp</module>
+		<module>corejava-classpath-exp</module>
+		<module>corejava-exception-exp</module>
 		<module>corejava-math-exp</module>
+		<module>corejava-lang-exp</module>
 		<module>corejava-reflection-exp</module>
 		<module>corejava-stream-exp</module>
 	</modules>

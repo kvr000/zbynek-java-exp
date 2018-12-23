@@ -9,7 +9,7 @@
 	<artifactId>qooxdoo-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Spring experiments base</name>
+	<name>Qooxdoo experiments base</name>
 	<description>Parent of qooxdoo experiments</description>
 
 	<parent>

@@ -9,7 +9,7 @@
 	<artifactId>mapdb-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Spring experiments base</name>
+	<name>MapDb experiments base</name>
 	<description>Parent of mapdb experiments</description>
 
 	<parent>

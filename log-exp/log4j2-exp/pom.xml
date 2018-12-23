@@ -5,16 +5,16 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cz.znj.kvr.sw.exp.java.corejava</groupId>
-	<artifactId>corejava-exp-base</artifactId>
+	<groupId>cz.znj.kvr.sw.exp.java.logexp.log4j2</groupId>
+	<artifactId>log4j2-exp-base</artifactId>
 	<packaging>pom</packaging>
 	<version>0.0.1</version>
-	<name>Spring experiments base</name>
-	<description>Parent of corejava experiments</description>
+	<name>Log4j2 experiments base</name>
+	<description>Parent of Log4j2 experiments</description>
 
 	<parent>
-		<groupId>cz.znj.kvr.sw.exp.java</groupId>
-		<artifactId>java-exp</artifactId>
+		<groupId>cz.znj.kvr.sw.exp.java.logexp</groupId>
+		<artifactId>log-exp-base</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
@@ -23,10 +23,7 @@
 	</properties>
 
 	<modules>
-		<module>corejava-annotation-exp</module>
-		<module>corejava-math-exp</module>
-		<module>corejava-reflection-exp</module>
-		<module>corejava-stream-exp</module>
+		<module>log4j2-logging-exp</module>
 	</modules>
 
 	<dependencyManagement>

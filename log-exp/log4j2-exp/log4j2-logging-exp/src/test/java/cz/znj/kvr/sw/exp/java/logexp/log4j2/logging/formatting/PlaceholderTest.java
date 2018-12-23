@@ -24,4 +24,10 @@ public class PlaceholderTest
 	{
 		log.fatal("Placeholder: {1} {0}", "World", "Hello");
 	}
+
+	@Test
+	public void testParameterWithsException()
+	{
+		log.fatal("Hello: {} of {}", "End", "World", new Exception());
+	}
 }

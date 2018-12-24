@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
 
 /**
@@ -15,15 +14,12 @@ import java.util.concurrent.ExecutorService;
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class LocalExecutionAgent implements ExecutionAgent
 {
-	private final ExecutorService executorService;
-
 	@Override
 	public CompletableFuture<Integer> execute(Machine machine, List<String> command)
 	{
 		CompletableFuture<Integer> future = new CompletableFuture<Integer>() {
 			Process process;
 
-			public CompletableFuture<Integer> initialize()
 			{
 				try {
 					this.process = new ProcessBuilder()
@@ -31,21 +27,21 @@ public class LocalExecutionAgent implements ExecutionAgent
 						.redirectOutput(ProcessBuilder.Redirect.INHERIT)
 						.redirectError(ProcessBuilder.Redirect.INHERIT)
 						.start();
-					executorService.execute(() -> {
-						try {
-							complete(process.waitFor());
-						}
-						catch (Throwable ex) {
-							completeExceptionally(ex);
-						}
-					});
+					process.onExit()
+						.whenComplete((process1, ex) -> {
+							if (ex != null) {
+								completeExceptionally(ex);
+							}
+							else {
+								complete(process1.exitValue());
+							}
+						});
 				}
 				catch (Throwable ex) {
 					completeExceptionally(ex);
 				}
-				return this;
 			}
-		}.initialize();
+		};
 		return future;
 	}
 }

@@ -22,7 +22,7 @@ public class ExternalRuntimeJobExecutorConcurrentTest
 {
 	private JobExecutor jobExecutor = new RuntimeJobExecutor(
 		new WrappingExecutionAgent(
-			ImmutableMap.of("local", new LocalExecutionAgent(Executors.newCachedThreadPool()))
+			ImmutableMap.of("local", new LocalExecutionAgent())
 		)
 	);
 

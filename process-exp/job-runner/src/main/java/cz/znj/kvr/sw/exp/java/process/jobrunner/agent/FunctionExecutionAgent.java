@@ -26,7 +26,6 @@ public class FunctionExecutionAgent implements ExecutionAgent
 	{
 		CompletableFuture<Integer> future = new CompletableFuture<Integer>()
 		{
-			public CompletableFuture<Integer> initialize()
 			{
 				try {
 					String clazzName = command.get(0);
@@ -64,9 +63,8 @@ public class FunctionExecutionAgent implements ExecutionAgent
 				catch (Throwable ex) {
 					completeExceptionally(ex);
 				}
-				return this;
 			}
-		}.initialize();
+		};
 		return future;
 	}
 }

@@ -50,7 +50,7 @@ public class ProcessExecutor
 		{
 			Process process;
 
-			CompletableFuture<Integer> exitFuture = new CompletableFuture<>();
+			final CompletableFuture<Integer> exitFuture = new CompletableFuture<>();
 
 			@Override
 			public CompletableFuture<Integer> waitExit()
@@ -72,28 +72,27 @@ public class ProcessExecutor
 					this.process.destroyForcibly();
 			}
 
-			public TaskHandle initialize()
 			{
 				try {
 					this.process = builder
 						.redirectOutput(ProcessBuilder.Redirect.INHERIT)
 						.redirectError(ProcessBuilder.Redirect.INHERIT)
 						.start();
-					executorService.execute(() -> {
-						try {
-							exitFuture.complete(process.waitFor());
-						}
-						catch (Throwable ex) {
-							exitFuture.completeExceptionally(ex);
-						}
-					});
+					process.onExit()
+						.whenComplete((process1, ex) -> {
+							if (ex != null) {
+								exitFuture.completeExceptionally(ex);
+							}
+							else {
+								exitFuture.complete(process1.exitValue());
+							}
+						});
 				}
 				catch (Throwable ex) {
 					exitFuture.completeExceptionally(ex);
 				}
-				return this;
 			}
-		}.initialize();
+		};
 		return handle;
 	}
 }

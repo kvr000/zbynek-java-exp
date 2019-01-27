@@ -33,6 +33,9 @@
 
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+		<webstart-maven-plugin.version>1.0-beta-2</webstart-maven-plugin.version>
+		<grunt-maven-plugin.version>1.5.1</grunt-maven-plugin.version>
+		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 
 		<spring-boot-maven-plugin.version>2.0.6.RELEASE</spring-boot-maven-plugin.version>
 
@@ -84,6 +87,7 @@
 		<commons-io.version>2.4</commons-io.version>
 
 		<guice.version>4.1.0</guice.version>
+		<mycila-guice-extensions.version>4.0.rc1</mycila-guice-extensions.version>
 
 		<dagger.version>2.20</dagger.version>
 
@@ -101,13 +105,30 @@
 
 		<wagon.version>2.9</wagon.version>
 
-		<netty.version>5.0.0.Alpha3</netty.version>
+		<netty.version>4.1.33.Final</netty.version>
 
 		<protobuf.version>3.0.0-beta-1</protobuf.version>
 
 		<camel.version>2.24.0</camel.version>
 
+		<dryuf-concurrent.version>1.1.0</dryuf-concurrent.version>
+
+		<dryuf-bigio.version>0.0.1</dryuf-bigio.version>
+
+		<tomcat-embed-jasper.version>9.0.14</tomcat-embed-jasper.version>
+
+		<org.eclipse.jdt.core.compiler-ecj.version>4.6.1</org.eclipse.jdt.core.compiler-ecj.version>
+
 		<bootstrap.version>4.1.1</bootstrap.version>
+
+		<org.mapdb.version>1.0.9</org.mapdb.version>
+
+		<org.mongodb.version>3.3.0</org.mongodb.version>
+		<fakemongo-fongo.version>2.0.10</fakemongo-fongo.version>
+		<flapdoodle.embed.mongo.version>1.50.5</flapdoodle.embed.mongo.version>
+
+		<snmp4j.version>3.0.6</snmp4j.version>
+		<snmp4j-agent.version>3.0.3</snmp4j-agent.version>
 
 		<jquery.version>3.3.1-1</jquery.version>
 
@@ -174,16 +195,37 @@
 				</plugin>
 
 				<!-- Maven 3rd-party plugins -->
+
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>${exec-maven-plugin.version}</version>
 				</plugin>
+
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>${build-helper-maven-plugin.version}</version>
 				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo.webstart</groupId>
+					<artifactId>webstart-maven-plugin</artifactId>
+					<version>${webstart-maven-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>pl.allegro</groupId>
+					<artifactId>grunt-maven-plugin</artifactId>
+					<version>${grunt-maven-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>com.github.eirslett</groupId>
+					<artifactId>frontend-maven-plugin</artifactId>
+					<version>${frontend-maven-plugin.version}</version>
+				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -343,6 +385,17 @@
 				<artifactId>guice</artifactId>
 				<version>${guice.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.mycila.guice.extensions</groupId>
+				<artifactId>mycila-guice-injection</artifactId>
+				<version>${mycila-guice-extensions.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.mycila.guice.extensions</groupId>
+				<artifactId>mycila-guice-jsr250</artifactId>
+				<version>${mycila-guice-extensions.version}</version>
+			</dependency>
+
 
 			<dependency>
 				<groupId>com.google.dagger</groupId>
@@ -582,7 +635,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-messsaging</artifactId>
+				<artifactId>spring-messaging</artifactId>
 				<version>${spring.version}</version>
 			</dependency>
 
@@ -646,6 +699,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-thymeleaf</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-tomcat</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
@@ -655,6 +713,81 @@
 				<version>${spring-boot.version}</version>
 				<optional>true</optional>
 			</dependency>
+
+			<!-- dryuf -->
+			<dependency>
+				<groupId>net.dryuf</groupId>
+				<artifactId>dryuf-concurrent</artifactId>
+				<version>${dryuf-concurrent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.dryuf</groupId>
+				<artifactId>dryuf-bigio</artifactId>
+				<version>${dryuf-bigio.version}</version>
+			</dependency>
+
+			<!-- JSP pages -->
+			<dependency>
+				<groupId>org.apache.tomcat.embed</groupId>
+				<artifactId>tomcat-embed-jasper</artifactId>
+				<version>${tomcat-embed-jasper.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.eclipse.jdt.core.compiler</groupId>
+				<artifactId>ecj</artifactId>
+				<version>${org.eclipse.jdt.core.compiler-ecj.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mapdb</groupId>
+				<artifactId>mapdb</artifactId>
+				<version>${org.mapdb.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mongodb</groupId>
+				<artifactId>mongo-java-driver</artifactId>
+				<version>${org.mongodb.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.fakemongo</groupId>
+				<artifactId>fongo</artifactId>
+				<version>${fakemongo-fongo.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.flapdoodle.embed</groupId>
+				<artifactId>de.flapdoodle.embed.mongo</artifactId>
+				<version>${flapdoodle.embed.mongo.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.snmp4j</groupId>
+				<artifactId>snmp4j-agent</artifactId>
+				<version>${snmp4j-agent.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.snmp4j</groupId>
+				<artifactId>snmp4j</artifactId>
+				<version>${snmp4j.version}</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-mongodb</artifactId>
+				<version>${spring-data.version}</version>
+			</dependency>
+
+			<!-- spring boot is not good solution as the port is hardcoded -->
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter-data-mongodb</artifactId>
+				<version>${spring-boot.version}</version>
+			</dependency>
+
 
 			<!-- Web Jars -->
 			<dependency>

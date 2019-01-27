@@ -44,12 +44,10 @@
 			<dependency>
 				<groupId>com.mycila.guice.extensions</groupId>
 				<artifactId>mycila-guice-injection</artifactId>
-				<version>4.0.rc1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.mycila.guice.extensions</groupId>
 				<artifactId>mycila-guice-jsr250</artifactId>
-				<version>4.0.rc1</version>
 			</dependency>
 
 		</dependencies>

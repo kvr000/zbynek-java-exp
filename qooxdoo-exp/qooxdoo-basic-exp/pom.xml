@@ -24,7 +24,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
+				<version>${build-helper-maven-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>add-source</id>
@@ -57,7 +57,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.10</version>
+				<version>${maven-dependency-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>unpack-dependencies</id>
@@ -88,7 +88,7 @@
 			<plugin>
 				<groupId>pl.allegro</groupId>
 				<artifactId>grunt-maven-plugin</artifactId>
-				<version>1.0.2</version>
+				<version>${grunt-maven-plugin.version}</version>
 				<configuration>
 					<gruntBuildDirectory>${project.build.directory}/grunt</gruntBuildDirectory>
 				</configuration>
@@ -156,8 +156,9 @@
 			       prepare distribution by copying files in a maven compliant structure
 			-->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
+				<version>${maven-resources-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>prepare-package-javascript</id>
@@ -227,9 +228,7 @@
 					<plugin>
 						<groupId>com.github.eirslett</groupId>
 						<artifactId>frontend-maven-plugin</artifactId>
-						<!-- Use the latest released version:
-						https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>0.0.26</version>
+						<version>${frontend-maven-plugin.version}</version>
 						<executions>
 							<execution>
 								<phase>validate</phase>

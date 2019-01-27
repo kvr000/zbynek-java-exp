@@ -7,7 +7,7 @@
 
 	<groupId>cz.znj.kvr.sw.exp.java</groupId>
 	<artifactId>console-exp</artifactId>
-	<version>0.0</version>
+	<version>0.0.1</version>
 
 	<parent>
 		<groupId>cz.znj.kvr.sw.exp.java</groupId>

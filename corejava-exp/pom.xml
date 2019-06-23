@@ -28,6 +28,7 @@
 		<module>corejava-exception-exp</module>
 		<module>corejava-math-exp</module>
 		<module>corejava-lang-exp</module>
+		<module>corejava-string-exp</module>
 		<module>corejava-localization-exp</module>
 		<module>corejava-reflection-exp</module>
 		<module>corejava-stream-exp</module>

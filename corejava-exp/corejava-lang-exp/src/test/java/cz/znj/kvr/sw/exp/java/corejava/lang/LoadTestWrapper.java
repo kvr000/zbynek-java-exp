@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.corejava.lang;
+package cz.znj.kvr.sw.exp.java.corejava.lang.classload;
 
 
 /**

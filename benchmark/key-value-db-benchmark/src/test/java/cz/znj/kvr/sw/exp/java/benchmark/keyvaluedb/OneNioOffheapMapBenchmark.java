@@ -25,6 +25,9 @@
 //
 //
 //@State(value = Scope.Benchmark)
+//@Fork(0)
+//@Warmup(iterations = 1)
+//@Measurement(iterations = 2, time = 10)
 //@Log4j2
 //public class OneNioOffheapMapBenchmark
 //{
@@ -51,9 +54,6 @@
 //	}
 //
 //	@Benchmark
-//	@Fork(0)
-//	@Warmup(iterations = 1)
-//	@Measurement(iterations = 2, time = 10)
 //	public void benchmarkSequentialSingle1M() throws IOException {
 //		try (SmallKeyValueSupplier keyValueSupplier = new SmallKeyValueSupplier()) {
 //			new SequentialSingleThreadedBenchmarker().benchmark(1_000_000, NUM_ITEMS, (Long partition) -> new AbstractCloseableConsumer<Long>() {
@@ -67,9 +67,6 @@
 //	}
 //
 //	@Benchmark
-//	@Fork(0)
-//	@Warmup(iterations = 1)
-//	@Measurement(iterations = 2, time = 10)
 //	public void benchmarkSequentialMulti1M() throws IOException {
 //		try (SmallKeyValueSupplier keyValueSupplier = new SmallKeyValueSupplier()) {
 //			new SequentialMultiThreadedBenchmarker().benchmark(1_000_000, NUM_ITEMS, (Long partition) -> new AbstractCloseableConsumer<Long>() {

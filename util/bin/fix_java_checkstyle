@@ -1,0 +1,142 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Slurp;
+use FileHandle;
+
+
+sub addFinal($)
+{
+	my ( $original ) = @_;
+
+	my ( $start, $rest, $open ) = ( $original, "", 0);
+	while ($start =~ m/^(.*?)((\b[\w.]+\b)|(\?|\.\.\.|\[\])|(,\s*)|(\s+)|(<)|(>))$/) {
+		$start = $1;
+		$rest = $2.$rest;
+		return "${start}final ${rest}" if ((defined $3) && $open == 0);
+		if (defined $7) {
+			--$open;
+		}
+		elsif (defined $8) {
+			++$open;
+		}
+	}
+	die "Could not add final before type: $original";
+}
+
+sub wrapLineChar($$$)
+{
+	my ( $line, $length, $c ) = ( @_ );
+	my $rest = $line;
+	chomp($rest);
+	my $output = "";
+	my $isComment = $line =~ m/^\s*\/\//;
+	die "length already shorter than $length" if (length($rest) <= $length);
+	while (length($rest) > $length) {
+		my $last = $isComment ? length(($rest =~ m/^(\s*\/\/\s*)/)[0]) : 0;
+		my $success = -1;
+		for (;;) {
+			my $split = $rest =~ m/^(.{$last}.*?($c))/ ? length($1) : -1;
+			my $sq = $isComment ? -1 : index($rest, "\'", $last);
+			my $dq = index($rest, "\"", $last);
+			my $commentStar = index($rest, "/*", $last);
+			my $commentDouble = index($rest, "//", $last);
+			my $commentAny = $commentStar >= 0 ? $commentDouble < 0 || $commentStar < $commentDouble ? $commentStar : $commentDouble : $commentDouble;
+			if ($split < 0) {
+				die "Failed to find ^(.{$last}.*?($c)) out of string literals to split in '$rest'" if ($success < 0);
+				last;
+			}
+			if (($dq >= 0 && $dq < $split) || ($sq >= 0 && $sq < $split)) {
+				my $p = ($sq >= 0 && ($dq < 0 || $sq < $dq)) ? $sq : $dq;
+				if ($commentAny <= $p) {
+					last if ($success >= 0);
+					die "Failed to split before comment";
+				}
+				my $c = ($sq >= 0 && ($dq < 0 || $sq < $dq)) ? "'" : "\"";
+				$rest =~ m/^(.{$p}$c(?:[^$c\\]|\\.)+$c)/
+					or die "Failed to match end of string with start at ^(.{$p}$c(?:[^$c\\]|\\.)+$c) :: $rest";
+				$last = length($1);
+			}
+			elsif ($commentAny >= 0 && $commentAny <= $split) {
+				last if ($success >= 0);
+				die "Failed to split before comment";
+			}
+			elsif ($split >= $length) {
+				die "Failed to find split within limit" if ($success < 0);
+				last;
+			}
+			else {
+				die "split is the same as last" if ($last == $split);
+				$success = $last = $split;
+			}
+		}
+		$output .= (substr($rest, 0, $success) =~ m/^(.*?)\s*$/)[0]."\n";
+		$rest = ($line =~ m/^(\s+(?:\/\/\s*)?)/)[0].($isComment ? "" : "        ").substr($rest, $success);
+	}
+	return $output.$rest.(($line =~ m/((\r?\n)?)$/s)[0]);
+}
+
+sub wrapLine($$)
+{
+	my ( $line, $length ) = @_;
+	for my $c ($line =~ m/^\s*\/\// ? " " : ( ",", "=", '(\+\+|--|\+|->|-|\()')) {
+		my $out = eval {
+			wrapLineChar($line, $length, $c);
+		};
+		return $out if (defined $out);
+	}
+	die $@;
+}
+
+my $lastFilename = "";
+my @lines;
+while (<>) {
+	chomp;
+	my $full = $_;
+	STDERR->say("Expected ... filepath:line:col: message for $full"), next unless (m/^(.*?\s)([a-zA-Z0-9_\/.]+):(\d+):(?:(\d+):)?\s(.*?)\s\[(\w+)\]$/);
+	my ( $filename, $lineno, $colno, $message, $category ) = ( $2, $3-1, $4, $5, $6 );
+	eval {
+		@lines = read_file($filename), $lastFilename = $filename unless ($filename eq $lastFilename);
+		if ($category eq "FinalLocalVariable") {
+			$message =~ m/Variable '(\w+)' should be declared final/
+				or die "Failed to match FinalLocalVariable error: $message";
+			my $parameter = $1;
+			my @split;
+			(split(/(?<!\.)\b$parameter\b(?!\()/, $lines[$lineno])) <= 2
+				or die "Found multiple variable names $parameter for: $full ($lines[$lineno])";
+			$lines[$lineno] =~ m/^(.*?)(?<!\.)(\s+$parameter\b(?!\().*)$/s
+				or die "Failed to match variable context for: $full";
+			my ( $beginning, $rest ) = ( $1, $2 );
+			$lines[$lineno] = addFinal($beginning).$rest;
+		}
+		elsif ($category eq "FinalParameters") {
+			$message =~ m/Parameter (\w+) should be final/
+				or die "Failed to match FinalLocalVariable error: $message";
+			my $parameter = $1;
+			my @split;
+			(split(/(?<!\.)\b$parameter\b(?!\()/, $lines[$lineno])) <= 2
+				or die "Found multiple parameter names $parameter for: $full ($lines[$lineno])";
+			$lines[$lineno] =~ m/^(.*?)(?<!\.)(\s+$parameter\b(?!\().*)$/s
+				or die "Failed to match parameter context for: $full";
+			my ( $beginning, $rest ) = ( $1, $2 );
+			$lines[$lineno] = addFinal($beginning).$rest;
+		}
+		elsif ($category eq "LineLength") {
+			$message =~ m/^Line is longer than (\d+) characters.*/
+				or die "Failed to match LineLength error: $message";
+			$lines[$lineno] = wrapLine($lines[$lineno], $1);
+		}
+		else {
+			STDERR->say("Skipping unsupported message: $_");
+			goto SKIP;
+		}
+		STDERR->say("success");
+		write_file($filename, @lines);
+SKIP:
+		1;
+	}
+		or STDERR->say("Failed to process $_: $@");
+
+}

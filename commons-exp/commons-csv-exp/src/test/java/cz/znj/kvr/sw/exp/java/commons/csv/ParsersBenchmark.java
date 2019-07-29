@@ -6,8 +6,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Warmup;
 
 import java.io.BufferedReader;
@@ -19,8 +22,14 @@ import java.io.PipedOutputStream;
 import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
+@Warmup(iterations = 1)
+@Measurement(iterations = 2, batchSize = 1)
+@Fork(warmups = 1, value = 1)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class ParsersBenchmark
 {
 	public static final int DOCUMENT_LENGTH = 100_000;
@@ -49,9 +58,6 @@ public class ParsersBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, batchSize = 1)
-	@Fork(warmups = 1, value = 1)
 	public void                     benchmarkSplitRead() throws Exception
 	{
 		List<String[]> records = new LinkedList<>();
@@ -64,9 +70,6 @@ public class ParsersBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, batchSize = 1)
-	@Fork(warmups = 1, value = 1)
 	public void                     benchmarkCsvRead() throws Exception
 	{
 		List<String[]> records = new LinkedList<>();

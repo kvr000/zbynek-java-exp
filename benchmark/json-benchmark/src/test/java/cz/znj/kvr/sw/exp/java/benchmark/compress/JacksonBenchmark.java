@@ -7,8 +7,11 @@ import lombok.extern.log4j.Log4j2;
 import net.dryuf.bigio.iostream.LinedInputMultiStream;
 import net.dryuf.bigio.iostream.MultiStream;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Warmup;
 import org.testng.annotations.Test;
 
@@ -17,10 +20,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 
 @Log4j2
+@Fork(0)
+@Warmup(iterations = 1)
+@Measurement(iterations = 2, time = 10)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class JacksonBenchmark
 {
 	public static ObjectMapper mapper = new ObjectMapper();
@@ -40,36 +49,24 @@ public class JacksonBenchmark
 	}).get();
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkBytesRead() throws IOException
 	{
 		mapper.readerFor(new TypeReference<Collection<TestDomain>>() {}).readValue(json);
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkStringRead() throws IOException
 	{
 		mapper.readerFor(new TypeReference<Collection<TestDomain>>() {}).readValue(new String(json));
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkStreamRead() throws IOException
 	{
 		mapper.readerFor(new TypeReference<Collection<TestDomain>>() {}).readValue(new ByteArrayInputStream(json));
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	@Test
 	public void benchmarkMultiStreamRead() throws IOException
 	{

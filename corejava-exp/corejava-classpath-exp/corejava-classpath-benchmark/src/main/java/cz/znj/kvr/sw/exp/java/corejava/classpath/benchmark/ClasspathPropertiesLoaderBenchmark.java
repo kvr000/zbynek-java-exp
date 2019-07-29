@@ -2,8 +2,11 @@ package cz.znj.kvr.sw.exp.java.corejava.classpath.benchmark;
 
 import lombok.extern.log4j.Log4j2;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Warmup;
 
 import java.io.IOException;
@@ -14,11 +17,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 
 /**
  * Benchmark for loading properties files from classpath.
  */
+@Fork(0)
+@Warmup(iterations = 1)
+@Measurement(iterations = 2, time = 10)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Log4j2
 public class ClasspathPropertiesLoaderBenchmark
 {
@@ -30,9 +39,6 @@ public class ClasspathPropertiesLoaderBenchmark
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkUtf8Reader() throws IOException
 	{
 		try (Reader reader = openClasspathPropertiesReader()) {
@@ -50,9 +56,6 @@ public class ClasspathPropertiesLoaderBenchmark
 	 */
 	@SuppressWarnings("checkstyle:MagicNumber")
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkInputStream() throws IOException
 	{
 		try (InputStream reader = openClasspathProperties()) {

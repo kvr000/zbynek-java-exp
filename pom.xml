@@ -175,6 +175,9 @@
 
 		<react.version>16.3.2</react.version>
 
+		<zstd.version>1.4.2-1</zstd.version>
+		<brotli.version>0.1.2</brotli.version>
+
 	</properties>
 
 	<build>
@@ -946,6 +949,18 @@
 				<version>${dryuf-bigio.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.github.luben</groupId>
+				<artifactId>zstd-jni</artifactId>
+				<version>${zstd.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.brotli</groupId>
+				<artifactId>dec</artifactId>
+				<version>${brotli.version}</version>
+			</dependency>
+
 			<!-- JSP pages -->
 			<dependency>
 				<groupId>org.apache.tomcat.embed</groupId>
@@ -1036,6 +1051,7 @@
 				<artifactId>stomp-websocket</artifactId>
 				<version>${stomp-websocket.version}</version>
 			</dependency>
+
 
 		</dependencies>
 	</dependencyManagement>

@@ -5,8 +5,11 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.lang3.RandomUtils;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
@@ -20,10 +23,16 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipException;
 
 
+@Warmup(iterations = 1)
+@Measurement(iterations = 2, batchSize = 1)
+@Fork(warmups = 1, value = 0)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(value = Scope.Benchmark)
 public class ZipFileParallelReadBenchmark
 {
@@ -120,9 +129,6 @@ public class ZipFileParallelReadBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, batchSize = 1)
-	@Fork(warmups = 1, value = 0)
 	public void                     benchmarkStoredSingleThreadRead()
 	{
 		try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
@@ -134,9 +140,6 @@ public class ZipFileParallelReadBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, batchSize = 1)
-	@Fork(warmups = 1, value = 0)
 	public void                     benchmarkStoredMultiThreadRead() throws Exception
 	{
 		try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
@@ -154,9 +157,6 @@ public class ZipFileParallelReadBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, batchSize = 1)
-	@Fork(warmups = 1, value = 0)
 	public void                     benchmarkDeflatedSingleThreadRead()
 	{
 		try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {
@@ -168,9 +168,6 @@ public class ZipFileParallelReadBenchmark
 	}
 
 	@Benchmark
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, batchSize = 1)
-	@Fork(warmups = 1, value = 0)
 	public void                     benchmarkDeflatedMultiThreadRead() throws Exception
 	{
 		try (ZipFile zipFile = new ZipFile(zipPath.toFile())) {

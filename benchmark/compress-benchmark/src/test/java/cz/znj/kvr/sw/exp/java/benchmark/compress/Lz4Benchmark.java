@@ -7,15 +7,24 @@ import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorOutputStrea
 import org.apache.commons.compress.compressors.lz4.FramedLZ4CompressorOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Warmup;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 
 
+@Fork(0)
+@Warmup(iterations = 1)
+@Measurement(iterations = 2, time = 10)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Log4j2
 public class Lz4Benchmark
 {
@@ -26,9 +35,6 @@ public class Lz4Benchmark
 	private static final byte[] sequence = CompressBenchmarkSupport.generateInput(TEST_SIZE);
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkLz4JavaSingle() throws IOException
 	{
 		try (
@@ -40,9 +46,6 @@ public class Lz4Benchmark
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkLz4JavaMulti() throws IOException
 	{
 		CompressBenchmarkSupport.runParallel(NUM_THREADS, (Integer id) -> {
@@ -59,9 +62,6 @@ public class Lz4Benchmark
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkLz4CommonsBlockSingle() throws IOException
 	{
 		try (
@@ -73,9 +73,6 @@ public class Lz4Benchmark
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkLz4CommonsBlockMulti() throws IOException
 	{
 		CompressBenchmarkSupport.runParallel(NUM_THREADS, (Integer id) -> {
@@ -92,9 +89,6 @@ public class Lz4Benchmark
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkLz4CommonsFramedSingle() throws IOException
 	{
 		try (
@@ -106,9 +100,6 @@ public class Lz4Benchmark
 	}
 
 	@Benchmark
-	@Fork(0)
-	@Warmup(iterations = 1)
-	@Measurement(iterations = 2, time = 10)
 	public void benchmarkLz4CommonsFramedMulti() throws IOException
 	{
 		CompressBenchmarkSupport.runParallel(NUM_THREADS, (Integer id) -> {

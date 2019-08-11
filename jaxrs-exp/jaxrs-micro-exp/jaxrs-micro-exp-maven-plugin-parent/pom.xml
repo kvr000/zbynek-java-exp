@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.maven</groupId>
+	<artifactId>jaxrs-micro-exp-maven-plugin-parent</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1</version>
+	<name>Maven PostProc experiment Plugin base</name>
+	<description>Parent of Maven PostProc experiment</description>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro</groupId>
+		<artifactId>jaxrs-micro-exp-base</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<javac.version>11</javac.version>
+	</properties>
+
+	<modules>
+		<module>jaxrs-micro-exp-maven-plugin</module>
+		<module>jaxrs-micro-exp-maven-plugin/jaxrs-micro-exp-maven-plugin-test</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+
+		</dependencies>
+	</dependencyManagement>
+
+</project>

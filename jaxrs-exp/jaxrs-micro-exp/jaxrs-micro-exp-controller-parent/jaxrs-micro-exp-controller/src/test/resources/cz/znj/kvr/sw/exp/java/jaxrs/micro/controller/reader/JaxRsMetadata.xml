@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<jaxrs-paths
+		xmlns="http://github.com/kvr000/zbynek-java-exp/jaxrs-exp/jaxrs-micro-exp/schema/jaxrs-paths"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://github.com/kvr000/zbynek-java-exp/jaxrs-exp/jaxrs-micro-exp/schema/jaxrs-paths http://github.com/kvr000/zbynek-java-exp/raw/master/jaxrs-exp/jaxrs-micro-exp/schema/jaxrs-paths-1.0.0.xsd">
+
+	>
+	<controllers>
+		<controller path="/" class="test.HomeController">
+			<methods>
+				<method path="/" method="GET" function="homePage()">
+				</method>
+			</methods>
+		</controller>
+		<controller path="/sub" class="test.sub.RestController">
+			<methods>
+				<method path="/deeper/{user}/" method="POST" function="deeper(java.lang.String)">
+				</method>
+				<method path="/deeper/{user}/" method="POST" function="deeperPost(java.lang.String,RestController$DeeperData)">
+				</method>
+				<method path="/" method="GET" function="page()">
+				</method>
+				<method path="/" method="POST" function="pagePost()">
+				</method>
+				<method path="/both" method="GET,POST" function="pageMulti()">
+				</method>
+			</methods>
+		</controller>
+	</controllers>
+</jaxrs-paths>

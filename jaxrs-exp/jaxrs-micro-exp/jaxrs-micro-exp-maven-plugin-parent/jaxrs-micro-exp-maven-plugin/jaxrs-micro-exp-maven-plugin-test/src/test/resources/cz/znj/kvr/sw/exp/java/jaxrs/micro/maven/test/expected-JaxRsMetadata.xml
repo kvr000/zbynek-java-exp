@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<jaxrs-paths
+		xmlns="http://github.com/kvr000/zbynek-java-exp/jaxrs-exp/jaxrs-micro-exp/schema/jaxrs-paths"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://github.com/kvr000/zbynek-java-exp/jaxrs-exp/jaxrs-micro-exp/schema/jaxrs-paths http://github.com/kvr000/zbynek-java-exp/raw/master/jaxrs-exp/jaxrs-micro-exp/schema/jaxrs-paths-1.0.0.xsd"
+>
+	<controllers>
+		<controller path="/" class="cz.znj.kvr.sw.exp.java.jaxrs.micro.maven.test.HomeController">
+			<methods>
+				<method path="/" method="GET" function="homePage()">
+				</method>
+			</methods>
+		</controller>
+		<controller path="/prio" class="cz.znj.kvr.sw.exp.java.jaxrs.micro.maven.test.sub.PriorityController">
+			<methods>
+				<method path="/" method="POST" function="page()">
+				</method>
+				<method path="/consumes/" method="POST" function="consumesHtml()">
+				</method>
+				<method path="/consumes/" method="POST" function="consumesJson()">
+				</method>
+				<method path="/consumes/" method="POST" function="consumes()">
+				</method>
+				<method path="/method/" method="GET" function="methodGet()">
+				</method>
+				<method path="/method/" method="POST" function="methodPost()">
+				</method>
+				<method path="/method/" method="" function="methodAnyEmpty()">
+				</method>
+				<method path="/method/" method="*" function="methodAnyStar()">
+				</method>
+				<method path="/produces/" method="POST" function="producesHtml()">
+				</method>
+				<method path="/produces/" method="POST" function="producesJson()">
+				</method>
+				<method path="/produces/" method="POST" function="produces()">
+				</method>
+				<method path="/query/" method="POST" function="queryVersion1()">
+				</method>
+				<method path="/query/" method="POST" function="queryVersion2()">
+				</method>
+				<method path="/query/" method="POST" function="query()">
+				</method>
+				<method path="/{placeholder}/" method="POST" function="placeholder()">
+				</method>
+			</methods>
+		</controller>
+		<controller path="/sub" class="cz.znj.kvr.sw.exp.java.jaxrs.micro.maven.test.sub.RestController">
+			<methods>
+				<method path="/" method="GET" function="page()">
+				</method>
+				<method path="/" method="POST" function="pagePost()">
+				</method>
+				<method path="/deeper/{user}/" method="POST" function="deeper(java.lang.String)">
+				</method>
+				<method path="/deeper/{user}/" method="POST" function="deeperPost(java.lang.String,cz.znj.kvr.sw.exp.java.jaxrs.micro.maven.test.sub.RestController$DeeperData)">
+				</method>
+			</methods>
+		</controller>
+	</controllers>
+</jaxrs-paths>

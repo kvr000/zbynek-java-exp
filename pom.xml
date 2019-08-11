@@ -187,6 +187,8 @@
 
 		<org.eclipse.jdt.core.compiler-ecj.version>4.6.1</org.eclipse.jdt.core.compiler-ecj.version>
 
+		<jetty.version>9.4.3.v20170317</jetty.version>
+
 		<bootstrap.version>4.1.1</bootstrap.version>
 
 		<org.mapdb.version>1.0.9</org.mapdb.version>
@@ -1320,7 +1322,6 @@
 				<version>${spring-boot.version}</version>
 			</dependency>
 
-			<!-- AWS -->
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk</artifactId>
@@ -1342,7 +1343,6 @@
 				<version>${aws-lambda-java-events.version}</version>
 			</dependency>
 
-			<!-- Jetty -->
 			<dependency>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-server</artifactId>

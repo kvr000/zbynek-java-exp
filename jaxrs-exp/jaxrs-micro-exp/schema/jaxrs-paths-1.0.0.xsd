@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://github.com/kvr000/zbynek-java-exp/jaxrs-exp/jaxrs-capture-exp/schema/jaxrs-paths">
+	<xs:element name="jaxrs-paths">
+		<xs:annotation>
+			<xs:documentation>JaxRs Paths schema</xs:documentation>
+		</xs:annotation>
+		<!-- <xs:attributeGroup ref="sections.attlist"/> -->
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element name="controllers" minOccurs="1" maxOccurs="1">
+					<xs:annotation><xs:documentation>List of controllers</xs:documentation></xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="controller" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="methods" minOccurs="0" maxOccurs="1">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element minOccurs="0" maxOccurs="unbounded" name="method">
+														<xs:complexType mixed="true">
+															<xs:attribute name="method" />
+															<xs:attribute name="path" />
+															<xs:attribute name="function" />
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="path" />
+									<xs:attribute name="class" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="multi" />
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -43,6 +43,7 @@
 	<modules>
 		<module>jaxrs-micro-exp-controller</module>
 		<module>jaxrs-micro-exp-controller/jaxrs-micro-exp-controller-benchmark</module>
+		<module>jaxrs-micro-exp-controller-mvc</module>
 		<module>binding</module>
 		<module>test</module>
 	</modules>

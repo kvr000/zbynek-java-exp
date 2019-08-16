@@ -4,6 +4,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyRequestEven
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyResponseEvent;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.AbstractRequestExchange;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.ResponseExchangeBuilderProvider;
+import lombok.Getter;
 import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.Cookie;
@@ -12,13 +13,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchange
@@ -27,6 +31,23 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	{
 		super(responseExchangeBuilderProvider);
 		this.requestEvent = requestEvent;
+		this.allQueryParams = requestEvent.getMultiValueQueryStringParameters().entrySet().stream()
+				.flatMap(entry -> entry.getValue().stream().map(value -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey().toLowerCase(Locale.ROOT), value)))
+				.collect(Collectors.groupingBy(
+						Map.Entry::getKey,
+						Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+				));
+
+		this.allHeaders = requestEvent.getMultiValueHeaders().entrySet().stream()
+				.flatMap(entry -> entry.getValue().stream().map(value -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey().toLowerCase(Locale.ROOT), value)))
+				.collect(Collectors.groupingBy(
+						Map.Entry::getKey,
+						Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+				));
+
+		this.allCookies = this.allHeaders.getOrDefault("cookie", Collections.emptyList()).stream()
+				.map(Cookie::valueOf)
+				.collect(Collectors.groupingBy(Cookie::getName));
 	}
 
 	@Override
@@ -39,27 +60,6 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	public String getPath()
 	{
 		return requestEvent.getPath();
-	}
-
-	@Override
-	public Map<String, List<String>> getAllQueryParams()
-	{
-		return requestEvent.getMultiValueQueryStringParameters();
-	}
-
-	@Override
-	public Map<String, List<Cookie>> getAllCookies()
-	{
-		return Optional.ofNullable(requestEvent.getHeaders().get("Cookie"))
-				.map(Cookie::valueOf)
-				.map(c -> Collections.singletonMap(c.getName(), Collections.singletonList(c)))
-				.orElse(Collections.emptyMap());
-	}
-
-	@Override
-	public Map<String, List<String>> getAllHeaders()
-	{
-		return requestEvent.getMultiValueHeaders();
 	}
 
 	@Override
@@ -114,6 +114,15 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	}
 
 	private final APIGatewayV2ProxyRequestEvent requestEvent;
+
+	@Getter
+	private final Map<String, List<String>> allQueryParams;
+
+	@Getter
+	private final Map<String, List<String>> allHeaders;
+
+	@Getter
+	private final Map<String, List<Cookie>> allCookies;
 
 	int responseStatus;
 

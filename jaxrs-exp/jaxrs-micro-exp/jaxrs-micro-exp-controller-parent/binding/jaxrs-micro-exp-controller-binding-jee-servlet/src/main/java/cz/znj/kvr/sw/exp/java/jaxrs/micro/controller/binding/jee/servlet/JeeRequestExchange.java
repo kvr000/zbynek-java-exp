@@ -2,6 +2,7 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.binding.jee.servlet;
 
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.AbstractRequestExchange;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.ResponseExchangeBuilderProvider;
+import lombok.Getter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,10 +15,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 public class JeeRequestExchange extends AbstractRequestExchange
@@ -32,12 +37,12 @@ public class JeeRequestExchange extends AbstractRequestExchange
 		String queryString = request.getQueryString();
 
 		if (queryString == null || queryString.isEmpty()) {
-			this.queryParameters = Collections.emptyMap();
+			this.allQueryParams = Collections.emptyMap();
 		}
 		else {
 			String[] parameters = queryString.split("&");
 
-			this.queryParameters = Stream.of(parameters)
+			this.allQueryParams = Stream.of(parameters)
 					.map(p -> p.split("=", 2))
 					.map(p -> p.length == 1 ?
 							new AbstractMap.SimpleImmutableEntry<>("", URLDecoder.decode(p[0], StandardCharsets.UTF_8)) :
@@ -47,6 +52,17 @@ public class JeeRequestExchange extends AbstractRequestExchange
 							Collectors.mapping(Map.Entry::getValue, Collectors.toList())
 					));
 		}
+
+		this.allHeaders = StreamSupport.stream(Spliterators.spliteratorUnknownSize(request.getHeaderNames().asIterator(), Spliterator.ORDERED), false)
+				.flatMap(name -> StreamSupport.stream(Spliterators.spliteratorUnknownSize(request.getHeaders(name).asIterator(), Spliterator.ORDERED), false).map(value -> new AbstractMap.SimpleImmutableEntry<>(name.toLowerCase(Locale.ROOT), value)))
+				.collect(Collectors.groupingBy(
+						Map.Entry::getKey,
+						Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+				));
+
+		this.allCookies = this.allHeaders.getOrDefault("cookie", Collections.emptyList()).stream()
+				.map(Cookie::valueOf)
+				.collect(Collectors.groupingBy(Cookie::getName));
 	}
 
 	@Override
@@ -59,25 +75,6 @@ public class JeeRequestExchange extends AbstractRequestExchange
 	public String getPath()
 	{
 		return request.getServletPath().substring(1);
-	}
-
-	@Override
-	public Map<String, List<String>> getAllQueryParams()
-	{
-		return queryParameters;
-	}
-
-	@Override
-	public Map<String, List<Cookie>> getAllCookies()
-	{
-		return Collections.emptyMap();
-	}
-
-	@Override
-	public Map<String, List<String>> getAllHeaders()
-	{
-		return Collections.list(request.getHeaderNames()).stream()
-				.collect(Collectors.toMap(Function.identity(), name -> Collections.list(request.getHeaders(name))));
 	}
 
 	@Override
@@ -113,5 +110,13 @@ public class JeeRequestExchange extends AbstractRequestExchange
 
 	private final HttpServletResponse response;
 
-	private final Map<String, List<String>> queryParameters;
+	@Getter
+	private final Map<String, List<String>> allQueryParams;
+
+	@Getter
+	private final Map<String, List<String>> allHeaders;
+
+	@Getter
+	private final Map<String, List<Cookie>> allCookies;
+
 }

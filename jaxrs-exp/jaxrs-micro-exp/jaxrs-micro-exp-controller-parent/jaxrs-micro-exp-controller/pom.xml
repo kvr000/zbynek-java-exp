@@ -146,6 +146,11 @@
 			<artifactId>guava</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>net.dryuf</groupId>
+			<artifactId>dryuf-concurrent</artifactId>
+		</dependency>
+
 	</dependencies>
 
 

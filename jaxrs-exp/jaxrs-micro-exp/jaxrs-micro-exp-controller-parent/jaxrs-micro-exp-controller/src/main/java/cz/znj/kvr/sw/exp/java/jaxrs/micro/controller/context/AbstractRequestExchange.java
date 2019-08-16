@@ -1,5 +1,7 @@
 package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context;
 
+import net.dryuf.concurrent.collection.LazilyBuiltLoadingCache;
+
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -11,7 +13,9 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Function;
 
 
 public abstract class AbstractRequestExchange implements RequestExchange
@@ -41,7 +45,7 @@ public abstract class AbstractRequestExchange implements RequestExchange
 	@Override
 	public List<String> getQueryParams(String name)
 	{
-		return Optional.ofNullable(getAllQueryParams().get(name)).orElse(Collections.emptyList());
+		return Optional.ofNullable(getAllQueryParams().get(LOWERCASE_MAPPER.apply(name))).orElse(Collections.emptyList());
 	}
 
 	@Override
@@ -54,7 +58,7 @@ public abstract class AbstractRequestExchange implements RequestExchange
 	@Override
 	public List<String> getHeaders(String name)
 	{
-		return getAllHeaders().getOrDefault(name, Collections.emptyList());
+		return getAllHeaders().getOrDefault(LOWERCASE_MAPPER.apply(name), Collections.emptyList());
 	}
 
 	@Override
@@ -66,7 +70,7 @@ public abstract class AbstractRequestExchange implements RequestExchange
 	@Override
 	public List<Cookie> getCookies(String name)
 	{
-		return Optional.ofNullable(getAllCookies().get(name)).orElse(Collections.emptyList());
+		return Optional.ofNullable(getAllCookies().get(LOWERCASE_MAPPER.apply(name))).orElse(Collections.emptyList());
 	}
 
 	@Override
@@ -115,4 +119,6 @@ public abstract class AbstractRequestExchange implements RequestExchange
 	}
 
 	protected final ResponseExchangeBuilderProvider responseExchangeBuilderProvider;
+
+	private static Function<String, String> LOWERCASE_MAPPER = new LazilyBuiltLoadingCache<>(name -> name.toLowerCase(Locale.ROOT));
 }

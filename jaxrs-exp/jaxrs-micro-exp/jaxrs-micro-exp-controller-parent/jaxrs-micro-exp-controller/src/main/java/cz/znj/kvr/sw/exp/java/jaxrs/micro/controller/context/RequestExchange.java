@@ -23,18 +23,36 @@ public interface RequestExchange
 
 	List<String> getQueryParams(String name);
 
+	/**
+	 * Returns all query parameters, keys are lower-case.
+	 *
+	 * @return
+	 * 	map of all query parameters, with lower-case keys
+	 */
 	Map<String, List<String>> getAllQueryParams();
 
 	Cookie getCookie(String name);
 
 	List<Cookie> getCookies(String name);
 
+	/**
+	 * Returns all cookies parameters, keys are lower-case.
+	 *
+	 * @return
+	 * 	map of all cookies parameters, with lower-case keys
+	 */
 	Map<String, List<Cookie>> getAllCookies();
 
 	String getHeader(String name);
 
 	List<String> getHeaders(String name);
 
+	/**
+	 * Returns all headers, keys are lower-case.
+	 *
+	 * @return
+	 * 	map of all headers, with lower-case keys
+	 */
 	Map<String, List<String>> getAllHeaders();
 
 	InputStream getRequestBody() throws IOException;

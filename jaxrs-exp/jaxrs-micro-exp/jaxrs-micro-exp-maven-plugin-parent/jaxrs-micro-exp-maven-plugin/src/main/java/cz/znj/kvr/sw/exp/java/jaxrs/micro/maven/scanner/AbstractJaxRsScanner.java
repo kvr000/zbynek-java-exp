@@ -72,8 +72,7 @@ public abstract class AbstractJaxRsScanner implements JaxRsScanner
 						throw new RuntimeException(e);
 					}
 				})
-				.collect(Collectors.toList())
-				.toArray(URL_EMPTY_ARRAY);
+				.toArray(URL[]::new);
 	}
 
 	protected ClassLoader createClassLoader(Runtime runtime)

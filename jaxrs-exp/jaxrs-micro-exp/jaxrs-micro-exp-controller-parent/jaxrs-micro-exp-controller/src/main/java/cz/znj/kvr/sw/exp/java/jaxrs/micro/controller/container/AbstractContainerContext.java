@@ -52,8 +52,7 @@ public abstract class AbstractContainerContext implements ContainerContext
 		String methodName = methodId.methodName().substring(0, p);
 		Class<?>[] args = StreamSupport.stream(Util.splitByChar(methodId.methodName().substring(p+1, methodId.methodName().length()-1), ',').spliterator(), false)
 				.map(arg -> Util.loadClass(AbstractContainerContext.class.getClassLoader(), arg))
-				.collect(Collectors.toList())
-				.toArray(Util.EMPTY_CLASS_ARRAY);
+				.toArray(Class[]::new);
 		try {
 			return clazz.getMethod(methodName, args);
 		}

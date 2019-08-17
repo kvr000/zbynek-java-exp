@@ -57,10 +57,6 @@ public class Util
 
 	public static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-	public static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
-
-	public static final MediaType[] EMPTY_MEDIATYPE_ARRAY = new MediaType[0];
-
 	@SuppressWarnings("unchecked")
 	public static final Predicate<RequestExchange>[] EMPTY_CONDITIONS_ARRAY = new Predicate[0];
 

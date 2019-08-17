@@ -87,8 +87,7 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 			String name = methodId.methodName().substring(0, p);
 			Class<?>[] args = StreamSupport.stream(Util.splitByChar(methodId.methodName().substring(p+1, methodId.methodName().length()-1), ',').spliterator(), false)
 					.map(className -> Util.loadClass(FunctionData.class.getClassLoader(), className))
-					.collect(Collectors.toList())
-					.toArray(Util.EMPTY_CLASS_ARRAY);
+					.toArray(Class[]::new);
 			runtime.resolvedMethod =  runtime.clazz.getMethod(name, args);
 
 			Optional.ofNullable(runtime.resolvedMethod.getAnnotation(Produces.class))
@@ -97,8 +96,7 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 						conditions.add(new ProducesPredicate(producesAnno.value()));
 						runtime.produces = Arrays.asList(producesAnno.value()).stream()
 								.map(MediaType::valueOf)
-								.collect(Collectors.toList())
-								.toArray(Util.EMPTY_MEDIATYPE_ARRAY);
+								.toArray(MediaType[]::new);
 					});
 
 			Optional.ofNullable(runtime.resolvedMethod.getAnnotation(Consumes.class))
@@ -108,7 +106,7 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 			Stream.of(runtime.resolvedMethod.getAnnotationsByType(QueryParam.class))
 					.forEach((QueryParam qp) -> conditions.add(new QueryParamPredicate(qp.value())));
 
-			runtime.conditions = conditions.toArray(Util.EMPTY_CONDITIONS_ARRAY);
+			runtime.conditions = conditions.toArray(new Predicate[conditions.size()]);
 
 		}
 		catch (Exception e) {
@@ -243,8 +241,7 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 		{
 			this.patterns = Stream.of(patterns)
 					.map(MediaType::valueOf)
-					.collect(Collectors.toList())
-					.toArray(Util.EMPTY_MEDIATYPE_ARRAY);
+					.toArray(MediaType[]::new);
 		}
 
 		protected final MediaType[] patterns;

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,7 +39,12 @@ public class TestRequestExchange extends AbstractRequestExchange
 		catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
-		this.headers = headers;
+		this.allHeaders = headers.entrySet().stream()
+				.flatMap(entry -> entry.getValue().stream().map(value -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey().toLowerCase(Locale.ROOT), value)))
+				.collect(Collectors.groupingBy(
+						Map.Entry::getKey,
+						Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+				));
 		this.queryParameters = Stream.of(Optional.ofNullable(this.url.getQuery()).orElse("").split("&"))
 				.map(p -> p.split("=", 2))
 				.map(p -> p.length == 1 ?
@@ -95,7 +101,7 @@ public class TestRequestExchange extends AbstractRequestExchange
 	@Override
 	public Map<String, List<String>> getAllHeaders()
 	{
-		return headers;
+		return allHeaders;
 	}
 
 	@Override
@@ -143,7 +149,7 @@ public class TestRequestExchange extends AbstractRequestExchange
 
 	private final Map<String, List<String>> queryParameters;
 
-	private final Map<String, List<String>> headers;
+	private final Map<String, List<String>> allHeaders;
 
 	private final Map<String, List<String>> outputHeaders = new LinkedHashMap<>();
 

@@ -8,6 +8,8 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.response.ControllerResponse
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class RootController
 			}
 			else {
 				try (ResponseExchangeBuilder response = requestExchange.startUnknownResponse(200)) {
+					response.addHeader(HttpHeaders.CONTENT_TYPE, result.contentType().toString());
 					try (OutputStream out = response.openBodyStream()) {
 						bodyWriter.writeTo(result.output(), output.getClass(), output.getClass(), new Annotation[0], null, null, out);
 					}

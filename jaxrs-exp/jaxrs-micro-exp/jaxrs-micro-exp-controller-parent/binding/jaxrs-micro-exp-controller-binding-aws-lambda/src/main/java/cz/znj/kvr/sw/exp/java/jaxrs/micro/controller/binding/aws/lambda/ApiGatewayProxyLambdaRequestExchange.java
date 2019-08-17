@@ -4,7 +4,9 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyRequestEven
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2ProxyResponseEvent;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.AbstractRequestExchange;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.ResponseExchangeBuilderProvider;
+import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.util.Util;
 import lombok.Getter;
+import net.dryuf.concurrent.collection.LazilyBuiltLoadingCache;
 import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.core.Cookie;
@@ -14,13 +16,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -31,14 +35,14 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	{
 		super(responseExchangeBuilderProvider);
 		this.requestEvent = requestEvent;
-		this.allQueryParams = requestEvent.getMultiValueQueryStringParameters().entrySet().stream()
+		this.allQueryParams = Objects.requireNonNullElse(requestEvent.getMultiValueQueryStringParameters(), Collections.<String, List<String>>emptyMap()).entrySet().stream()
 				.flatMap(entry -> entry.getValue().stream().map(value -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey().toLowerCase(Locale.ROOT), value)))
 				.collect(Collectors.groupingBy(
 						Map.Entry::getKey,
 						Collectors.mapping(Map.Entry::getValue, Collectors.toList())
 				));
 
-		this.allHeaders = requestEvent.getMultiValueHeaders().entrySet().stream()
+		this.allHeaders = Objects.requireNonNullElse(requestEvent.getMultiValueHeaders(), Collections.<String, List<String>>emptyMap()).entrySet().stream()
 				.flatMap(entry -> entry.getValue().stream().map(value -> new AbstractMap.SimpleImmutableEntry<>(entry.getKey().toLowerCase(Locale.ROOT), value)))
 				.collect(Collectors.groupingBy(
 						Map.Entry::getKey,
@@ -59,7 +63,7 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	@Override
 	public String getPath()
 	{
-		return requestEvent.getPath();
+		return requestEvent.getPath().substring(1);
 	}
 
 	@Override
@@ -94,7 +98,7 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 		else if (isText >= 0 && name.equalsIgnoreCase("content-encoding")) {
 			isText = -1;
 		}
-		headers.put(name, value);
+		responseHeaders.computeIfAbsent(LOWERCASE_MAPPER.apply(name), key -> new ArrayList<>()).add(value);
 	}
 
 	@Override
@@ -107,7 +111,9 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	{
 		APIGatewayV2ProxyResponseEvent response = new APIGatewayV2ProxyResponseEvent();
 		response.setStatusCode(responseStatus);
-		response.setHeaders(headers);
+		response.setMultiValueHeaders(responseHeaders.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toArray(Util.EMPTY_STRING_ARRAY)))
+		);
 		response.setIsBase64Encoded(isText <= 0);
 		response.setBody(isText <= 0 ? Base64.getEncoder().encodeToString(output.toByteArray()) : new String(output.toByteArray(), StandardCharsets.UTF_8));
 		return response;
@@ -128,9 +134,11 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 
 	private byte isText = 0; // convenience, -1 is binary, 0 is unknown yet, 1 is text
 
-	private Map<String, String> headers = new LinkedHashMap<>();
+	private Map<String, List<String>> responseHeaders = new LinkedHashMap<>();
 
 	private ByteArrayOutputStream output = new ByteArrayOutputStream();
 
 	private static final Pattern TEXT_CONTENT_TYPE_PATTERN = Pattern.compile("text/[-a-zA-Z0-9_]+(|\\s*;\\s*charset=UTF-8.*)|application/json");
+
+	private static Function<String, String> LOWERCASE_MAPPER = new LazilyBuiltLoadingCache<>(name -> name.toLowerCase(Locale.ROOT));
 }

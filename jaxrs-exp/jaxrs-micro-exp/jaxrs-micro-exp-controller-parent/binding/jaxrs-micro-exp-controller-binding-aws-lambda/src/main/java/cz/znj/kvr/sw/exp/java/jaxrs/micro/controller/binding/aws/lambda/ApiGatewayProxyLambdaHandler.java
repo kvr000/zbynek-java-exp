@@ -34,9 +34,9 @@ public class ApiGatewayProxyLambdaHandler extends RequestHandler2
 		return requestExchange.createResponse();
 	}
 
-	private final ContainerContext container;
+	protected final ContainerContext container;
 
-	private final RootController rootController;
+	protected final RootController rootController;
 
-	private final ResponseExchangeBuilderProvider responseExchangeBuilderProvider;
+	protected final ResponseExchangeBuilderProvider responseExchangeBuilderProvider;
 }

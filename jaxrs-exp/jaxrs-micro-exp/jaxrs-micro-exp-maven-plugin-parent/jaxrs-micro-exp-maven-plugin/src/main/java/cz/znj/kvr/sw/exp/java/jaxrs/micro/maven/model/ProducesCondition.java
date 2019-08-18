@@ -7,7 +7,7 @@ import java.util.List;
 
 
 /**
- *
+ * Condition based on Produces (accept).
  */
 @EqualsAndHashCode(callSuper = true)
 public class ProducesCondition extends MediaTypeCondition

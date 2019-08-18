@@ -7,7 +7,7 @@ import java.util.List;
 
 
 /**
- *
+ * Condition for Consumes rule (content-type).
  */
 @EqualsAndHashCode(callSuper = true)
 public class ConsumesCondition extends MediaTypeCondition

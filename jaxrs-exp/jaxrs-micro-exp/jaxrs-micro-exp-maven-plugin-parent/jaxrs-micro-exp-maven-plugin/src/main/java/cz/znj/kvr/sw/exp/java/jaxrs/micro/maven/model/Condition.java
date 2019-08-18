@@ -4,7 +4,7 @@ import java.util.Map;
 
 
 /**
- *
+ * Matching condition interface.
  */
 public interface Condition
 {

@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 /**
- *
+ * General key-value based Condition.
  */
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)

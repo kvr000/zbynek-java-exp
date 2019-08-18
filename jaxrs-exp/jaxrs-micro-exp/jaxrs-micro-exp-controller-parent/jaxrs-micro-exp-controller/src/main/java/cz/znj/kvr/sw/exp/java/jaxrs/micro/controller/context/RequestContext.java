@@ -3,7 +3,7 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.container.BeanMethod;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.container.ContainerContext;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.OwnedMethodHolder;
-import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.MethodInvokerStatic;
+import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.MethodArgumentsResolver;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
@@ -34,5 +34,5 @@ public interface RequestContext
 
 	InputStream input();
 
-	BeanMethod resolveMethod(OwnedMethodHolder method, BiFunction<ContainerContext, OwnedMethodHolder, MethodInvokerStatic> invokerProvider);
+	BeanMethod resolveMethod(OwnedMethodHolder method, BiFunction<ContainerContext, OwnedMethodHolder, MethodArgumentsResolver> invokerProvider);
 }

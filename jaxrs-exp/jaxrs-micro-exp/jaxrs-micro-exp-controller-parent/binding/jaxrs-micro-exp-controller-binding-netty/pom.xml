@@ -25,30 +25,23 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.binding</groupId>
-	<artifactId>jaxrs-micro-exp-controller-binding-parent</artifactId>
+	<artifactId>jaxrs-micro-exp-controller-binding-netty</artifactId>
 	<version>0.0.1</version>
-	<packaging>pom</packaging>
-	<name>jaxrs-micro-exp-controller-parent</name>
+	<packaging>jar</packaging>
+	<name>jaxrs-micro-exp-controller-binding-netty</name>
 	<description>
-		JaxRs micro controller binding projects
+		JaxRs micro controller, Netty server
 	</description>
 
 	<parent>
-		<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.controller</groupId>
-		<artifactId>jaxrs-micro-exp-controller-parent</artifactId>
+		<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.binding</groupId>
+		<artifactId>jaxrs-micro-exp-controller-binding-parent</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<modules>
-		<module>jaxrs-micro-exp-controller-binding-jee-servlet</module>
-		<module>jaxrs-micro-exp-controller-binding-sun-httpserver</module>
-		<module>jaxrs-micro-exp-controller-binding-netty</module>
-		<module>jaxrs-micro-exp-controller-binding-aws-lambda</module>
-		<module>jaxrs-micro-exp-controller-binding-guice</module>
-		<module>jaxrs-micro-exp-controller-binding-dagger</module>
-		<module>jaxrs-micro-exp-controller-binding-jackson</module>
-	</modules>
+	<properties>
+	</properties>
 
 	<build>
 		<plugins>
@@ -67,6 +60,49 @@
 
 		</plugins>
 	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest</artifactId>
+			<version>${hamcrest.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.controller</groupId>
+			<artifactId>jaxrs-micro-exp-controller</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	</dependencies>
+
 
 	<developers>
 		<developer>

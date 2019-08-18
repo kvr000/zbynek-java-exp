@@ -3,6 +3,10 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect;
 import lombok.Value;
 import lombok.experimental.Accessors;
 
+
+/**
+ * Class method, specified by its name.
+ */
 @Value
 @Accessors(fluent = true)
 public class OwnedMethodId

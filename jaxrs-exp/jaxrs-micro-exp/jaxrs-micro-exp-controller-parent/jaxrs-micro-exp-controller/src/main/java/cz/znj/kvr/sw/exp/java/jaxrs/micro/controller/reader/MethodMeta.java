@@ -5,6 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 
+/**
+ * Method metadata, supported methods, path and function to be executed.
+ */
 @Data
 public class MethodMeta
 {

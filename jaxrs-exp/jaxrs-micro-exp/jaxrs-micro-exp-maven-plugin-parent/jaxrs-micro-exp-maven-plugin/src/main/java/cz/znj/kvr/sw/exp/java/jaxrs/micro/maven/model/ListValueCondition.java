@@ -10,7 +10,7 @@ import java.util.Map;
 
 
 /**
- *
+ * Generic list based Condition.
  */
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)

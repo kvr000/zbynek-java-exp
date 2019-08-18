@@ -6,7 +6,7 @@ import java.util.List;
 
 
 /**
- *
+ * Meta information about class.
  */
 @Data
 public class JaxRsClassMeta

@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 
 
 /**
- *
+ * Condition based on query parameter.
  */
 @EqualsAndHashCode(callSuper = true)
 public class QueryParamCondition extends KeyValueCondition

@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 
 /**
- *
+ * Path function resolver.
  */
 public interface PathResolver<C, H extends Predicate<C>>
 {

@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
+/**
+ * Testing {@link RequestExchange}, for unit testing purposes.
+ */
 public class TestRequestExchange extends AbstractRequestExchange
 {
 	public TestRequestExchange(

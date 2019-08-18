@@ -7,7 +7,7 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.RequestExchange;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.OwnedMethodHolder;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.OwnedMethodId;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.util.Util;
-import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.MethodInvokerStatic;
+import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.MethodArgumentsResolver;
 import lombok.RequiredArgsConstructor;
 
 import javax.ws.rs.Consumes;
@@ -27,9 +27,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +48,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -45,13 +56,12 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHolder
 {
-	public static final FunctionData DUMMY;
-
-	static {
-		DUMMY = new FunctionData(null);
-		DUMMY.runtime = new RuntimeData();
-		DUMMY.runtime.conditions = Util.EMPTY_CONDITIONS_ARRAY;
-	}
+	public static final FunctionData DUMMY = ((Supplier<FunctionData>)() -> {
+		FunctionData dummy = new FunctionData(null);
+		dummy.runtime = new RuntimeData();
+		dummy.runtime.conditions = Util.EMPTY_CONDITIONS_ARRAY;
+		return dummy;
+	}).get();
 
 	@Override
 	public boolean test(RequestExchange requestExchange)
@@ -115,7 +125,7 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 		return runtime;
 	}
 
-	public static MethodInvokerStatic<CallContext> resolverContainerInvoker(ContainerContext container, OwnedMethodHolder methodHolder)
+	public static MethodArgumentsResolver<CallContext> resolverContainerInvoker(ContainerContext container, OwnedMethodHolder methodHolder)
 	{
 		FunctionData function = (FunctionData) methodHolder;
 		RuntimeData runtime = function.runtime;
@@ -130,7 +140,7 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 				throw new IllegalArgumentException("Failed to populate argument "+i+" on method: "+runtime.resolvedMethod, ex);
 			}
 		}
-		return new MethodInvokerStaticImpl(argsResolvers);
+		return new MethodArgumentsResolverImpl(argsResolvers);
 	}
 
 	private static Function<CallContext, Object> getArgResolver(ContainerContext container, Type type, Annotation[] annotations)
@@ -316,7 +326,7 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 	}
 
 	@RequiredArgsConstructor
-	private static class MethodInvokerStaticImpl implements MethodInvokerStatic<CallContext>
+	private static class MethodArgumentsResolverImpl implements MethodArgumentsResolver<CallContext>
 	{
 		@Override
 		public Object[] resolveArguments(CallContext context)
@@ -589,5 +599,15 @@ public class FunctionData implements Predicate<RequestExchange>, OwnedMethodHold
 			.put(Integer.class, Integer::valueOf)
 			.put(Long.class, Long::valueOf)
 			.put(String.class, s -> s)
+			.put(BigInteger.class, BigInteger::new)
+			.put(BigDecimal.class, BigDecimal::new)
+			.put(Date.class, (String s) -> Date.from((Instant) DateTimeFormatter.ISO_INSTANT.parse(s)))
+			.put(Instant.class, Instant::parse)
+			.put(ZonedDateTime.class, ZonedDateTime::parse)
+			.put(LocalDate.class, LocalDate::parse)
+			.put(LocalTime.class, LocalTime::parse)
+			.put(LocalDateTime.class, LocalDateTime::parse)
+			.put(ZoneId.class, ZoneId::of)
+			.put(ZoneOffset.class, ZoneOffset::of)
 			.build();
 }

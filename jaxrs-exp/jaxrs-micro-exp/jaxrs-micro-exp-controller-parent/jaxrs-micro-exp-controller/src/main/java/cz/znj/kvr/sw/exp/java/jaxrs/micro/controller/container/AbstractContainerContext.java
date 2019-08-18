@@ -4,7 +4,7 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.RequestContext;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.OwnedMethodHolder;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.OwnedMethodId;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.util.Util;
-import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.MethodInvokerStatic;
+import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.reflect.MethodArgumentsResolver;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 
@@ -30,7 +28,7 @@ public abstract class AbstractContainerContext implements ContainerContext
 	}
 
 	@Override
-	public <C> BeanMethod<C> resolveMethod(OwnedMethodHolder methodHolder, BiFunction<ContainerContext, OwnedMethodHolder, MethodInvokerStatic<C>> invokerProvider)
+	public <C> BeanMethod<C> resolveMethod(OwnedMethodHolder methodHolder, BiFunction<ContainerContext, OwnedMethodHolder, MethodArgumentsResolver<C>> invokerProvider)
 	{
 		@SuppressWarnings("unchecked")
 		BeanMethodHolder<C> holder = (BeanMethodHolder<C>) beanMethodHolders.get(methodHolder.methodId());
@@ -81,7 +79,7 @@ public abstract class AbstractContainerContext implements ContainerContext
 
 		private final Method method;
 
-		private final MethodInvokerStatic<C> invokerStatic;
+		private final MethodArgumentsResolver<C> invokerStatic;
 	}
 
 	@RequiredArgsConstructor
@@ -98,6 +96,6 @@ public abstract class AbstractContainerContext implements ContainerContext
 
 		private final Method method;
 
-		private final MethodInvokerStatic<C> invokerStatic;
+		private final MethodArgumentsResolver<C> invokerStatic;
 	}
 }

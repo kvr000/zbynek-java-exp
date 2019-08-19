@@ -1,5 +1,6 @@
 package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.util;
 
+import com.google.common.collect.ImmutableMap;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.RequestExchange;
 
 import javax.ws.rs.core.MediaType;
@@ -60,16 +61,20 @@ public class Util
 	@SuppressWarnings("unchecked")
 	public static final Predicate<RequestExchange>[] EMPTY_CONDITIONS_ARRAY = new Predicate[0];
 
-	private static final Map<String, Class<?>> BUILTIN_CLASSES = Map.of(
-			boolean.class.getName(), boolean.class,
-			byte.class.getName(), byte.class,
-			short.class.getName(), short.class,
-			int.class.getName(), int.class,
-			long.class.getName(), long.class,
-			String.class.getName(), String.class,
-			Boolean.class.getName(), Boolean.class,
-			Short.class.getName(), short.class,
-			Integer.class.getName(), Integer.class,
-			Long.class.getName(), Long.class
-	);
+	private static final Map<String, Class<?>> BUILTIN_CLASSES = ImmutableMap.<String, Class<?>>builderWithExpectedSize(16)
+		.put(boolean.class.getName(), boolean.class)
+		.put(byte.class.getName(), byte.class)
+		.put(short.class.getName(), short.class)
+		.put(int.class.getName(), int.class)
+		.put(long.class.getName(), long.class)
+		.put(float.class.getName(), float.class)
+		.put(double.class.getName(), double.class)
+		.put(String.class.getName(), String.class)
+		.put(Boolean.class.getName(), Boolean.class)
+		.put(Short.class.getName(), short.class)
+		.put(Integer.class.getName(), Integer.class)
+		.put(Long.class.getName(), Long.class)
+		.put(Float.class.getName(), Float.class)
+		.put(Double.class.getName(), Double.class)
+		.build();
 }

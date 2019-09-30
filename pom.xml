@@ -17,22 +17,29 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
-		<exec-maven-plugin.version>1.4.0</exec-maven-plugin.version>
 		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
 		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
+		<maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
 		<maven-war-plugin.version>2.6</maven-war-plugin.version>
+		<maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
 		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
+
+		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
+		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
+
 		<spring-boot-maven-plugin.version>2.0.6.RELEASE</spring-boot-maven-plugin.version>
 
-		<lombok.version>1.16.10</lombok.version>
+		<lombok.version>1.18.2</lombok.version>
 
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 
-		<jmh.version>1.11.1</jmh.version>
+		<jmh.version>1.21</jmh.version>
 
 		<javax.inject.version>1</javax.inject.version>
 		<javax.cache.version>1.0.0</javax.cache.version>
+
+		<zip4j.version>2.1.4</zip4j.version>
 
 		<testng.version>6.9.10</testng.version>
 
@@ -54,12 +61,13 @@
 		<commons-beanutils.version>1.9.2</commons-beanutils.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
+		<commons-compress.version>1.19</commons-compress.version>
 		<commons-csv.version>1.2</commons-csv.version>
 		<commons-io.version>2.4</commons-io.version>
 
 		<guava.version>27.0-jre</guava.version>
 
-		<jackson.version>2.9.9.2</jackson.version>
+		<jackson.version>2.9.10</jackson.version>
 
 		<gson.version>2.5</gson.version>
 
@@ -113,16 +121,48 @@
 			</plugin>
 
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!-- Maven plugins -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>${maven-war-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>${maven-jar-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>${maven-assembly-plugin.version}</version>
+				</plugin>
+
+				<!-- Maven 3rd-party plugins -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>${exec-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>${build-helper-maven-plugin.version}</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<dependencyManagement>
 		<dependencies>
-
-			<dependency>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>${maven-war-plugin.version}</version>
-			</dependency>
 
 			<!-- lombok -->
 			<dependency>
@@ -219,6 +259,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-compress</artifactId>
+				<version>${commons-compress.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-csv</artifactId>
 				<version>${commons-csv.version}</version>
 			</dependency>
@@ -247,6 +292,12 @@
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-http-lightweight</artifactId>
 				<version>${wagon.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.lingala.zip4j</groupId>
+				<artifactId>zip4j</artifactId>
+				<version>${zip4j.version}</version>
 			</dependency>
 
 			<dependency>

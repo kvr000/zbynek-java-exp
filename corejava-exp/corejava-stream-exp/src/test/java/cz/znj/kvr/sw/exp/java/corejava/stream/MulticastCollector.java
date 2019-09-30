@@ -31,8 +31,9 @@ public class MulticastCollector<T, A> implements Collector<T, MulticastCollector
 	public BiConsumer<MulticastCollector, T> accumulator()
 	{
 		for (Stream<T> s: consumers) {
-			s.
+
 		}
+		return null;
 	}
 
 	@Override

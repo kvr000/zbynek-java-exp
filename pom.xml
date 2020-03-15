@@ -113,7 +113,7 @@
 
 		<guava.version>27.0-jre</guava.version>
 
-		<spring.version>5.1.2.RELEASE</spring.version>
+		<spring.version>5.2.4.RELEASE</spring.version>
 		<spring-boot.version>2.0.6.RELEASE</spring-boot.version>
 		<spring-security.version>5.1.5.RELEASE</spring-security.version>
 

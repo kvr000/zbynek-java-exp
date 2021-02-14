@@ -171,7 +171,7 @@
 
 		<react.version>16.3.2</react.version>
 
-		<zstd.version>1.4.2-1</zstd.version>
+		<zstd.version>1.4.8-4</zstd.version>
 		<brotli.version>0.1.2</brotli.version>
 
 	</properties>

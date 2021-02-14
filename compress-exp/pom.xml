@@ -24,6 +24,7 @@
 
 	<modules>
 		<module>compress-various-exp</module>
+		<module>compress-benchmark</module>
 	</modules>
 
 </project>

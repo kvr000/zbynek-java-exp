@@ -126,7 +126,7 @@
 
 		<appengine-maven-plugin.version>2.0.0</appengine-maven-plugin.version>
 
-		<httpcomponents.version>4.5</httpcomponents.version>
+		<httpcomponents.version>4.5.13</httpcomponents.version>
 
 		<jackson.version>2.9.8</jackson.version>
 

@@ -138,6 +138,7 @@
 		<httpcomponents.version>4.5</httpcomponents.version>
 
 		<mina-sshd.version>2.8.0</mina-sshd.version>
+		<jsch.version>0.1.55</jsch.version>
 
 		<jackson.version>2.9.8</jackson.version>
 
@@ -694,6 +695,12 @@
 				<groupId>org.apache.sshd</groupId>
 				<artifactId>sshd-git</artifactId>
 				<version>${mina-sshd.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jcraft</groupId>
+				<artifactId>jsch</artifactId>
+				<version>${jsch.version}</version>
 			</dependency>
 
 			<dependency>

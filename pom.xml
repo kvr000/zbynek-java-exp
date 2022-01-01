@@ -156,7 +156,7 @@
 
 		<org.eclipse.jdt.core.compiler-ecj.version>4.6.1</org.eclipse.jdt.core.compiler-ecj.version>
 
-		<jetty.version>9.4.3.v20170317</jetty.version>
+		<jetty.version>9.4.41.v20210516</jetty.version>
 
 		<bootstrap.version>4.1.1</bootstrap.version>
 

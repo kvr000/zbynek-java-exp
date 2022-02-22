@@ -128,7 +128,7 @@
 		<spring-boot.version>2.0.6.RELEASE</spring-boot.version>
 		<spring-security.version>5.1.5.RELEASE</spring-security.version>
 
-		<netty.version>4.1.39.Final</netty.version>
+		<netty.version>4.1.42.Final</netty.version>
 
 		<aws-java-sdk.version>1.11.587</aws-java-sdk.version>
 		<aws-lambda-java-core.version>1.2.0</aws-lambda-java-core.version>

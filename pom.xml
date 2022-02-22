@@ -105,7 +105,7 @@
 		<commons-beanutils.version>1.9.2</commons-beanutils.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
-		<commons-compress.version>1.19</commons-compress.version>
+		<commons-compress.version>1.21</commons-compress.version>
 		<commons-csv.version>1.2</commons-csv.version>
 		<commons-io.version>2.4</commons-io.version>
 

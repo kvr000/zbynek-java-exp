@@ -51,6 +51,7 @@
 						</goals>
 						<configuration>
 							<vmParams>-Xmx16m</vmParams>
+							<sort>true</sort>
 							<input>target/job-runner.jar</input>
 						</configuration>
 					</execution>

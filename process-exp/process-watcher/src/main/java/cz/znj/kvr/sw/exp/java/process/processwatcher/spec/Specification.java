@@ -19,11 +19,9 @@ import java.util.Map;
 public class Specification
 {
 	@NonNull
-	@JsonDeserialize(as = LinkedHashMap.class)
 	Map<String, Process> processes;
 
 	@NonNull
-	@JsonDeserialize(as = LinkedHashMap.class)
 	Map<String, String> properties;
 
 	@JsonPOJOBuilder(withPrefix = "")
@@ -32,6 +30,7 @@ public class Specification
 		@JsonDeserialize(as = LinkedHashMap.class)
 		Map<String, Process> processes = new LinkedHashMap<>();
 
+		@JsonDeserialize(as = LinkedHashMap.class)
 		Map<String, String> properties = new LinkedHashMap<>();
 	}
 }

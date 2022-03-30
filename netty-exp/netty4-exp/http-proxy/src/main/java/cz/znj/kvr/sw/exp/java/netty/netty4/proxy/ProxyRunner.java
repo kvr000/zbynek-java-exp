@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -177,7 +178,7 @@ public class ProxyRunner extends AbstractCommand
 		PortForwarder.ForwardConfig.AddressSpec addressSpec = parseAddressSpec(spec, false);
 		return HttpProxyFactory.Config.builder()
 			.proto(addressSpec.getProto())
-			.listenAddress(addressSpec.getHost() == null ? new InetSocketAddress(addressSpec.getPort()) : InetSocketAddress.createUnresolved(addressSpec.getHost(), addressSpec.getPort()))
+			.listenAddress(InetSocketAddress.createUnresolved(Optional.ofNullable(addressSpec.getHost()).orElse("*"), addressSpec.getPort()))
 			.remapHosts(proxyRemap)
 			.addedHeaders(proxyHeaders)
 			.build();

@@ -54,6 +54,14 @@
 						</goals>
 						<configuration>
 							<vmParams>-Xmx64m</vmParams>
+							<sort>true</sort>
+							<resourceConfigs>
+								<resourceConfig>
+									<pattern>glob:**</pattern>
+									<type>dir</type>
+									<remove>true</remove>
+								</resourceConfig>
+							</resourceConfigs>
 							<input>target/http-proxy.jar</input>
 						</configuration>
 					</execution>
@@ -68,6 +76,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>

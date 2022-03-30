@@ -167,7 +167,7 @@ public class DoubleMathEvaluatorProviderTest
 	{
 		{
 			Double result = factory.parse("nullfor(1, 2)").evaluate(new NullContext<>());
-			Assert.assertEquals(result, 1.0);
+			Assert.assertEquals(result, (Double) 1.0);
 		}
 		{
 			Double result = factory.parse("nullfor(1, 1)").evaluate(new NullContext<>());

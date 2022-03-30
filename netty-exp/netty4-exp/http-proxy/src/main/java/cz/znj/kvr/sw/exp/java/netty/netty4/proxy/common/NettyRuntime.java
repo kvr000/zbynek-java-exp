@@ -5,7 +5,7 @@ import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.pipeline.ForwarderHandle
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelFactory;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
@@ -36,6 +36,8 @@ import io.netty.resolver.InetNameResolver;
 import io.netty.resolver.dns.DnsNameResolverBuilder;
 import io.netty.util.concurrent.Future;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.concurrent.FutureUtil;
 import org.apache.commons.lang3.SystemUtils;
@@ -47,8 +49,15 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.ProtocolFamily;
 import java.net.SocketAddress;
+import java.net.StandardProtocolFamily;
 import java.net.UnknownHostException;
+import java.nio.channels.Pipe;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.nio.channels.spi.AbstractSelector;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -82,12 +91,16 @@ public class NettyRuntime implements Closeable
 	@Getter
 	private final InetNameResolver inetNameResolver = new DnsNameResolverBuilder()
 		.eventLoop(workerGroup.next())
-		.channelType(configAdapter.getDatagramChannel())
+		.channelFactory(configAdapter.getDatagramChannel(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0)))
 		.build();
 
 	public CompletableFuture<SocketAddress> resolve(SocketAddress address)
 	{
 		if (address instanceof InetSocketAddress && ((InetSocketAddress) address).isUnresolved()) {
+			InetSocketAddress address1 = (InetSocketAddress) address;
+			if (address1.getHostName().equals("*")) {
+				return CompletableFuture.completedFuture(new InetSocketAddress(address1.getPort()));
+			}
 			Future<InetAddress> future =
 				getInetNameResolver().resolve(((InetSocketAddress)address).getHostName());
 			return new CompletableFuture<SocketAddress>() {
@@ -111,14 +124,35 @@ public class NettyRuntime implements Closeable
 	private CompletableFuture<SocketAddress> resolve(String proto, SocketAddress address)
 	{
 		if (address instanceof InetSocketAddress && ((InetSocketAddress) address).isUnresolved()) {
-			String hostname = ((InetSocketAddress) address).getHostName();
+			InetSocketAddress address1 = (InetSocketAddress) address;
+			String hostname = address1.getHostName();
+			try {
+				if (hostname.equals("*")) {
+					switch (proto) {
+					case "ip4":
+					case "tcp4":
+					case "udp4":
+						return CompletableFuture.completedFuture(new InetSocketAddress(InetAddress.getByAddress(new byte[4]), address1.getPort()));
+
+					case "ip6":
+					case "tcp6":
+					case "udp6":
+						return CompletableFuture.completedFuture(new InetSocketAddress(InetAddress.getByAddress(new byte[16]), address1.getPort()));
+
+					default:
+						throw new IllegalArgumentException("Unknown protocol: proto="+proto);
+					}
+				}
+			}
+			catch (UnknownHostException ex) {
+				return CompletableFuture.failedFuture(new UnknownHostException("Failed to resolve "+hostname+" : "+ex.getMessage()));
+			}
 			Future<List<InetAddress>> future =
 				getInetNameResolver().resolveAll(hostname);
 			return new CompletableFuture<SocketAddress>() {
 				{
 					future.addListener((f) -> {
 						try {
-							List<InetAddress> addresses = future.get();
 							Class<? extends InetAddress> clazz = proto == null ? InetAddress.class : PROTO_TO_ADDRESS_CLASS.get(proto);
 							if (clazz == null) {
 								throw new IllegalArgumentException("Unrecognized proto: "+proto);
@@ -145,17 +179,17 @@ public class NettyRuntime implements Closeable
 	public CompletableFuture<ServerChannel> listen(String proto, SocketAddress listen, ChannelInitializer<DuplexChannel> channelInitializer) throws InterruptedException
 	{
 		try {
-			ServerBootstrap b = new ServerBootstrap();
-			b.group(bossGroup, workerGroup)
-				.channel(configAdapter.getServerChannel(listen))
-				.childHandler(channelInitializer).option(ChannelOption.SO_BACKLOG, Integer.MAX_VALUE)
-				.childOption(ChannelOption.SO_KEEPALIVE, true);
-
 			return new CompletableFuture<ServerChannel>() {
 				ChannelFuture bindFuture;
 
 				private synchronized void stepBind(SocketAddress address)
 				{
+					ServerBootstrap b = new ServerBootstrap();
+					b.group(bossGroup, workerGroup)
+							.channelFactory(configAdapter.getServerChannel(address))
+							.childHandler(channelInitializer).option(ChannelOption.SO_BACKLOG, Integer.MAX_VALUE)
+							.childOption(ChannelOption.SO_KEEPALIVE, true);
+
 					bindFuture = b.bind(address);
 
 					bindFuture.addListener((f) -> {
@@ -227,7 +261,7 @@ public class NettyRuntime implements Closeable
 				try {
 					Bootstrap b = new Bootstrap();
 					future = b.group(workerGroup)
-						.channel(configAdapter.getStreamChannel(resolved))
+						.channelFactory(configAdapter.getStreamChannel(resolved))
 						.handler(channelInitializer)
 						.connect(resolved);
 
@@ -307,11 +341,16 @@ public class NettyRuntime implements Closeable
 		bossGroup.shutdownGracefully();
 	}
 
+	public static ProtocolFamily getProtocolByAddress(InetAddress address)
+	{
+		return address instanceof Inet6Address ? StandardProtocolFamily.INET6 : StandardProtocolFamily.INET;
+	}
+
 	private ConfigAdapter createConfigAdapter()
 	{
 		try {
 			if (SystemUtils.IS_OS_LINUX) {
-				return new EpollConfigAdapter();
+				//return new EpollConfigAdapter();
 			}
 			else if (SystemUtils.IS_OS_MAC_OSX) {
 				return new KqueueConfigAdapter();
@@ -327,11 +366,11 @@ public class NettyRuntime implements Closeable
 	{
 		EventLoopGroup createEventLoopGroup();
 
-		Class<? extends ServerChannel> getServerChannel(SocketAddress address);
+		ChannelFactory<? extends ServerChannel> getServerChannel(SocketAddress address);
 
-		Class<? extends Channel> getStreamChannel(SocketAddress address);
+		ChannelFactory<? extends DuplexChannel> getStreamChannel(SocketAddress address);
 
-		Class<? extends DatagramChannel> getDatagramChannel();
+		ChannelFactory<? extends DatagramChannel> getDatagramChannel(SocketAddress address);
 	}
 
 	public static class EpollConfigAdapter implements ConfigAdapter
@@ -348,13 +387,13 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends ServerChannel> getServerChannel(SocketAddress address)
+		public ChannelFactory<? extends ServerChannel> getServerChannel(SocketAddress address)
 		{
 			if (address instanceof InetSocketAddress) {
-				return EpollServerSocketChannel.class;
+				return EpollServerSocketChannel::new;
 			}
 			else if (address instanceof DomainSocketAddress) {
-				return EpollServerDomainSocketChannel.class;
+				return EpollServerDomainSocketChannel::new;
 			}
 			else {
 				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
@@ -362,13 +401,13 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends Channel> getStreamChannel(SocketAddress address)
+		public ChannelFactory<? extends DuplexChannel> getStreamChannel(SocketAddress address)
 		{
 			if (address instanceof InetSocketAddress) {
-				return EpollSocketChannel.class;
+				return EpollSocketChannel::new;
 			}
 			else if (address instanceof DomainSocketAddress) {
-				return EpollDomainSocketChannel.class;
+				return EpollDomainSocketChannel::new;
 			}
 			else {
 				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
@@ -376,9 +415,9 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends DatagramChannel> getDatagramChannel()
+		public ChannelFactory<? extends DatagramChannel> getDatagramChannel(SocketAddress socketAddress)
 		{
-			return EpollDatagramChannel.class;
+			return EpollDatagramChannel::new;
 		}
 	}
 
@@ -396,13 +435,13 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends ServerChannel> getServerChannel(SocketAddress address)
+		public ChannelFactory<? extends ServerChannel> getServerChannel(SocketAddress address)
 		{
 			if (address instanceof InetSocketAddress) {
-				return KQueueServerSocketChannel.class;
+				return KQueueServerSocketChannel::new;
 			}
 			else if (address instanceof DomainSocketAddress) {
-				return KQueueServerDomainSocketChannel.class;
+				return KQueueServerDomainSocketChannel::new;
 			}
 			else {
 				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
@@ -410,13 +449,13 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends Channel> getStreamChannel(SocketAddress address)
+		public ChannelFactory<? extends DuplexChannel> getStreamChannel(SocketAddress address)
 		{
 			if (address instanceof InetSocketAddress) {
-				return KQueueSocketChannel.class;
+				return KQueueSocketChannel::new;
 			}
 			else if (address instanceof DomainSocketAddress) {
-				return KQueueDomainSocketChannel.class;
+				return KQueueDomainSocketChannel::new;
 			}
 			else {
 				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
@@ -424,9 +463,9 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends DatagramChannel> getDatagramChannel()
+		public ChannelFactory<? extends DatagramChannel> getDatagramChannel(SocketAddress address)
 		{
-			return KQueueDatagramChannel.class;
+			return KQueueDatagramChannel::new;
 		}
 	}
 
@@ -439,10 +478,16 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends ServerChannel> getServerChannel(SocketAddress address)
+		public ChannelFactory<? extends ServerChannel> getServerChannel(SocketAddress address)
 		{
 			if (address instanceof InetSocketAddress) {
-				return NioServerSocketChannel.class;
+				return () -> new NioServerSocketChannel(new DelegatedSelectorProvider(SelectorProvider.provider()) {
+					@Override
+					public ServerSocketChannel openServerSocketChannel() throws IOException {
+						ProtocolFamily protocol = getProtocolByAddress(((InetSocketAddress) address).getAddress());
+						return super.openServerSocketChannel(protocol);
+					}
+				});
 			}
 			else {
 				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
@@ -450,11 +495,17 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends Channel> getStreamChannel(SocketAddress address)
+		public ChannelFactory<? extends DuplexChannel> getStreamChannel(SocketAddress address)
 		{
 
 			if (address instanceof InetSocketAddress) {
-				return NioSocketChannel.class;
+				return () -> new NioSocketChannel(new DelegatedSelectorProvider(SelectorProvider.provider()) {
+					@Override
+					public SocketChannel openSocketChannel() throws IOException {
+						ProtocolFamily protocol = getProtocolByAddress(((InetSocketAddress) address).getAddress());
+						return super.openSocketChannel(protocol);
+					}
+				});
 			}
 			else {
 				throw new UnsupportedOperationException("Unsupported socket address: class="+address.getClass());
@@ -462,9 +513,27 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends DatagramChannel> getDatagramChannel()
+		public ChannelFactory<? extends DatagramChannel> getDatagramChannel(SocketAddress address)
 		{
-			return NioDatagramChannel.class;
+			if (address instanceof InetSocketAddress) {
+				return () -> new NioDatagramChannel(new DelegatedSelectorProvider(SelectorProvider.provider()) {
+					@Override
+					public java.nio.channels.DatagramChannel openDatagramChannel() throws IOException {
+						ProtocolFamily protocol = getProtocolByAddress(((InetSocketAddress) address).getAddress());
+						return super.openDatagramChannel(protocol);
+					}
+				});
+			}
+			else {
+				return NioDatagramChannel::new;
+			}
 		}
+	}
+
+	@RequiredArgsConstructor
+	public static class DelegatedSelectorProvider extends SelectorProvider
+	{
+		@Delegate
+		private final SelectorProvider delegate;
 	}
 }

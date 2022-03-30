@@ -51,6 +51,14 @@
 						</goals>
 						<configuration>
 							<vmParams>-Xmx16m</vmParams>
+							<sort>true</sort>
+							<resourceConfigs>
+								<resourceConfig>
+									<pattern>glob:**</pattern>
+									<type>dir</type>
+									<remove>true</remove>
+								</resourceConfig>
+							</resourceConfigs>
 							<input>target/process-watcher.jar</input>
 						</configuration>
 					</execution>

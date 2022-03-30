@@ -13,54 +13,54 @@
 	<description>Parent of Zbynek java experiments</description>
 
 	<properties>
-		<javac.version>11</javac.version>
+		<javac.version>17</javac.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
-		<maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
-		<maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
-		<maven-resources-plugin.version>2.7</maven-resources-plugin.version>
-		<maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
-		<maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
-		<maven-war-plugin.version>2.6</maven-war-plugin.version>
-		<maven-plugin-plugin.version>3.6.0</maven-plugin-plugin.version>
-		<maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
-		<maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
-		<maven-surefire-plugin.version>2.21.0</maven-surefire-plugin.version>
-		<maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
-		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
-		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-		<maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
-		<maven-archetype-plugin.version>3.0.1</maven-archetype-plugin.version>
+		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>3.3.2</maven-javadoc-plugin.version>
+		<maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
+		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
+		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
+		<maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+		<maven-war-plugin.version>3.3.2</maven-war-plugin.version>
+		<maven-ear-plugin.version>3.0.2</maven-ear-plugin.version>
+		<maven-plugin-plugin.version>3.6.4</maven-plugin-plugin.version>
+		<maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+		<maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
+		<maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
+		<maven-deploy-plugin.version>3.0.0-M2</maven-deploy-plugin.version>
+		<maven-release-plugin.version>3.0.0-M5</maven-release-plugin.version>
+		<maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version>
+		<maven-archetype-plugin.version>3.2.1</maven-archetype-plugin.version>
 		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
-		<maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+		<maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
-		<maven-site-plugin.version>3.7.1</maven-site-plugin.version>
-		<maven-scm-plugin.version>1.11.1</maven-scm-plugin.version>
-		<maven-surefire-report-plugin.version>3.0.0-M1</maven-surefire-report-plugin.version>
-		<maven-help-plugin.version>3.1.1</maven-help-plugin.version>
+		<maven-site-plugin.version>3.11.0</maven-site-plugin.version>
+		<maven-scm-plugin.version>2.0.0-M1</maven-scm-plugin.version>
+		<maven-surefire-report-plugin.version>3.0.0-M5</maven-surefire-report-plugin.version>
+		<maven-help-plugin.version>3.2.0</maven-help-plugin.version>
 		<maven-jarsigner-plugin.version>3.0.0</maven-jarsigner-plugin.version>
 		<maven-repository-plugin.version>2.4</maven-repository-plugin.version>
 		<maven-toolchains-plugin.version>3.0.0</maven-toolchains-plugin.version>
 		<maven-scm-publish-plugin.version>3.0.0</maven-scm-publish-plugin.version>
-		<maven-ear-plugin.version>3.0.2</maven-ear-plugin.version>
-		<maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
+		<maven-project-info-reports-plugin.version>3.2.2</maven-project-info-reports-plugin.version>
 
-		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
-		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-		<build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
-		<spotbugs-maven-plugin.version>3.1.10</spotbugs-maven-plugin.version>
-		<spotbugs.version>3.1.10</spotbugs.version>
+		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
+		<nexus-staging-maven-plugin.version>1.6.12</nexus-staging-maven-plugin.version>
+		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
+		<spotbugs-maven-plugin.version>4.6.0.0</spotbugs-maven-plugin.version>
+		<spotbugs.version>4.6.0</spotbugs.version>
 
 		<webstart-maven-plugin.version>1.0-beta-2</webstart-maven-plugin.version>
 		<grunt-maven-plugin.version>1.5.1</grunt-maven-plugin.version>
-		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
+		<frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
 
 		<spring-boot-maven-plugin.version>2.0.6.RELEASE</spring-boot-maven-plugin.version>
-		<dryuf-executable-jar-maven-plugin.version>0.0.1</dryuf-executable-jar-maven-plugin.version>
+		<dryuf-executable-jar-maven-plugin.version>1.2.2</dryuf-executable-jar-maven-plugin.version>
 
-		<lombok.version>1.18.4</lombok.version>
+		<lombok.version>1.18.22</lombok.version>
 
 		<maven-core.version>3.6.0</maven-core.version>
 		<maven-plugin-api.version>${maven-core.version}</maven-plugin-api.version>
@@ -81,54 +81,48 @@
 		<javax.json.version>1.1</javax.json.version>
 		<glassfish-javax.json.version>1.1.4</glassfish-javax.json.version>
 
-		<zip4j.version>2.1.4</zip4j.version>
+		<zip4j.version>2.10.0</zip4j.version>
 
-		<testng.version>6.9.10</testng.version>
+		<testng.version>7.3.0</testng.version>
 
 		<junit.version>4.12</junit.version>
 		<jmock-junit4.version>2.5.1</jmock-junit4.version>
 
-		<hamcrest.version>2.1</hamcrest.version>
+		<hamcrest.version>2.2</hamcrest.version>
 
-		<xmlunit.version>2.6.3</xmlunit.version>
+		<xmlunit.version>2.9.0</xmlunit.version>
 
 		<mockito.version>2.23.4</mockito.version>
 
-		<log4j.version>2.11.0</log4j.version>
-		<slf4j.version>1.7.5</slf4j.version>
+		<log4j.version>2.17.2</log4j.version>
+		<slf4j.version>1.7.36</slf4j.version>
 
-		<joda-time.version>2.9.9</joda-time.version>
-
-		<reflections.version>0.9.10</reflections.version>
+		<reflections.version>0.10.2</reflections.version>
 
 		<commons-lang3.version>3.4</commons-lang3.version>
-		<commons-beanutils.version>1.9.2</commons-beanutils.version>
+		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<commons-codec.version>1.10</commons-codec.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
-		<commons-compress.version>1.19</commons-compress.version>
+		<commons-compress.version>1.21</commons-compress.version>
 		<commons-csv.version>1.2</commons-csv.version>
 		<commons-io.version>2.4</commons-io.version>
 
-		<guice.version>4.0</guice.version>
+		<junixsocket.version>2.4.0</junixsocket.version>
 
-		<junixsocket.version>2.0.4</junixsocket.version>
+		<joda-time.version>2.10.14</joda-time.version>
 
-		<joda-time.version>2.9.9</joda-time.version>
+		<guava.version>31.1-jre</guava.version>
 
-		<guava.version>27.0-jre</guava.version>
+		<guice.version>5.1.0</guice.version>
+		<mycila-guice-extensions.version>5.0</mycila-guice-extensions.version>
 
-		<guice.version>4.1.0</guice.version>
-		<mycila-guice-extensions.version>4.0.rc1</mycila-guice-extensions.version>
+		<dagger.version>2.41</dagger.version>
 
-		<dagger.version>2.20</dagger.version>
+		<spring.version>5.3.17</spring.version>
+		<spring-boot.version>2.6.4</spring-boot.version>
+		<spring-security.version>5.6.2</spring-security.version>
 
-		<guava.version>27.0-jre</guava.version>
-
-		<spring.version>5.1.2.RELEASE</spring.version>
-		<spring-boot.version>2.0.6.RELEASE</spring-boot.version>
-		<spring-security.version>5.1.5.RELEASE</spring-security.version>
-
-		<netty.version>4.1.39.Final</netty.version>
+		<netty.version>4.1.75.Final</netty.version>
 
 		<aws-java-sdk.version>1.11.587</aws-java-sdk.version>
 		<aws-lambda-java-core.version>1.2.0</aws-lambda-java-core.version>
@@ -136,14 +130,14 @@
 
 		<appengine-maven-plugin.version>2.0.0</appengine-maven-plugin.version>
 
-		<httpcomponents.version>4.5</httpcomponents.version>
+		<httpcomponents.version>4.5.13</httpcomponents.version>
 
 		<mina-sshd.version>2.8.0</mina-sshd.version>
 		<jsch.version>0.1.55</jsch.version>
 
-		<jackson.version>2.9.8</jackson.version>
+		<jackson.version>2.13.2</jackson.version>
 
-		<gson.version>2.5</gson.version>
+		<gson.version>2.9.0</gson.version>
 
 		<wagon.version>2.9</wagon.version>
 
@@ -151,10 +145,10 @@
 
 		<camel.version>2.24.0</camel.version>
 
-		<dryuf-concurrent.version>1.2.0</dryuf-concurrent.version>
-		<dryuf-cmdline.version>0.0.1</dryuf-cmdline.version>
+		<dryuf-concurrent.version>1.3.0</dryuf-concurrent.version>
+		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
 
-		<dryuf-bigio.version>0.0.1</dryuf-bigio.version>
+		<dryuf-bigio.version>1.1.0</dryuf-bigio.version>
 
 		<tomcat-embed-jasper.version>9.0.14</tomcat-embed-jasper.version>
 
@@ -179,7 +173,7 @@
 
 		<react.version>16.3.2</react.version>
 
-		<zstd.version>1.4.2-1</zstd.version>
+		<zstd.version>1.5.2-2</zstd.version>
 		<brotli.version>0.1.2</brotli.version>
 
 	</properties>
@@ -430,6 +424,7 @@
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
+				<scope>provided</scope>
 			</dependency>
 
 			<dependency>

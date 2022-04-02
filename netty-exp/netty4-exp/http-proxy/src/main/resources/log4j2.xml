@@ -6,10 +6,18 @@
 		</console>
 	</appenders>
 	<loggers>
-		<logger name="cz.znj.kvr.sw.exp.java" level="DEBUG" />
+		<logger name="cz.znj.kvr.sw.exp.java" level="WARN" />
 
 		<root level="debug">
 			<appenderRef ref="Console" />
+		</root>
+	</loggers>
+	<loggers>
+		<logger name="io.netty.channel.socket.nio.NioServerSocketChannel" level="info" additivity="false">
+			<AppenderRef ref="Console"/>
+		</logger>
+		<root level="info">
+			<appenderRef ref="Console"/>
 		</root>
 	</loggers>
 </configuration>

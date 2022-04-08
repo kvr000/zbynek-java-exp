@@ -56,7 +56,7 @@
 		<maven-plugin-api.version>${maven-core.version}</maven-plugin-api.version>
 		<maven-plugin-tools.version>3.4</maven-plugin-tools.version>
 
-		<lombok.version>1.18.2</lombok.version>
+		<lombok.version>1.18.22</lombok.version>
 
 		<reflections.version>0.9.10</reflections.version>
 

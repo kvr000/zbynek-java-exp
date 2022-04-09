@@ -1,5 +1,8 @@
 package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context;
 
+import net.dryuf.bigio.iostream.CommittableOutputStream;
+import org.glassfish.jersey.message.internal.CommittingOutputStream;
+
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -57,7 +60,7 @@ public interface RequestExchange
 
 	InputStream getRequestBody() throws IOException;
 
-	OutputStream getResponseBody() throws IOException;
+	CommittableOutputStream getResponseBody() throws IOException;
 
 	void addHeader(String name, String value);
 

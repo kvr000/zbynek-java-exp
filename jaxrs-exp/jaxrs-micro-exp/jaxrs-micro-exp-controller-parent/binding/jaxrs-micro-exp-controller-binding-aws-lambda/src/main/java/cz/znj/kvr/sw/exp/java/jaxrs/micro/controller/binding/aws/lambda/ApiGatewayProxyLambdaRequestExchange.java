@@ -6,6 +6,8 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.AbstractRequestExch
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.ResponseExchangeBuilderProvider;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.util.Util;
 import lombok.Getter;
+import net.dryuf.bigio.iostream.CommittableOutputStream;
+import net.dryuf.bigio.iostream.FilterCommittableOutputStream;
 import net.dryuf.concurrent.collection.LazilyBuiltLoadingCache;
 import org.apache.commons.io.IOUtils;
 
@@ -79,9 +81,16 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	}
 
 	@Override
-	public OutputStream getResponseBody() throws IOException
+	public CommittableOutputStream getResponseBody() throws IOException
 	{
-		return output;
+		return new FilterCommittableOutputStream(output)
+		{
+			@Override
+			public void committable(boolean committable)
+			{
+				committed = committable;
+			}
+		};
 	}
 
 	@Override
@@ -131,6 +140,8 @@ public class ApiGatewayProxyLambdaRequestExchange extends AbstractRequestExchang
 	private final Map<String, List<Cookie>> allCookies;
 
 	int responseStatus;
+
+	boolean committed = false;
 
 	private byte isText = 0; // convenience, -1 is binary, 0 is unknown yet, 1 is text
 

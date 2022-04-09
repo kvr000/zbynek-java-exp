@@ -1,5 +1,8 @@
 package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context;
 
+import net.dryuf.bigio.iostream.CommittableOutputStream;
+import net.dryuf.bigio.iostream.FilterCommittableOutputStream;
+
 import javax.ws.rs.core.Cookie;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -114,9 +117,16 @@ public class TestRequestExchange extends AbstractRequestExchange
 	}
 
 	@Override
-	public OutputStream getResponseBody() throws IOException
+	public CommittableOutputStream getResponseBody() throws IOException
 	{
-		return responseBody;
+		return new FilterCommittableOutputStream(responseBody)
+		{
+			@Override
+			public void committable(boolean committable)
+			{
+				committed = committable;
+			}
+		};
 	}
 
 	@Override
@@ -157,6 +167,8 @@ public class TestRequestExchange extends AbstractRequestExchange
 	private final Map<String, List<String>> outputHeaders = new LinkedHashMap<>();
 
 	int responseStatus;
+
+	boolean committed;
 
 	private final InputStream requestBody;
 

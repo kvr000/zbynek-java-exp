@@ -44,7 +44,7 @@ public class MessageBodyWriterResolver
 	}
 
 	@RequiredArgsConstructor
-	private class WriterKey
+	private static class WriterKey
 	{
 		private final Class<?> clazz;
 		private final Type genericType;

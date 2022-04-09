@@ -3,6 +3,8 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.binding.jee.servlet;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.AbstractRequestExchange;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.ResponseExchangeBuilderProvider;
 import lombok.Getter;
+import net.dryuf.bigio.iostream.CommittableOutputStream;
+import net.dryuf.bigio.iostream.FilterCommittableOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -84,10 +86,17 @@ public class JeeRequestExchange extends AbstractRequestExchange
 	}
 
 	@Override
-	public OutputStream getResponseBody() throws IOException
+	public CommittableOutputStream getResponseBody() throws IOException
 	{
 		try {
-			return response.getOutputStream();
+			return new FilterCommittableOutputStream(response.getOutputStream())
+			{
+				@Override
+				public void committable(boolean committable)
+				{
+					committed = committable;
+				}
+			};
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
@@ -118,5 +127,7 @@ public class JeeRequestExchange extends AbstractRequestExchange
 
 	@Getter
 	private final Map<String, List<Cookie>> allCookies;
+
+	private boolean committed;
 
 }

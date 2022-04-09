@@ -4,6 +4,8 @@ import com.sun.net.httpserver.HttpExchange;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.AbstractRequestExchange;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.controller.context.ResponseExchangeBuilderProvider;
 import lombok.Getter;
+import net.dryuf.bigio.iostream.CommittableOutputStream;
+import net.dryuf.bigio.iostream.FilterCommittableOutputStream;
 
 import javax.ws.rs.core.Cookie;
 import java.io.IOException;
@@ -88,9 +90,14 @@ public class HttpExchangeRequestExchange extends AbstractRequestExchange
 	}
 
 	@Override
-	public OutputStream getResponseBody() throws IOException
+	public CommittableOutputStream getResponseBody() throws IOException
 	{
-		return httpExchange.getResponseBody();
+		return new FilterCommittableOutputStream(httpExchange.getResponseBody()) {
+			@Override
+			public void committable(boolean committable)
+			{
+			}
+		};
 	}
 
 	@Override

@@ -150,6 +150,10 @@
 			<groupId>net.dryuf</groupId>
 			<artifactId>dryuf-concurrent</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.dryuf</groupId>
+			<artifactId>dryuf-bigio</artifactId>
+		</dependency>
 
 	</dependencies>
 

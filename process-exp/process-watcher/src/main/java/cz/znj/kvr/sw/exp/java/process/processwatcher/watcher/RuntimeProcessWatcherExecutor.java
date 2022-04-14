@@ -7,6 +7,7 @@ import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Process;
 import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Specification;
 import lombok.Builder;
 import lombok.extern.log4j.Log4j2;
+import net.dryuf.concurrent.executor.FinishingSerializingExecutor;
 import net.dryuf.concurrent.queue.SingleConsumerQueue;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -22,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -57,18 +59,11 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 		return context;
 	}
 
-	private void doNext(RuntimeContext context)
+	private void queueFinisher(RuntimeContext context)
 	{
-		try (SingleConsumerQueue<Runnable>.Consumer reader = context.pendingTasks.consume()) {
-			Runnable runnable;
-			while ((runnable = reader.next()) != null) {
-				runnable.run();
-			}
-
-			if (context.needReview) {
-				context.needReview = false;
-				handleReview(context);
-			}
+		if (context.needReview) {
+			context.needReview = false;
+			handleReview(context);
 		}
 	}
 
@@ -84,7 +79,7 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 
 	private void scheduleStep(RuntimeContext context, Runnable step)
 	{
-		context.pendingTasks.add(step);
+		context.tasksExecutor.execute(step);
 	}
 
 	private void runProcess(RuntimeContext context, ProcessState state)
@@ -301,15 +296,8 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 
 		Map<String, ProcessState> processes;
 
-		/** Pending finished tasks to process.  In case it's null, doNext can be scheduled, otherwise it already is. */
-		final SingleConsumerQueue<Runnable> pendingTasks = new SingleConsumerQueue<>(() ->
-			CompletableFuture.runAsync(() -> doNext(RuntimeContext.this))
-				.whenComplete((v, ex) -> {
-					if (ex != null) {
-						log.fatal(ex);
-					}
-				})
-		);
+		final Executor tasksExecutor = FinishingSerializingExecutor.createFromFinisher(
+				() -> queueFinisher(RuntimeContext.this));
 
 		boolean needReview = true;
 

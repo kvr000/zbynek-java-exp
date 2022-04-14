@@ -41,6 +41,15 @@ public class LocalExecutionAgent implements ExecutionAgent
 					completeExceptionally(ex);
 				}
 			}
+
+			@Override
+			public boolean cancel(boolean interrupt)
+			{
+				if (!super.cancel(interrupt))
+					return false;
+				process.destroyForcibly();
+				return true;
+			}
 		};
 		return future;
 	}

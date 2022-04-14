@@ -9,7 +9,7 @@ import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.Specification;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.queue.SingleConsumerQueue;
+import net.dryuf.concurrent.executor.FinishingSerializingExecutor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import javax.inject.Inject;
@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -56,17 +57,16 @@ public class RuntimeJobExecutor implements JobExecutor
 		return context1.result;
 	}
 
-	private void doNext(Context context)
+	private void doReview(Context context)
 	{
-		try (SingleConsumerQueue<TaskState>.Consumer consumer = context.pendingTasks.consume()) {
-			TaskState lastFailed = processTasks(context, consumer);
-			if (lastFailed != null) {
-				context.result.complete(lastFailed.exitCode);
-			}
+		if (context.result.isDone())
+			return;
+		if (context.firstFailed != null) {
+			context.result.complete(context.firstFailed.exitCode);
+			return;
+		}
 
-			if (context.result.isDone())
-				return;
-
+		try {
 			processReady(context);
 		}
 		catch (Throwable ex) {
@@ -74,42 +74,29 @@ public class RuntimeJobExecutor implements JobExecutor
 		}
 	}
 
-	/**
-	 * Processes tasks from pending tasks.
-	 *
-	 * @param consumer
-	 * 	pending tasks consumer
-	 *
-	 * @return
-	 * 	last failed tasks or null
-	 */
-	private TaskState processTasks(Context context, SingleConsumerQueue<TaskState>.Consumer consumer)
+	private void doFinished(Context context, TaskState taskState)
 	{
-		TaskState lastFailed = null;
-		for (TaskState taskState; (taskState = consumer.next()) != null; ) {
-			log.trace("Processing: {}", taskState.id);
-			taskState.machine.availableCpusMultiplied += taskState.usedCpusMultiplied;
-			taskState.machine.availableMemory += taskState.usedMemory;
-			if (taskState.statesCounter.decrementAndGet() == 0) {
-				context.running.remove(taskState.id);
-				context.finished.put(taskState.id, taskState.task);
-				Optional.ofNullable(context.reverseDependent.get(taskState.id))
+		log.trace("Processing: {}", taskState.id);
+		taskState.machine.availableCpusMultiplied += taskState.usedCpusMultiplied;
+		taskState.machine.availableMemory += taskState.usedMemory;
+		if (taskState.statesCounter.decrementAndGet() == 0) {
+			context.running.remove(taskState.id);
+			context.finished.put(taskState.id, taskState.task);
+			Optional.ofNullable(context.reverseDependent.get(taskState.id))
 					.ifPresent(map -> map.forEach((depId, depTask) -> {
 						if (context.blocked.containsKey(depId) &&
-							depTask.getDependencies().stream().allMatch(context.finished::containsKey)) {
+								depTask.getDependencies().stream().allMatch(context.finished::containsKey)) {
 							context.blocked.remove(depId);
 							context.ready.put(depId, depTask);
 						}
 					}));
-			}
-			if (taskState.exitCode != 0) {
-				log.fatal("Command failed: id={} machine={} command={} exit={}", taskState.id, taskState.machine.id, taskState.task.getCommand(), taskState.exitCode);
-				if (lastFailed == null) {
-					lastFailed = taskState;
-				}
+		}
+		if (taskState.exitCode != 0) {
+			log.fatal("Command failed: id={} machine={} command={} exit={}", taskState.id, taskState.machine.id, taskState.task.getCommand(), taskState.exitCode);
+			if (context.firstFailed == null) {
+				context.firstFailed = taskState;
 			}
 		}
-		return lastFailed;
 	}
 
 	private void processReady(Context context)
@@ -149,13 +136,13 @@ public class RuntimeJobExecutor implements JobExecutor
 	{
 		taskState.exitCode = exitCode;
 		log.debug("Finishing: {}", taskState.id);
-		context.pendingTasks.add(taskState);
+		context.taskExecutor.execute(() -> doFinished(context, taskState));
 	}
 
 	private void scheduleDoNext(Context context)
 	{
 		log.trace("Scheduling doNext");
-		CompletableFuture.runAsync(() -> doNext(context));
+		CompletableFuture.runAsync(() -> doReview(context));
 	}
 
 	private Collection<TaskState> allocateMachine(Context context, Map.Entry<String, JobTask> taskEntry)
@@ -172,6 +159,17 @@ public class RuntimeJobExecutor implements JobExecutor
 		return tasks.values();
 	}
 
+	/**
+	 * Finds machine for the task.
+	 *
+	 * @param context
+	 * 	execution context
+	 * @param taskEntry
+	 * 	task
+	 *
+	 * @return
+	 * 	map of machine entries to taskState, taskState can be null in case the machine is not eligible
+	 */
 	private Map<String, TaskState> findMachine(Context context, Map.Entry<String, JobTask> taskEntry)
 	{
 		JobTask task = taskEntry.getValue();
@@ -190,11 +188,9 @@ public class RuntimeJobExecutor implements JobExecutor
 		if (task.isRunAllHosts()) {
 			Map<String, TaskState> taskStates = new LinkedHashMap<>();
 			AtomicInteger statesCounter = new AtomicInteger(machines.size());
-			int failed = 0;
 			for (Map.Entry<String, MachineState> machineEntry : machines.entrySet()) {
 				TaskState taskState = checkRunningEligibility(taskEntry, machineEntry.getValue());
 				if (taskState == null) {
-					++failed;
 					taskStates.put(machineEntry.getKey(), null);
 				}
 				else {
@@ -283,7 +279,7 @@ public class RuntimeJobExecutor implements JobExecutor
 			}
 		}
 
-		context.pendingTasks = new SingleConsumerQueue<>(() -> scheduleDoNext(context));
+		context.taskExecutor = FinishingSerializingExecutor.createFromFinisher(() -> doReview(context));
 
 		return context;
 	}
@@ -374,7 +370,9 @@ public class RuntimeJobExecutor implements JobExecutor
 
 		CompletableFuture<Integer> result;
 
-		SingleConsumerQueue<TaskState> pendingTasks;
+		Executor taskExecutor;
+
+		TaskState firstFailed;
 	}
 
 	@Builder

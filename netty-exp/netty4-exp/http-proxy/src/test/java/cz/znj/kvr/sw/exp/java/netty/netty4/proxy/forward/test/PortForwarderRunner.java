@@ -1,9 +1,12 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.test;
 
 import com.google.common.collect.ImmutableList;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.NettyPortForwarder;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.PortForwarder;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyFutures;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.NettyPortForwarderFactory;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.PortForwarderFactory;
 
 
 /**
@@ -13,44 +16,44 @@ public class PortForwarderRunner
 {
 	public static void main(String[] args) throws Exception
 	{
-		try (NettyRuntime nettyRuntime = new NettyRuntime()) {
-			new NettyPortForwarder(nettyRuntime)
+		try (NettyEngine nettyEngine = new NettyEngine()) {
+			Server.waitOneAndClose(NettyFutures.nestedAllOrCancel(new NettyPortForwarderFactory(nettyEngine)
 				.runForwards(ImmutableList.of(
-					PortForwarder.ForwardConfig.builder()
-						.bind(PortForwarder.ForwardConfig.AddressSpec.builder()
+					PortForwarderFactory.ForwardConfig.builder()
+						.bind(AddressSpec.builder()
 							.proto("tcp4")
 							.host("localhost")
 							.port(3300)
 							.build())
-						.connect(PortForwarder.ForwardConfig.AddressSpec.builder()
+						.connect(AddressSpec.builder()
 							.proto("tcp4")
 							.host("localhost")
 							.port(3301)
 							.build())
 						.build(),
-					PortForwarder.ForwardConfig.builder()
-						.bind(PortForwarder.ForwardConfig.AddressSpec.builder()
+					PortForwarderFactory.ForwardConfig.builder()
+						.bind(AddressSpec.builder()
 							.proto("tcp4")
 							.host("localhost")
 							.port(3301)
 							.build())
-						.connect(PortForwarder.ForwardConfig.AddressSpec.builder()
+						.connect(AddressSpec.builder()
 							.proto("unix")
 							.path("target/forward.socket")
 							.build())
 						.build(),
-					PortForwarder.ForwardConfig.builder()
-						.bind(PortForwarder.ForwardConfig.AddressSpec.builder()
+					PortForwarderFactory.ForwardConfig.builder()
+						.bind(AddressSpec.builder()
 							.proto("unix")
 							.path("target/forward.socket")
 							.build())
-						.connect(PortForwarder.ForwardConfig.AddressSpec.builder()
+						.connect(AddressSpec.builder()
 							.proto("tcp4")
 							.host("localhost")
 							.port(3302)
 							.build())
 						.build()
-				)).get().get();
+				))).get()).get();
 			throw new IllegalStateException("Unreachable");
 		}
 	}

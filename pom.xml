@@ -14,6 +14,7 @@
 
 	<properties>
 		<javac.version>17</javac.version>
+		<javac.target.version>${javac.version}</javac.target.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
@@ -122,7 +123,7 @@
 		<spring-boot.version>2.6.6</spring-boot.version>
 		<spring-security.version>5.6.2</spring-security.version>
 
-		<netty.version>4.1.75.Final</netty.version>
+		<netty.version>4.1.76.Final</netty.version>
 
 		<aws-java-sdk.version>1.11.587</aws-java-sdk.version>
 		<aws-lambda-java-core.version>1.2.0</aws-lambda-java-core.version>
@@ -187,7 +188,7 @@
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${javac.version}</source>
-					<target>${javac.version}</target>
+					<target>${javac.target.version}</target>
 				</configuration>
 			</plugin>
 
@@ -1063,6 +1064,46 @@
 				<artifactId>spring-boot-starter-data-mongodb</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
+
+			<!-- AWS -->
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk</artifactId>
+				<version>${aws-java-sdk.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-lambda</artifactId>
+				<version>${aws-java-sdk.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-lambda-java-core</artifactId>
+				<version>${aws-lambda-java-core.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-lambda-java-events</artifactId>
+				<version>${aws-lambda-java-events.version}</version>
+			</dependency>
+
+			<!-- Jetty -->
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-server</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-servlet</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-webapp</artifactId>
+				<version>${jetty.version}</version>
+			</dependency>
+
 
 			<!-- Web Jars -->
 			<dependency>

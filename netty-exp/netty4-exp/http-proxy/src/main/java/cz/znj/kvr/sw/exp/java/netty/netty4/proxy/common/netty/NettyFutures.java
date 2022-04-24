@@ -1,15 +1,21 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty;
 
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import io.netty.util.concurrent.Promise;
+import lombok.SneakyThrows;
+import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.concurrent.function.ThrowingFunction;
 
 import java.util.List;
-import java.util.concurrent.CancellationException;
+import java.util.Objects;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 
 /**
@@ -17,6 +23,9 @@ import java.util.function.BiConsumer;
  */
 public class NettyFutures
 {
+	/**
+	 * Converts Netty Future to CompletableFuture.
+	 */
 	public static <V> CompletableFuture<V> toCompletable(Future<V> future)
 	{
 		return new CompletableFuture<V>() {
@@ -43,23 +52,70 @@ public class NettyFutures
 		};
 	}
 
-	public static <V> void completeOrFail(Future<V> future, CompletableFuture<V> completable)
+	/**
+	 * Propagates Netty Future to existing CompletableFuture.
+	 */
+	public static <V> void copy(Future<V> future, CompletableFuture<V> target)
 	{
 		future.addListener((f) -> {
 			try {
 				@SuppressWarnings("unchecked")
 				V result = (V) f.get();
-				completable.complete(result);
+				target.complete(result);
 			}
 			catch (ExecutionException ex) {
-				completable.completeExceptionally(ex.getCause());
+				target.completeExceptionally(ex.getCause());
 			}
 			catch (Throwable ex) {
-				completable.completeExceptionally(ex);
+				target.completeExceptionally(ex);
 			}
 		});
 	}
 
+	/**
+	 * Propagates CompletableFuture to existing CompletableFuture.
+	 */
+	public static <V> void copy(CompletableFuture<V> source, CompletableFuture<V> target)
+	{
+		source.whenComplete((v, ex) -> FutureUtil.completeOrFail(target, v, ex));
+	}
+
+	/**
+	 * Adds handler to CompletableFuture chain, no matter whether it is successful or failed.
+	 *
+	 * @return
+	 * 	CompletableFuture representing either the original exception or return value from handler.
+	 */
+	public static <V, R> CompletableFuture<R> composeAlways(CompletableFuture<V> source, Callable<CompletableFuture<R>> handler)
+	{
+		return new CompletableFuture<>()
+		{
+			{
+				source.whenComplete((v, ex) -> {
+					try {
+						handler.call().whenComplete((v2, ex2) -> {
+							if (ex != null) {
+								completeExceptionally(ex);
+							}
+							else if (ex2 != null) {
+								completeExceptionally(ex2);
+							}
+							else {
+								complete(v2);
+							}
+						});
+					}
+					catch (Throwable ex2) {
+						completeExceptionally(Objects.requireNonNullElse(ex, ex2));
+					}
+				});
+			}
+		};
+	}
+
+	/**
+	 * Joins two Netty Future objects, propagating any exception or last result.
+	 */
 	public static <V> CompletableFuture<V> join(Future<V> one, Future<V> two)
 	{
 		return new CompletableFuture<V>() {
@@ -92,6 +148,9 @@ public class NettyFutures
 		};
 	}
 
+	/**
+	 * Joins two CompletableFuture objects, propagating first exception or last result.
+	 */
 	public static <V> CompletableFuture<V> join(CompletableFuture<V> one, CompletableFuture<V> two)
 	{
 		return new CompletableFuture<V>() {
@@ -124,11 +183,15 @@ public class NettyFutures
 		};
 	}
 
-	public static <T> CompletableFuture<CompletableFuture<T>> nestedAllOrCancel(List<CompletableFuture<CompletableFuture<T>>> futures)
+	/**
+	 * Converts List of CompletableFuture objects into one CompletableFuture completing once all original futures
+	 * are completed.  It cancels all original futures or closes underlying AutoCloseable when some of them fails.
+	 */
+	public static <T extends AutoCloseable> CompletableFuture<List<T>> nestedAllOrCancel(List<CompletableFuture<T>> futures)
 	{
 		AtomicInteger remaining = new AtomicInteger(futures.size());
 
-		return new CompletableFuture<CompletableFuture<T>>() {
+		return new CompletableFuture<List<T>>() {
 			{
 				futures.forEach(f -> {
 					f.whenComplete((v, ex) -> {
@@ -144,7 +207,14 @@ public class NettyFutures
 					if (ex != null) {
 						futures.forEach(f -> {
 							f.cancel(true);
-							f.thenAccept(sf -> sf.cancel(true));
+							f.thenAccept(sf -> {
+								try {
+									sf.close();
+								}
+								catch (Exception e) {
+									// ignore;
+								}
+							});
 						});
 					}
 				});
@@ -152,33 +222,10 @@ public class NettyFutures
 
 			private void stepInner()
 			{
-				complete(new CompletableFuture<T>() {
-					{
-						futures.forEach(f ->
-							f.thenAccept(sf -> sf.whenComplete((v, ex) -> {
-								if (ex != null) {
-									completeExceptionally(ex);
-								}
-								else {
-									complete(v);
-								}
-							}))
-						);
-						whenComplete((v, ex) -> {
-							futures.forEach(f -> {
-								f.thenAccept(sf -> sf.cancel(true));
-							});
-						});
-					}
-
-					public synchronized boolean cancel(boolean interrupt)
-					{
-						futures.forEach(f -> {
-							f.thenAccept(sf -> sf.cancel(true));
-						});
-						return super.cancel(interrupt);
-					}
-				});
+				complete(futures.stream()
+					.map(CompletableFuture::join)
+					.collect(Collectors.toList())
+				);
 			}
 
 			@Override
@@ -186,10 +233,28 @@ public class NettyFutures
 			{
 				futures.forEach((future) -> {
 					future.cancel(interrupt);
-					future.thenAccept(sf -> sf.cancel(interrupt));
+					future.thenAccept(sf -> {
+						try {
+							sf.close();
+						}
+						catch (Exception e) {
+						}
+					});
 				});
 				return super.cancel(interrupt);
 			}
 		};
+	}
+
+	@SneakyThrows
+	public static <T> T sneakyCall(ThrowingCall<T> c)
+	{
+		return c.call();
+	}
+
+	@FunctionalInterface
+	public interface ThrowingCall<T>
+	{
+		T call() throws Throwable;
 	}
 }

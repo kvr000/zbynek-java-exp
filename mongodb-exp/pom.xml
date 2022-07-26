@@ -21,13 +21,9 @@
 
 	<properties>
 		<mongodb.version>3.3.0</mongodb.version>
-		<fongodb.version>2.0.10</fongodb.version>
+		<fongodb.version>3.4.8</fongodb.version>
 		<spring-data.version>1.9.5.RELEASE</spring-data.version>
 	</properties>
-
-	<modules>
-		<module>mongodb-basic-exp</module>
-	</modules>
 
 	<dependencyManagement>
 		<dependencies>

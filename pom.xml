@@ -159,9 +159,9 @@
 
 		<org.mapdb.version>1.0.9</org.mapdb.version>
 
-		<org.mongodb.version>3.3.0</org.mongodb.version>
-		<fakemongo-fongo.version>2.0.10</fakemongo-fongo.version>
-		<flapdoodle.embed.mongo.version>1.50.5</flapdoodle.embed.mongo.version>
+		<org.mongodb.version>3.12.8</org.mongodb.version>
+		<fakemongo-fongo.version>2.1.1</fakemongo-fongo.version>
+		<flapdoodle.embed.mongo.version>3.4.8</flapdoodle.embed.mongo.version>
 
 		<snmp4j.version>3.0.6</snmp4j.version>
 		<snmp4j-agent.version>3.0.3</snmp4j-agent.version>

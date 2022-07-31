@@ -29,7 +29,7 @@ public class ProtobufConversionTest
 	@Test(expectedExceptions = JsonParseException.class)
 	public void                     testList() throws IOException
 	{
-		List<TestObject> list = objectMapper.readValue("[{ testId: 1, name: \"hello\" }, {testId: 2, name: \"world\" }]".getBytes(), new TypeReference<List<cz.znj.kvr.sw.exp.java.jackson.json.TestObject>>(){});
+		List<TestObject> list = objectMapper.readValue("[{ testId: 1, name: \"hello\" }, {testId: 2, name: \"world\" }]".getBytes(), new TypeReference<List<TestObject>>(){});
 		{
 			TestObject o = list.get(0);
 			AssertJUnit.assertEquals(1, o.getTestId());

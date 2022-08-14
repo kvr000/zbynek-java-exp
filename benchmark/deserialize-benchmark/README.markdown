@@ -9,17 +9,19 @@ annotations etc.
 
 ### Performance
 
-Sorted by performance (fastest to slowest). Measured on low voltage Intel Core i7-4510U .
+Sorted by performance (fastest to slowest).  Measured on laptop CPU i7-1185G7 @ 3.00GHz :
 
 ```
 Benchmark                                                     Mode  Cnt       Score       Error  Units
-DeserializeBenchmark.benchmarkDeserializeJsonJackson          avgt    4   38815.603 ±  1740.291  ns/op
-DeserializeBenchmark.benchmarkDeserializeJsonJsr353Glassfish  avgt    4   65326.657 ± 10733.195  ns/op
-DeserializeBenchmark.benchmarkDeserializeJsonGson             avgt    4   78592.116 ±  9179.913  ns/op
-DeserializeBenchmark.benchmarkDeserializePropertiesIterate    avgt    4  115583.187 ±  2283.274  ns/op
-DeserializeBenchmark.benchmarkDeserializePropertiesLookup     avgt    4  164464.482 ±  7008.497  ns/op
-DeserializeBenchmark.benchmarkDeserializeXmlStaxCoreJava      avgt    4  175127.421 ± 10417.048  ns/op
+DeserializeBenchmark.benchmarkDeserializeJsonJackson          avgt    4   19677.678 ± 2961.419  ns/op
+DeserializeBenchmark.benchmarkDeserializeJsonGson             avgt    4   25001.741 ± 2710.641  ns/op
+DeserializeBenchmark.benchmarkDeserializeJsonJsr353Glassfish  avgt    4   30247.284 ± 1480.820  ns/op
+DeserializeBenchmark.benchmarkDeserializePropertiesIterate    avgt    4   68602.967 ± 2365.392  ns/op
+DeserializeBenchmark.benchmarkDeserializeXmlStaxCoreJava      avgt    4   95300.197 ± 4763.139  ns/op
+DeserializeBenchmark.benchmarkDeserializePropertiesLookup     avgt    4  105332.912 ± 6115.232  ns/op
 ```
+
+Apple M1 is about 20% slower and XmlStaxCoreJava was 3% slower than PropertiesLookup.
 
 
 ## License

@@ -15,6 +15,7 @@
 
 	<modules>
 		<module>benchmark/corejava-string-benchmark/</module>
+		<module>corejava-string-test/</module>
 	</modules>
 
 	<dependencies>

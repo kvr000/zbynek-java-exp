@@ -17,6 +17,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.InsertOneModel;
 import cz.znj.kvr.sw.exp.java.mongodb.basic.config.MongoEmbeddedConfig;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
@@ -207,16 +208,9 @@ public class PojoTest extends AbstractTestNGSpringContextTests
 	@Value
 	@JsonDeserialize(builder = PojoTable.Builder.class)
 	@BsonDiscriminator
+	@AllArgsConstructor(onConstructor = @__(@BsonCreator))
 	public static class PojoTable
 	{
-		@BsonCreator
-		public PojoTable(@BsonId ObjectId id, @BsonProperty("myId") long myId, @BsonProperty("name") String name)
-		{
-			this.id = id;
-			this.myId = myId;
-			this.name = name;
-		}
-
 		@BsonId
 		ObjectId id;
 
@@ -227,12 +221,7 @@ public class PojoTest extends AbstractTestNGSpringContextTests
 		String name;
 
 		@BsonProperty("data")
+		@lombok.Builder.Default
 		LinkedHashSet<String> data = new LinkedHashSet<>();
-
-		@BsonId
-		public ObjectId getId()
-		{
-			return id;
-		}
 	}
 }

@@ -63,9 +63,10 @@
 
 		<lombok.version>1.18.22</lombok.version>
 
-		<maven-core.version>3.6.0</maven-core.version>
+		<maven-core.version>3.8.6</maven-core.version>
 		<maven-plugin-api.version>${maven-core.version}</maven-plugin-api.version>
 		<maven-plugin-tools.version>3.4</maven-plugin-tools.version>
+		<plexus-utils.version>3.4.2</plexus-utils.version>
 
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
@@ -714,6 +715,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-core</artifactId>
+				<version>${maven-core.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-plugin-api</artifactId>
 				<version>${maven-plugin-api.version}</version>
 				<scope>provided</scope>
@@ -723,6 +730,11 @@
 				<artifactId>maven-plugin-annotations</artifactId>
 				<version>${maven-plugin-tools.version}</version>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-utils</artifactId>
+				<version>${plexus-utils.version}</version>
 			</dependency>
 
 			<dependency>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.jar</groupId>
+	<artifactId>jar-in-jar</artifactId>
+	<version>0.0.1</version>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java.jar</groupId>
+		<artifactId>jar-exp-base</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+	</properties>
+
+	<build>
+		<plugins>
+
+                        <plugin>
+                                <groupId>org.apache.maven.plugins</groupId>
+                                <artifactId>maven-assembly-plugin</artifactId>
+                                <version>${maven-assembly-plugin.version}</version>
+                                <executions>
+                                        <execution>
+						<id>jar-in-jar</id>
+                                                <phase>package</phase>
+                                                <goals>
+                                                        <goal>single</goal>
+                                                </goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<addClasspath>true</addClasspath>
+									<mainClass>cz.znj.kvr.sw.exp.java.jar.jarinjar.Main</mainClass>
+								</manifest>
+							</archive>
+							<finalName>jar-in-jar</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<descriptors><descriptor>
+								src/main/assembly/jar-in-jar-assembly.xml
+							</descriptor></descriptors>
+						</configuration>
+                                        </execution>
+                                </executions>
+                        </plugin>
+
+			<plugin>
+				<groupId>net.dryuf.maven.plugin</groupId>
+				<artifactId>dryuf-executable-jar-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>create-executable</goal>
+						</goals>
+						<configuration>
+							<vmParams>-Xmx16m</vmParams>
+							<sort>true</sort>
+							<resourceConfigs>
+								<resourceConfig>
+									<pattern>glob:**</pattern>
+									<type>dir</type>
+									<remove>true</remove>
+								</resourceConfig>
+								<resourceConfig>
+									<pattern>glob:*.jar</pattern>
+									<minimalCompress>100</minimalCompress>
+								</resourceConfig>
+							</resourceConfigs>
+							<input>target/jar-in-jar.jar</input>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>de.scrum-master</groupId>
+			<artifactId>jar-class-loader</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+	</dependencies>
+
+</project>

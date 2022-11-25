@@ -19,6 +19,7 @@
 
 	<modules>
 		<module>distributed-ehcache-exp</module>
+		<module>distributed-redisson-exp</module>
 	</modules>
 
 	<properties>

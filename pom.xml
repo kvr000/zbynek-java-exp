@@ -181,6 +181,8 @@
 		<zstd.version>1.5.2-2</zstd.version>
 		<brotli.version>0.1.2</brotli.version>
 
+		<de.scrum-master.jar-class-loader.version>1.0</de.scrum-master.jar-class-loader.version>
+
 	</properties>
 
 	<build>
@@ -1122,6 +1124,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-data-mongodb</artifactId>
 				<version>${spring-boot.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>de.scrum-master</groupId>
+				<artifactId>jar-class-loader</artifactId>
+				<version>${de.scrum-master.jar-class-loader.version}</version>
 			</dependency>
 
 			<!-- Web Jars -->

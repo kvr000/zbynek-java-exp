@@ -60,6 +60,7 @@
 
 		<spring-boot-maven-plugin.version>2.0.6.RELEASE</spring-boot-maven-plugin.version>
 		<dryuf-executable-jar-maven-plugin.version>1.2.2</dryuf-executable-jar-maven-plugin.version>
+		<dryuf-jmh-review-maven-plugin.version>1.0.0</dryuf-jmh-review-maven-plugin.version>
 
 		<lombok.version>1.18.22</lombok.version>
 
@@ -420,6 +421,12 @@
 					<groupId>net.dryuf.maven.plugin</groupId>
 					<artifactId>dryuf-executable-jar-maven-plugin</artifactId>
 					<version>${dryuf-executable-jar-maven-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>net.dryuf.maven.plugin</groupId>
+					<artifactId>dryuf-executable-jar-maven-plugin</artifactId>
+					<version>${dryuf-jmh-review-maven-plugin.version}</version>
 				</plugin>
 
 			</plugins>

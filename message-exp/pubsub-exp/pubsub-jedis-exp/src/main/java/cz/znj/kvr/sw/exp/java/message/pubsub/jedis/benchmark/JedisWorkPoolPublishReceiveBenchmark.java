@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.message.pubsub.jedis;
+package cz.znj.kvr.sw.exp.java.message.pubsub.jedis.benchmark;
 
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.concurrent.executor.BatchWorkExecutor;
@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -23,13 +24,13 @@ import java.util.stream.Collectors;
  * The Jedis client is not synchronized, therefore must have an instance per subscriber.
  */
 @Log4j2
-public class JedisWorkPoolPublishReceive
+public class JedisWorkPoolPublishReceiveBenchmark
 {
-	private final ExecutorService blockingExecutor = Executors.newCachedThreadPool(r -> {
-		Thread t = new Thread(r);
-		t.setDaemon(true);
-		return t;
-	});
+	private final ExecutorService blockingExecutor = Executors.newCachedThreadPool((runnable) -> {
+			Thread t = new Thread(runnable);
+			t.setDaemon(true);
+			return t;
+		});
 
 	private final String url = "redis://localhost:7207";
 
@@ -39,7 +40,7 @@ public class JedisWorkPoolPublishReceive
 
 	public static void main(String[] args) throws Exception
 	{
-		System.exit(new JedisWorkPoolPublishReceive().run(args));
+		System.exit(new JedisWorkPoolPublishReceiveBenchmark().run(args));
 	}
 
 	public int run(String[] args) throws Exception
@@ -58,19 +59,12 @@ public class JedisWorkPoolPublishReceive
 	{
 		log.info("publishTest: START");
 
-		CountDownLatch messageLatch = new CountDownLatch(4);
-		CountDownLatch exitLatch = new CountDownLatch(2);
+		AtomicInteger pending = new AtomicInteger(1);
 
 		CompletableFuture<JedisPubSub> listener1 = new CompletableFuture<>();
-		CompletableFuture<JedisPubSub> listener23 = new CompletableFuture<>();
+		CountDownLatch exitLatch = new CountDownLatch(1);
 
 		blockingExecutor.execute(() -> {
-				try {
-					Thread.sleep(200);
-				}
-				catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
 				try {
 					createListener().subscribe(new JedisPubSub()
 						{
@@ -86,66 +80,65 @@ public class JedisWorkPoolPublishReceive
 							public void onMessage(String channel,
 									      String message)
 							{
-								log.info("Channel-1   listener: Received "+
-										"message: channel={} message={}",
-									channel, message);
-								messageLatch.countDown();
+								int value = pending.decrementAndGet();
+								if (value == 0 || value == 65536) {
+									synchronized (pending) {
+										pending.notify();
+									}
+								}
 							}
 						},
 						"Channel-1");
 					log.info("Exiting Channel-1  listener");
-					exitLatch.countDown();
 				}
 				catch (Throwable ex) {
 					listener1.completeExceptionally(ex);
 				}
+				finally {
+					exitLatch.countDown();
+				}
 			});
-		blockingExecutor.execute(() -> {
-			try {
-				createListener().subscribe(new JedisPubSub()
-				{
-					@Override
-					public void onSubscribe(String channel, int count)
-					{
-						log.info("subscribed to: channel={} count={}", channel, count);
-						if (count == 2)
-							listener23.complete(this);
-					}
-
-					@Override
-					public void onMessage(String channel, String message)
-					{
-						log.info("Channel-2-3 listener: Received message: channel={} message={}", channel, message);
-						messageLatch.countDown();
-					}
-				}, "Channel-2", "Channel-3");
-				log.info("Exiting Channel-23 listener");
-				exitLatch.countDown();
-			}
-			catch (Throwable ex) {
-				listener23.completeExceptionally(ex);
-			}
-		});
 
 		listener1.get();
-		listener23.get();
 
-		log.info("Sending Channel-1 Message-1");
-		jedisExecutor.submit(j -> j.publish("Channel-1", "Message-1"));
-		log.info("Sending Channel-2 Message-1");
-		jedisExecutor.submit(j -> j.publish("Channel-2", "Message-1"));
-		log.info("Sending Channel-3 Message-1");
-		jedisExecutor.submit(j -> j.publish("Channel-3", "Message-1"));
-		log.info("Sending Channel-1 Message-2");
-		jedisExecutor.submit(j -> j.publish("Channel-1", "Message-2"));
-		for (int i = 0; i < 2*Runtime.getRuntime().availableProcessors(); ++i) {
-			jedisExecutor.submit(j -> j.publish("Channel-9", "Message-X"));
+		long count;
+		long started = System.currentTimeMillis();
+		for (count = 0; ; ++count) {
+			pending.incrementAndGet();
+			jedisExecutor.submit(j -> j.publish("Channel-1", "Message"));
+			if (count%65536 == 0) {
+				if (System.currentTimeMillis()-started >= 10_000) {
+					break;
+				}
+				else if (pending.get() > 65536) {
+					synchronized (pending) {
+						while (pending.get() > 65536) {
+							pending.wait();
+						}
+					}
+				}
+			}
+		}
+		if (pending.decrementAndGet() != 0) {
+			synchronized (pending) {
+				while (pending.get() != 0) {
+					pending.wait();
+				}
+			}
+		}
+		long end = System.currentTimeMillis();
+		log.info("Completed: messages={} time={} ms speed={} msg/s", count, end-started, count*1000L/(end-started));
+
+		try (BenchmarkFormatter formatter = new BenchmarkFormatter(System.out)) {
+			formatter.printBenchmark(BenchmarkFormatter.Benchmark.builder()
+					.name("Jedis.publishReceive")
+					.mode("avgt")
+					.units("ops/s")
+					.score(String.valueOf(count*1000L/(end-started)))
+				.build());
 		}
 
-		messageLatch.await();
-
 		listener1.get().unsubscribe();
-		listener23.get().unsubscribe();
 
 		exitLatch.await();
 
@@ -158,11 +151,11 @@ public class JedisWorkPoolPublishReceive
 		// See https://redis.io/docs/manual/keyspace-notifications/
 		//jedisPool.configSet("notify-keyspace-events", "AKExe");
 		jedisExecutor = new BatchWorkExecutor<>(
-			new ClosingExecutor(Executors.newCachedThreadPool()),
-			5,
+			new ClosingExecutor(Executors.newFixedThreadPool(10*Runtime.getRuntime().availableProcessors())),
+			100,
 			(List<Consumer<Jedis>> items) -> {
 				try (Jedis jedis = jedisPool.getResource()) {
-					log.info("Processing messages: count={}", items.size());
+					//log.info("Processing messages: count={}", items.size());
 					return items.stream()
 						.map(item -> {
 							item.accept(jedis);

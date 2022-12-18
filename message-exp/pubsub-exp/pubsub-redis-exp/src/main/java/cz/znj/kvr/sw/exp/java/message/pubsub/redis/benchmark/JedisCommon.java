@@ -8,6 +8,7 @@ import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Log4j2
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
+@Singleton
 public class JedisCommon
 {
 	private final ExecutorService blockingExecutor;

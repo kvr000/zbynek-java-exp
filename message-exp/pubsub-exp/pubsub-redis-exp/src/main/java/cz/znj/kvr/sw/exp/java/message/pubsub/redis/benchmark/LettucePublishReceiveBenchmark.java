@@ -1,11 +1,15 @@
 package cz.znj.kvr.sw.exp.java.message.pubsub.redis.benchmark;
 
+import cz.znj.kvr.sw.exp.java.message.pubsub.redis.LettuceCommon;
+import io.lettuce.core.RedisChannelHandler;
+import io.lettuce.core.RedisConnectionStateAdapter;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import javax.inject.Inject;
+import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -24,16 +28,29 @@ public class LettucePublishReceiveBenchmark extends AbstractPublishReceiveBenchm
 	protected void runBenchmark() throws Exception
 	{
 		try (StatefulRedisPubSubConnection<String, String> connection = common.getRedisClient().connectPubSub();
-		     LettuceCommon.Subscription subscription = common.createSubscription()
+		     LettuceCommon.Subscription subscription = common.createSubscription(new RedisConnectionStateAdapter() {
+			     @Override
+			     public void onRedisConnected(RedisChannelHandler<?, ?> connection, SocketAddress socketAddress)
+			     {
+				     log.info("Reconnected subscriber");
+			     }
+		     })
 		) {
 			AtomicInteger pending = new AtomicInteger();
 
-			RedisPubSubReactiveCommands<String, String> reactive = connection.reactive();
-			common.createListener(subscription, "Channel-1", pending).subscribe();
+			LettuceCommon.Publisher publisher = common.getPublisher(new RedisConnectionStateAdapter() {
+				@Override
+				public void onRedisConnected(RedisChannelHandler<?, ?> connection, SocketAddress socketAddress)
+				{
+					log.info("Reconnected publisher");
+				}
+			});
+			publisher.connectedFuture().get();
+			common.createListener(subscription, "Channel-1", pending).get();
 
 			runBenchmarkLoop(
 				pending,
-				(message) -> reactive.publish("Channel-1", message).subscribe()
+				(message) -> publisher.publish("Channel-1", message)
 			);
 		}
 	}

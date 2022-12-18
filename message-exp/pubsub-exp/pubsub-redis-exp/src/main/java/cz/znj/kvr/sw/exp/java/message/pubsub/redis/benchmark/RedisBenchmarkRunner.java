@@ -5,6 +5,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import cz.znj.kvr.sw.exp.java.message.pubsub.redis.RedisUrlInject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.cmdline.app.AppContext;
 import net.dryuf.cmdline.app.BeanFactory;
@@ -15,6 +17,7 @@ import net.dryuf.cmdline.command.Command;
 import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.ListIterator;
@@ -27,9 +30,10 @@ import java.util.concurrent.Executors;
  * Jedis pub-sub benchmark runner.
  */
 @Log4j2
+@RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class RedisBenchmarkRunner extends AbstractParentCommand
 {
-	private Options options;
+	private final Options options;
 
 	public static void main(String[] args)
 	{
@@ -40,12 +44,6 @@ public class RedisBenchmarkRunner extends AbstractParentCommand
 				Arrays.asList(args0)
 			);
 		});
-	}
-
-	@Override
-	public void createOptions(CommandContext context)
-	{
-		this.options = new Options();
 	}
 
 	@Override
@@ -73,7 +71,6 @@ public class RedisBenchmarkRunner extends AbstractParentCommand
 	protected CommandContext createChildContext(CommandContext commandContext, String name, boolean isHelp)
 	{
 		return commandContext.createChild(this, name, ImmutableMap.of(
-			Options.class, options
 		));
 	}
 
@@ -118,6 +115,8 @@ public class RedisBenchmarkRunner extends AbstractParentCommand
 
 	public static class GuiceModule extends AbstractModule
 	{
+		private Options options = new Options();
+
 		@Override
 		public void configure()
 		{
@@ -139,6 +138,21 @@ public class RedisBenchmarkRunner extends AbstractParentCommand
 				t.setDaemon(true);
 				return t;
 			});
+		}
+
+		@Provides
+		@Singleton
+		public Options options()
+		{
+			return options;
+		}
+
+		@Provides
+		@Singleton
+		@RedisUrlInject
+		public String redisUrl()
+		{
+			return options.redisUrl;
 		}
 	}
 }

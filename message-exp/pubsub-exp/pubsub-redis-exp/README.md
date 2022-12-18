@@ -27,10 +27,11 @@ java -jar pubsub-jedis-benchmark.jar -r redis://$REDIS lettuce-publish
 
 ### Results
 
-JedisWorkPoolPublishReceiveBenchmark (based on BatchWorkExecutor from dryuf-concurrent) is the fastest with 139934 msg/s,
-JedisPooled and single item JedisPool based solutions are 9% slower at 128777 msg/s.
+LettucePublishReceiveBenchmar is the fastest with 159000 msg/s, JedisPool client based on BatchWorkExecutor from
+dryuf-concurrent did 58000 msg/s, JedisPooled was only at 7% of top performance at 10500 msg/s.
 
-Data measured on 4-CPU Graviton-3 c7g.xlarge AWS EC2 instance, All Publisher, Redis and 10 other Subscribers running remotely.
+Data measured on 4-CPU Graviton-3 c7g.xlarge AWS EC2 instance, All Publisher, Redis and 100 other Subscribers running
+remotely on different instances.
 
 <!--- benchmark:table:publishreceive:order=lettuce-publish&compare=lettuce-publish: --->
 
@@ -68,3 +69,4 @@ Benchmark             Mode  Cnt   Score  Error  Units
 Redis.publishReceive  avgt    0  159440         ops/s
 ```
 
+<!--- vim: set tw=120: --->

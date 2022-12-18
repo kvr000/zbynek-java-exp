@@ -34,6 +34,7 @@
 						</goals>
 						<configuration>
 							<finalName>jcstress</finalName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<shadedArtifactAttached>true</shadedArtifactAttached>
 							<shadedClassifierName>full</shadedClassifierName>
 							<transformers>

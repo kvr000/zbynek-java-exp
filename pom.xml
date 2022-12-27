@@ -151,7 +151,7 @@
 		<ehcache.version>3.9.6</ehcache.version>
 		<redisson.version>3.18.0</redisson.version>
 
-		<dryuf-concurrent.version>1.5.0</dryuf-concurrent.version>
+		<dryuf-concurrent.version>1.6.1</dryuf-concurrent.version>
 		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
 
 		<dryuf-bigio.version>1.1.0</dryuf-bigio.version>
@@ -166,6 +166,9 @@
 
 		<jedis.version>4.3.1</jedis.version>
 		<lettuce.version>6.2.2.RELEASE</lettuce.version>
+
+		<amqp-client.version>5.16.0</amqp-client.version>
+		<reactor-rabbitmq.version>1.5.5</reactor-rabbitmq.version>
 
 		<org.mongodb.version>3.12.8</org.mongodb.version>
 		<fakemongo-fongo.version>2.1.1</fakemongo-fongo.version>
@@ -1145,6 +1148,17 @@
 				<groupId>io.lettuce</groupId>
 				<artifactId>lettuce-core</artifactId>
 				<version>${lettuce.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.rabbitmq</groupId>
+				<artifactId>amqp-client</artifactId>
+				<version>${amqp-client.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.projectreactor.rabbitmq</groupId>
+				<artifactId>reactor-rabbitmq</artifactId>
+				<version>${reactor-rabbitmq.version}</version>
 			</dependency>
 
 			<dependency>

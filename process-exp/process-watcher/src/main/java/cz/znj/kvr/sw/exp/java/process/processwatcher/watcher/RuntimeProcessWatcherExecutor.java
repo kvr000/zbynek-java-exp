@@ -7,7 +7,7 @@ import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Process;
 import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Specification;
 import lombok.Builder;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.executor.FinishingSerializingExecutor;
+import net.dryuf.concurrent.executor.FinishingSequencingExecutor;
 import net.dryuf.concurrent.queue.SingleConsumerQueue;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -296,7 +296,7 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 
 		Map<String, ProcessState> processes;
 
-		final Executor tasksExecutor = FinishingSerializingExecutor.createFromFinisher(
+		final Executor tasksExecutor = FinishingSequencingExecutor.createFromFinisher(
 				() -> queueFinisher(RuntimeContext.this));
 
 		boolean needReview = true;

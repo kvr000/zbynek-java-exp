@@ -21,6 +21,15 @@
 
 	<build>
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<parallel>none</parallel>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -31,7 +40,7 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<finalName>http-proxy</finalName>
+							<finalName>netty-http-proxy</finalName>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -63,7 +72,7 @@
 									<remove>true</remove>
 								</resourceConfig>
 							</resourceConfigs>
-							<input>target/http-proxy.jar</input>
+							<input>target/netty-http-proxy.jar</input>
 						</configuration>
 					</execution>
 				</executions>

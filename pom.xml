@@ -14,6 +14,7 @@
 
 	<properties>
 		<javac.version>17</javac.version>
+		<javac.target.version>${javac.version}</javac.target.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
@@ -201,7 +202,7 @@
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${javac.version}</source>
-					<target>${javac.version}</target>
+					<target>${javac.target.version}</target>
 				</configuration>
 			</plugin>
 

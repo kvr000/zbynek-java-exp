@@ -1,5 +1,7 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy;
 
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
 import lombok.Builder;
 import lombok.Value;
 
@@ -13,15 +15,13 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface HttpProxyFactory
 {
-	CompletableFuture<CompletableFuture<Void>> runProxy(Config config);
+	CompletableFuture<Server> runProxy(Config config);
 
 	@Builder
 	@Value
 	class Config
 	{
-		String proto;
-
-		SocketAddress listenAddress;
+		AddressSpec listenAddress;
 
 		Map<String, String> remapHosts;
 

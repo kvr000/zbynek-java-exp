@@ -5,12 +5,15 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyFutures;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.HttpProxyFactory;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.NettyHttpProxyFactory;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.NettyPortForwarder;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.PortForwarder;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyFutures;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy.HttpProxyFactory;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy.NettyHttpProxyFactory;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.NettyPortForwarderFactory;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.PortForwarderFactory;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpserver.DummyHttpServerFactory;
 import lombok.RequiredArgsConstructor;
 import net.dryuf.cmdline.app.AppContext;
 import net.dryuf.cmdline.app.BeanFactory;
@@ -22,14 +25,12 @@ import net.dryuf.cmdline.command.RootCommandContext;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,22 +44,26 @@ public class ProxyRunner extends AbstractCommand
 {
 	public static final Pattern ADDRESS_SPEC_PATTERN = Pattern.compile("^(?:(tcp4|tcp6):(?:(.+):)?(\\d+)$|(unix|domain):(.+))$");
 
-	private final PortForwarder portForwarder;
+	private final NettyEngine nettyEngine;
+	private final PortForwarderFactory portForwarderFactory;
 	private final HttpProxyFactory httpProxyFactory;
+	private final DummyHttpServerFactory dummyHttpServerFactory;
 
 	private Map<String, String> proxyRemap = new LinkedHashMap<>();
 	private Map<String, String> proxyHeaders = new LinkedHashMap<>();
 
-	private List<PortForwarder.ForwardConfig> forwards = new ArrayList<>();
+	private List<PortForwarderFactory.ForwardConfig> forwards = new ArrayList<>();
 
 	private List<HttpProxyFactory.Config> httpProxies = new ArrayList<>();
+
+	private List<DummyHttpServerFactory.Config> httpServers = new ArrayList<>();
 
 	public static void main(String[] args)
 	{
 		runMain(args, (args0) -> {
 			AppContext appContext = new CommonAppContext(Guice.createInjector(new GuiceModule()).getInstance(BeanFactory.class));
 			return appContext.getBeanFactory().getBean(ProxyRunner.class).run(
-				new RootCommandContext(appContext).createChild(null, "httpproxy", null),
+				new RootCommandContext(appContext).createChild(null, "netty-http-proxy", null),
 				Arrays.asList(args0)
 			);
 		});
@@ -71,7 +76,7 @@ public class ProxyRunner extends AbstractCommand
 		switch (arg) {
 		case "--forward":
 		case "-f":
-			PortForwarder.ForwardConfig config = PortForwarder.ForwardConfig.builder()
+			PortForwarderFactory.ForwardConfig config = PortForwarderFactory.ForwardConfig.builder()
 				.bind(parseAddressSpec(needArgsParam(null, args), false))
 				.connect(parseAddressSpec(needArgsParam(null, args), true))
 				.build();
@@ -82,7 +87,7 @@ public class ProxyRunner extends AbstractCommand
 			String value = needArgsParam(null, args);
 			String[] lr = value.split("=", 2);
 			if (lr.length != 2) {
-				throw new IllegalArgumentException("Need oldhost=newhost mapping");
+				throw new IllegalArgumentException("Need oldhost=newhost mapping: " + value);
 			}
 			proxyRemap.put(lr[0], lr[1]);
 			return true;
@@ -91,7 +96,7 @@ public class ProxyRunner extends AbstractCommand
 			String header = needArgsParam(null, args);
 			String[] headerSplit = header.split(":", 2);
 			if (headerSplit.length != 2) {
-				throw new IllegalArgumentException("Need key: value mapping");
+				throw new IllegalArgumentException("Need key:value mapping: " + header);
 			}
 			proxyHeaders.put(headerSplit[0], headerSplit[1]);
 			return true;
@@ -104,6 +109,13 @@ public class ProxyRunner extends AbstractCommand
 		case "--proxy":
 		case "-p":
 			this.httpProxies.add(parseProxySpec(needArgsParam(null, args)));
+			return true;
+
+		case "--http-server":
+			this.httpServers.add(DummyHttpServerFactory.Config.builder()
+				.listenAddress(parseAddressSpec(needArgsParam(null, args), false))
+				.build()
+			);
 			return true;
 
 		default:
@@ -123,7 +135,7 @@ public class ProxyRunner extends AbstractCommand
 	@Override
 	protected String configHelpTitle(CommandContext context)
 	{
-		return "ProxyRunner - runs port forwards or http proxy";
+		return context.getCommandPath() + "- runs port forwards or http proxy";
 	}
 
 	@Override
@@ -134,28 +146,30 @@ public class ProxyRunner extends AbstractCommand
 			"--proxy-remap oldhost[:port]=newhost[:port]", "remaps request from oldhost to newhost",
 			"--proxy-header name:value", "adds header to HTTP requests",
 			"--proxy-reset", "reset proxy settings for next instance",
-			"-p,--proxy [host:]port", "runs proxy on specified host and port"
+			"-p,--proxy proto:[host:]port", "runs proxy on specified host and port",
+			"-http-server proto:[host:]port", "runs simple HTTP server on specified host and port"
 		);
 	}
 
 	@Override
 	public int execute() throws Exception
 	{
-		List<CompletableFuture<CompletableFuture<Void>>> tasks = new ArrayList<>();
-		forwards.forEach(config -> tasks.add(portForwarder.runForward(config)));
+		List<CompletableFuture<Server>> tasks = new ArrayList<>();
+		forwards.forEach(config -> tasks.add(portForwarderFactory.runForward(config)));
 		httpProxies.forEach(config -> tasks.add(httpProxyFactory.runProxy(config)));
-		NettyFutures.nestedAllOrCancel(tasks).get().get();
+		httpServers.forEach(config -> tasks.add(dummyHttpServerFactory.runServer(config, (m, p) -> "Hello World\n")));
+		Server.waitOneAndClose(NettyFutures.nestedAllOrCancel(tasks).get()).get();
 		return EXIT_SUCCESS;
 	}
 
-	private PortForwarder.ForwardConfig.AddressSpec parseAddressSpec(String spec, boolean isConnect)
+	private AddressSpec parseAddressSpec(String spec, boolean isConnect)
 	{
 		Matcher m = ADDRESS_SPEC_PATTERN.matcher(spec);
 		if (!m.matches()) {
-			throw new IllegalArgumentException("Failed to parse address specification, it must be in form {tcp4|tcp6}:[host:]port or {unix|domain}:path "+spec);
+			throw new IllegalArgumentException("Failed to parse address specification, it must be in form {tcp4|tcp6}:[host:]port or {unix|domain}:path : "+spec);
 		}
-		PortForwarder.ForwardConfig.AddressSpec.Builder builder =
-			PortForwarder.ForwardConfig.AddressSpec.builder();
+		AddressSpec.Builder builder =
+			AddressSpec.builder();
 		if (m.group(1) != null) {
 			String host = m.group(2);
 			int port = Integer.parseInt(m.group(3));
@@ -175,10 +189,9 @@ public class ProxyRunner extends AbstractCommand
 
 	private HttpProxyFactory.Config parseProxySpec(String spec)
 	{
-		PortForwarder.ForwardConfig.AddressSpec addressSpec = parseAddressSpec(spec, false);
+		AddressSpec addressSpec = parseAddressSpec(spec, false);
 		return HttpProxyFactory.Config.builder()
-			.proto(addressSpec.getProto())
-			.listenAddress(InetSocketAddress.createUnresolved(Optional.ofNullable(addressSpec.getHost()).orElse("*"), addressSpec.getPort()))
+			.listenAddress(addressSpec)
 			.remapHosts(proxyRemap)
 			.addedHeaders(proxyHeaders)
 			.build();
@@ -189,8 +202,8 @@ public class ProxyRunner extends AbstractCommand
 		@Override
 		protected void configure()
 		{
-			bind(NettyRuntime.class).in(Singleton.class);
-			bind(PortForwarder.class).to(NettyPortForwarder.class).in(Singleton.class);
+			bind(NettyEngine.class).in(Singleton.class);
+			bind(PortForwarderFactory.class).to(NettyPortForwarderFactory.class).in(Singleton.class);
 			bind(HttpProxyFactory.class).to(NettyHttpProxyFactory.class).in(Singleton.class);
 		}
 

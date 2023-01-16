@@ -1,6 +1,6 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy;
 
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelConfig;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 /**
  * HttpProxyFactory tests.
  */
-public class HttpProxyFactoryTest
+public class NettyHttpProxyFactoryTest
 {
 	@Test
 	public void replaceBuffer_same_replace()
@@ -256,10 +256,10 @@ public class HttpProxyFactoryTest
 	public void requestParsing_incompleteHeaders_respondBadRequest() throws Exception
 	{
 		ClientFixture f = new ClientFixture();
-		when(f.nettyRuntime.writeAndClose(any(), any()))
+		when(f.nettyEngine.writeAndClose(any(), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		f.handler.channelRead(f.clientCtx, Unpooled.wrappedBuffer("GET / HTTP/1.0\n\n".getBytes(StandardCharsets.UTF_8)));
-		verify(f.nettyRuntime, times(1))
+		verify(f.nettyEngine, times(1))
 			.writeAndClose(eq(f.client), any());
 	}
 
@@ -267,10 +267,10 @@ public class HttpProxyFactoryTest
 	public void requestParsing_connectToUrl_respondBadRequest() throws Exception
 	{
 		ClientFixture f = new ClientFixture();
-		when(f.nettyRuntime.writeAndClose(any(), any()))
+		when(f.nettyEngine.writeAndClose(any(), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		f.handler.channelRead(f.clientCtx, Unpooled.wrappedBuffer("CONNECT http://localhost:443/ HTTP/1.0\n\n".getBytes(StandardCharsets.UTF_8)));
-		verify(f.nettyRuntime, times(1))
+		verify(f.nettyEngine, times(1))
 			.writeAndClose(eq(f.client), any());
 	}
 
@@ -278,10 +278,10 @@ public class HttpProxyFactoryTest
 	public void requestParsing_missingHost_respondBadRequest() throws Exception
 	{
 		ClientFixture f = new ClientFixture();
-		when(f.nettyRuntime.writeAndClose(any(), any()))
+		when(f.nettyEngine.writeAndClose(any(), any()))
 			.thenReturn(CompletableFuture.completedFuture(null));
 		f.handler.channelRead(f.clientCtx, Unpooled.wrappedBuffer("GET /path HTTP/1.0\n\n".getBytes(StandardCharsets.UTF_8)));
-		verify(f.nettyRuntime, times(1))
+		verify(f.nettyEngine, times(1))
 			.writeAndClose(eq(f.client), any());
 	}
 
@@ -291,12 +291,12 @@ public class HttpProxyFactoryTest
 	public void requestParsing_connectToHostFails_connectAnd503() throws Exception
 	{
 		ServerFixture f = new ServerFixture();
-		when(f.nettyRuntime.connect(any(), any(), any()))
+		when(f.nettyEngine.connect(any(), any(), any()))
 			.thenReturn(FutureUtil.exception(new IOException("failed to connect")));
 		f.handler.channelRead(f.clientCtx, Unpooled.wrappedBuffer("CONNECT localhost HTTP/1.0\n\n".getBytes(StandardCharsets.UTF_8)));
 		verify(f.clientPipeline, times(1))
 			.remove(NettyHttpProxyFactory.RequestReaderHandler.class);
-		verify(f.nettyRuntime, times(1))
+		verify(f.nettyEngine, times(1))
 			.writeAndClose(eq(f.client), any());
 	}
 
@@ -307,10 +307,10 @@ public class HttpProxyFactoryTest
 		ServerFixture f = new ServerFixture();
 		doReturn(succeededChannelFuture()).when(f.client).writeAndFlush(any());
 		doReturn(succeededChannelFuture()).when(f.server).writeAndFlush(any());
-		when(f.nettyRuntime.connect(any(), any(), any()))
+		when(f.nettyEngine.connect(any(), any(), any()))
 			.thenReturn(CompletableFuture.completedFuture(f.server));
 		f.handler.channelRead(f.clientCtx, Unpooled.wrappedBuffer("CONNECT localhost HTTP/1.0\n\n".getBytes(StandardCharsets.UTF_8)));
-		verify(f.nettyRuntime, times(1))
+		verify(f.nettyEngine, times(1))
 			.connect(any(), eq(InetSocketAddress.createUnresolved("localhost", 443)), any());
 		verify(f.client, times(1))
 			.writeAndFlush(any());
@@ -318,7 +318,7 @@ public class HttpProxyFactoryTest
 			.writeAndFlush(Unpooled.EMPTY_BUFFER);
 		verify(f.clientPipeline, times(1))
 			.remove(NettyHttpProxyFactory.RequestReaderHandler.class);
-		verify(f.nettyRuntime, times(1)).forwardDuplex(f.client, f.server);
+		verify(f.nettyEngine, times(1)).forwardDuplex(f.client, f.server);
 	}
 
 	@Test(timeOut = 10000L)
@@ -327,10 +327,10 @@ public class HttpProxyFactoryTest
 		ServerFixture f = new ServerFixture();
 		doReturn(succeededChannelFuture()).when(f.client).writeAndFlush(any());
 		doReturn(succeededChannelFuture()).when(f.server).writeAndFlush(any());
-		when(f.nettyRuntime.connect(any(), any(), any()))
+		when(f.nettyEngine.connect(any(), any(), any()))
 			.thenReturn(CompletableFuture.completedFuture(f.server));
 		f.handler.channelRead(f.clientCtx, Unpooled.wrappedBuffer("CONNECT localhost:1234 HTTP/1.0\n\n".getBytes(StandardCharsets.UTF_8)));
-		verify(f.nettyRuntime, times(1))
+		verify(f.nettyEngine, times(1))
 			.connect(any(), eq(InetSocketAddress.createUnresolved("localhost", 1234)), any());
 		verify(f.client, times(1))
 			.writeAndFlush(any());
@@ -338,7 +338,7 @@ public class HttpProxyFactoryTest
 			.writeAndFlush(Unpooled.EMPTY_BUFFER);
 		verify(f.clientPipeline, times(1))
 			.remove(NettyHttpProxyFactory.RequestReaderHandler.class);
-		verify(f.nettyRuntime, times(1)).forwardDuplex(f.client, f.server);
+		verify(f.nettyEngine, times(1)).forwardDuplex(f.client, f.server);
 	}
 
 	@Test(timeOut = 10000L)
@@ -347,10 +347,10 @@ public class HttpProxyFactoryTest
 		ServerFixture f = new ServerFixture();
 		doReturn(succeededChannelFuture()).when(f.client).writeAndFlush(any());
 		doReturn(succeededChannelFuture()).when(f.server).writeAndFlush(any());
-		when(f.nettyRuntime.connect(any(), any(), any()))
+		when(f.nettyEngine.connect(any(), any(), any()))
 			.thenReturn(CompletableFuture.completedFuture(f.server));
 		f.handler.channelRead(f.clientCtx, Unpooled.wrappedBuffer(("POST /path HTTP/1.0\nhost: localhost\nconnection: keep-alive\n\nsome body").getBytes(StandardCharsets.UTF_8)));
-		verify(f.nettyRuntime, times(1))
+		verify(f.nettyEngine, times(1))
 			.connect(any(), eq(InetSocketAddress.createUnresolved("localhost", 80)), any());
 		verify(f.client, times(1))
 			.writeAndFlush(Unpooled.EMPTY_BUFFER);
@@ -360,13 +360,13 @@ public class HttpProxyFactoryTest
 			.writeAndFlush(Unpooled.wrappedBuffer("some body".getBytes(StandardCharsets.UTF_8)));
 		verify(f.clientPipeline, times(1))
 			.remove(NettyHttpProxyFactory.RequestReaderHandler.class);
-		verify(f.nettyRuntime, times(1)).forwardDuplex(f.client, f.server);
+		verify(f.nettyEngine, times(1)).forwardDuplex(f.client, f.server);
 	}
 
 	public static class ClientFixture
 	{
 		HttpProxyFactory.Config proxyConfig;
-		NettyRuntime nettyRuntime;
+		NettyEngine nettyEngine;
 		ChannelPipeline clientPipeline;
 		ChannelConfig clientConfig;
 		DuplexChannel client;
@@ -378,11 +378,11 @@ public class HttpProxyFactoryTest
 		public ClientFixture()
 		{
 			proxyConfig = HttpProxyFactory.Config.builder().build();
-			nettyRuntime = mock(NettyRuntime.class);
+			nettyEngine = mock(NettyEngine.class);
 			clientConfig = mock(ChannelConfig.class);
 			clientPipeline = mock(ChannelPipeline.class);
 			client = mock(DuplexChannel.class);
-			proxy = new NettyHttpProxyFactory(nettyRuntime);
+			proxy = new NettyHttpProxyFactory(nettyEngine);
 			closeFuture = mock(CompletableFuture.class);
 			handler = proxy.new RequestReaderHandler(proxyConfig, closeFuture);
 			clientCtx = mock(ChannelHandlerContext.class);
@@ -395,7 +395,7 @@ public class HttpProxyFactoryTest
 			when(client.config())
 				.thenReturn(clientConfig);
 
-			when(nettyRuntime.resolve(any()))
+			when(nettyEngine.resolve(any()))
 				.thenAnswer((answer) ->
 					CompletableFuture.completedFuture(answer.getArgument(0))
 				);

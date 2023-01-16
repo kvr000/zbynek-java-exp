@@ -1,13 +1,18 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
 
 import com.google.common.base.Preconditions;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyFutures;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyFutures;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyServer;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.pipeline.FullFlowControlHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.socket.DuplexChannel;
 
 import io.netty.channel.unix.DomainSocketAddress;
+import io.netty.handler.flow.FlowControlHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.concurrent.FutureUtil;
@@ -26,36 +31,37 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
-public class NettyPortForwarder implements PortForwarder
+public class NettyPortForwarderFactory implements PortForwarderFactory
 {
-	private final NettyRuntime nettyRuntime;
+	private final NettyEngine nettyEngine;
 
 	@Override
-	public CompletableFuture<CompletableFuture<Void>> runForwards(List<ForwardConfig> forwards)
+	public List<CompletableFuture<Server>> runForwards(List<ForwardConfig> forwards)
 	{
-		List<CompletableFuture<CompletableFuture<Void>>> futures = forwards.stream().map(this::runForward).collect(Collectors.toList());
-		return NettyFutures.nestedAllOrCancel(futures);
+		List<CompletableFuture<Server>> futures = forwards.stream().map(this::runForward).collect(Collectors.toList());
+		return futures;
 	}
 
 	@Override
-	public CompletableFuture<CompletableFuture<Void>> runForward(ForwardConfig forward)
+	public CompletableFuture<Server> runForward(ForwardConfig forward)
 	{
 		try {
 			Preconditions.checkArgument(forward.getBind() != null, "bind must be specified");
-			Preconditions.checkArgument(forward.getConnect() != null, "connect must be specified");
 			switch (Optional.ofNullable(forward.getBind().getProto()).orElse("")) {
 			case "tcp4":
 			case "tcp6":
-				Preconditions.checkArgument(forward.getBind().getPort() != 0, "port not specified");
 				break;
 
 			case "unix":
+			case "domain":
 				Preconditions.checkArgument(forward.getBind().getPath() != null, "path not specified");
 				break;
 
 			default:
 				throw new IllegalArgumentException("Unknown bind.proto: "+forward.getBind().getProto());
 			}
+
+			Preconditions.checkArgument(forward.getConnect() != null, "connect must be specified");
 			switch (Optional.ofNullable(forward.getConnect().getProto()).orElse("")) {
 			case "tcp4":
 			case "tcp6":
@@ -75,14 +81,13 @@ public class NettyPortForwarder implements PortForwarder
 		catch (Throwable ex) {
 			return FutureUtil.exception(ex);
 		}
-		return runListener(forward);
+		return runForwarder(forward);
 
 	}
 
-	private CompletableFuture<CompletableFuture<Void>> runListener(ForwardConfig config)
+	private CompletableFuture<Server> runForwarder(ForwardConfig config)
 	{
-		return new CompletableFuture<CompletableFuture<Void>>() {
-			private final CompletableFuture<CompletableFuture<Void>> this0 = this;
+		return new CompletableFuture<Server>() {
 			private CompletableFuture<ServerChannel> initFuture;
 			private ServerChannel listener;
 
@@ -109,45 +114,44 @@ public class NettyPortForwarder implements PortForwarder
 				completeExceptionally(ex);
 			}
 
-			private void connectForward(String proto, DuplexChannel client, SocketAddress remote)
+			private void connectForward(DuplexChannel client, AddressSpec connect)
 			{
-				nettyRuntime.connect(
-					proto,
-						remote,
+				nettyEngine.connect(
+						connect,
 						new ChannelInitializer<DuplexChannel>()
 						{
 							@Override
 							public void initChannel(DuplexChannel server) throws Exception
 							{
 								server.config().setAutoRead(false);
+								server.pipeline().addLast(new FullFlowControlHandler());
 							}
 						}
 					)
 					.whenComplete((server, ex) -> {
 						if (ex == null) {
-							nettyRuntime.forwardDuplex(client, server)
-								.whenComplete((v, ex2) ->
-									NettyFutures.join(client.close(), server.close())
-								);
+							nettyEngine.forwardDuplex(client, server)
+								.whenComplete((v, ex2) -> {
+									NettyFutures.join(client.close(), server.close());
+								});
 						}
 						else {
-							log.error("Failed to connect", ex);
+							log.error("Failed to connect to: {}", connect, ex);
 							client.close();
 						}
 					});
 			}
 
-			private void createListener(String proto, SocketAddress address) throws InterruptedException
+			private void createListener(AddressSpec address) throws InterruptedException
 			{
-				initFuture = nettyRuntime.listen(
-					proto,
+				initFuture = nettyEngine.listen(
 					address,
 					new ChannelInitializer<DuplexChannel>() {
 						@Override
 						public void initChannel(DuplexChannel client) throws Exception {
 							client.config().setAutoRead(false);
-							SocketAddress remote = createAddress(config.getConnect());
-							connectForward(config.getConnect().getProto(), client, remote);
+							client.pipeline().addFirst(new FullFlowControlHandler());
+							connectForward(client, config.getConnect());
 						}
 					}
 				);
@@ -166,8 +170,9 @@ public class NettyPortForwarder implements PortForwarder
 									return super.cancel(interrupt);
 								}
 							};
-							NettyFutures.completeOrFail(channel.closeFuture(), close);
-							complete(close);
+							complete(new NettyServer(
+								channel
+							));
 						}
 					}
 				});
@@ -175,8 +180,7 @@ public class NettyPortForwarder implements PortForwarder
 
 			{
 				try {
-					SocketAddress address = createAddress(config.getBind());
-					createListener(config.getBind().getProto(), address);
+					createListener(config.getBind());
 				}
 				catch (Throwable ex) {
 					fail(ex);
@@ -185,7 +189,7 @@ public class NettyPortForwarder implements PortForwarder
 		};
 	}
 
-	private SocketAddress createAddress(ForwardConfig.AddressSpec addressSpec)
+	private SocketAddress createAddress(AddressSpec addressSpec)
 	{
 		switch (addressSpec.getProto()) {
 		case "tcp4":

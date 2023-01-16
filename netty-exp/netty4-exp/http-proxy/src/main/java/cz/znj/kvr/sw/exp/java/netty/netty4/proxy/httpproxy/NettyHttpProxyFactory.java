@@ -1,9 +1,12 @@
-package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward;
+package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy;
 
 import com.google.common.base.Ascii;
 import com.google.common.primitives.Bytes;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyFutures;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.NettyRuntime;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyFutures;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyServer;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
+import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.pipeline.FullFlowControlHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -12,7 +15,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ServerChannel;
+import io.netty.channel.socket.ChannelInputShutdownEvent;
 import io.netty.channel.socket.DuplexChannel;
+import io.netty.channel.socket.DuplexChannelConfig;
 import io.netty.util.ReferenceCountUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -53,25 +58,24 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 	private static final byte[] HOST_HEADER = "host".getBytes(StandardCharsets.UTF_8);
 	private static final byte[] CLOSE = "close".getBytes(StandardCharsets.UTF_8);
 
-	private final NettyRuntime nettyRuntime;
+	private final NettyEngine nettyEngine;
 
 	@Override
-	public CompletableFuture<CompletableFuture<Void>> runProxy(Config config)
+	public CompletableFuture<Server> runProxy(Config config)
 	{
 		try {
-			return new CompletableFuture<CompletableFuture<Void>>() {
+			return new CompletableFuture<Server>() {
 				CompletableFuture<ServerChannel> listenFuture;
 
 				{
-					listenFuture = nettyRuntime.listen(
-							config.getProto(),
+					listenFuture = nettyEngine.listen(
 							config.getListenAddress(),
 							new ChannelInitializer<DuplexChannel>()
 							{
 								@Override
 								protected void initChannel(DuplexChannel ch) throws Exception
 								{
-									runServer(ch, config);
+									initializeServer(ch, config);
 								}
 							}
 						)
@@ -80,7 +84,9 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 								completeExceptionally(ex);
 							}
 							else {
-								complete(NettyFutures.toCompletable(v.closeFuture()));
+								complete(new NettyServer(
+									v
+								));
 							}
 						});
 				}
@@ -98,11 +104,16 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 		}
 	}
 
-	CompletableFuture<Void> runServer(Channel client, Config config)
+	CompletableFuture<Void> initializeServer(Channel client, Config config)
 	{
 		return new CompletableFuture<Void>() {
 			{
-				client.pipeline().addLast(new RequestReaderHandler(config, this));
+				client.config().setAutoRead(false);
+				((DuplexChannelConfig) client.config()).setAllowHalfClosure(true);
+				client.pipeline().addLast(
+					new FullFlowControlHandler(),
+					new RequestReaderHandler(config, this)
+				);
 				whenComplete((v, ex) -> {
 					if (ex != null) {
 						client.close();
@@ -115,7 +126,7 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 
 	CompletableFuture<SocketAddress> resolveServer(Channel client, SocketAddress unresolved)
 	{
-		return nettyRuntime.resolve(unresolved)
+		return nettyEngine.resolve(unresolved)
 			.thenApply((v) -> {
 				try {
 					if (v.equals(client.localAddress())) {
@@ -301,9 +312,24 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 	{
 		private final Config config;
 
-		private final CompletableFuture<Void> finish;
+		private final CompletableFuture<Void> finishPromise;
 
 		private ByteBuf header = Unpooled.buffer(512, 32768);
+
+		@Override
+		public void handlerAdded(ChannelHandlerContext ctx) throws Exception
+		{
+			((DuplexChannelConfig) ctx.channel().config()).setAutoRead(false);
+			((DuplexChannelConfig) ctx.channel().config()).setAllowHalfClosure(true);
+			NettyFutures.copy(ctx.channel().closeFuture(), finishPromise);
+			super.handlerAdded(ctx);
+		}
+
+		@Override
+		public void channelActive(ChannelHandlerContext ctx) throws Exception
+		{
+			ctx.read();
+		}
 
 		@Override
 		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -311,7 +337,9 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 				if (!processHeader(ctx, (ByteBuf) msg)) {
 					if (header.readableBytes() >= header.maxCapacity()) {
 						respondAndClose(ctx, "400 Bad Request", new IOException("Failed to read HTTP request headers, exceeded 32768"));
+						return;
 					}
+					ctx.read();
 				}
 			}
 			catch (Throwable ex) {
@@ -319,6 +347,12 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 			}
 			finally {
 				ReferenceCountUtil.release(msg);
+			}
+		}
+
+		public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+			if (evt instanceof ChannelInputShutdownEvent) {
+				log.error("Unexpected EOF when reading HTTP request");
 			}
 		}
 
@@ -383,11 +417,13 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 			ctx.pipeline().remove(RequestReaderHandler.class);
 			resolveServer(ctx.channel(), remote)
 				.thenCompose((address) ->
-					nettyRuntime.connect(null, address, new ChannelInitializer<Channel>() {
+					nettyEngine.connect(null, address, new ChannelInitializer<Channel>() {
 						@Override
 						protected void initChannel(Channel server) throws Exception
 						{
 							server.config().setAutoRead(false);
+							((DuplexChannelConfig) server.config()).setAllowHalfClosure(true);
+							server.pipeline().addLast(new FullFlowControlHandler());
 						}
 					})
 				)
@@ -403,12 +439,14 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 							ChannelFuture clientFuture = client.writeAndFlush(clientOutput);
 							NettyFutures.join(serverFuture, clientFuture)
 								.thenCompose((v) ->
-									nettyRuntime.forwardDuplex(client, server)
+									nettyEngine.forwardDuplex(client, server)
 								)
-								.whenComplete((v, ex2) ->
-									NettyFutures.join(client.close(), server.close())
-										.whenComplete((v3, ex3) ->
-											FutureUtil.completeOrFail(finish, v, ex2))
+								.whenComplete((v, ex2) -> {
+										NettyFutures.join(client.close(), server.close())
+											.whenComplete((v3, ex3) -> {
+												FutureUtil.completeOrFail(finishPromise, v, ex2);
+											});
+									}
 								);
 						}
 					});
@@ -417,12 +455,22 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 
 		private void respondAndClose(ChannelHandlerContext ctx, String status, Exception response)
 		{
-			DuplexChannel channel = (DuplexChannel) ctx.channel();
-			channel.config().setAutoRead(false);
-			nettyRuntime.writeAndClose(channel, Unpooled.wrappedBuffer(("HTTP/1.0 "+status+"\r\ncontent-type: text/plain\r\nconnection: close\r\n\r\n"+response.toString()+"\n").getBytes(StandardCharsets.UTF_8)))
-				.whenComplete((v, ex) ->
-					finish.completeExceptionally(new IOException(response))
-				);
+			try {
+				DuplexChannel channel = (DuplexChannel)ctx.channel();
+				ByteBuf output = Unpooled.buffer();
+				output.writeCharSequence("HTTP/1.0 "+status+"\r\ncontent-type: text/plain\r\nconnection: close\r\n", StandardCharsets.UTF_8);
+				byte[] content = response.toString().getBytes(StandardCharsets.UTF_8);
+				output.writeCharSequence("content-length: "+(content.length+1)+"\r\n\r\n", StandardCharsets.UTF_8);
+				output.writeBytes(content);
+				output.writeByte('\n');
+				nettyEngine.writeAndClose(channel, output)
+					.whenComplete((v, ex) ->
+						finishPromise.completeExceptionally(new IOException(response))
+					);
+			}
+			catch (Throwable ex) {
+				finishPromise.completeExceptionally(ex);
+			}
 		}
 	}
 

@@ -86,7 +86,7 @@
 
 		<zip4j.version>2.10.0</zip4j.version>
 
-		<testng.version>7.6.1</testng.version>
+		<testng.version>7.7.1</testng.version>
 
 		<junit.version>4.13.2</junit.version>
 		<jupiter.version>5.9.1</jupiter.version>
@@ -630,6 +630,11 @@
 				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-assistedinject</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.mycila.guice.extensions</groupId>
 				<artifactId>mycila-guice-injection</artifactId>
 				<version>${mycila-guice-extensions.version}</version>
@@ -639,7 +644,6 @@
 				<artifactId>mycila-guice-jsr250</artifactId>
 				<version>${mycila-guice-extensions.version}</version>
 			</dependency>
-
 
 			<dependency>
 				<groupId>com.google.dagger</groupId>

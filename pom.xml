@@ -630,6 +630,11 @@
 				<version>${guice.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-assistedinject</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.mycila.guice.extensions</groupId>
 				<artifactId>mycila-guice-injection</artifactId>
 				<version>${mycila-guice-extensions.version}</version>
@@ -639,7 +644,6 @@
 				<artifactId>mycila-guice-jsr250</artifactId>
 				<version>${mycila-guice-extensions.version}</version>
 			</dependency>
-
 
 			<dependency>
 				<groupId>com.google.dagger</groupId>

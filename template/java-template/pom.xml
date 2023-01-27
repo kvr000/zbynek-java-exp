@@ -48,7 +48,7 @@
 
 		<lombok.version>1.18.22</lombok.version>
 
-		<testng.version>7.3.0</testng.version>
+		<testng.version>7.7.0</testng.version>
 
 		<javax.inject.version>1</javax.inject.version>
 

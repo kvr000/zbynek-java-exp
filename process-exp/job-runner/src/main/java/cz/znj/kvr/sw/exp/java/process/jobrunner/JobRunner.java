@@ -27,6 +27,7 @@ import net.dryuf.cmdline.app.guice.GuiceBeanFactory;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
+import org.apache.commons.io.IOUtils;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -62,6 +63,7 @@ public class JobRunner extends AbstractCommand
 
 	private final JobExecutor jobExecutor;
 
+	private int printDoc;
 	private String tasksFile;
 	private String machinesFile;
 	private String machinesGroupsFile;
@@ -82,6 +84,10 @@ public class JobRunner extends AbstractCommand
 	protected boolean parseOption(CommandContext context, String arg, ListIterator<String> args) throws Exception
 	{
 		switch (arg) {
+		case "--doc":
+			this.printDoc = 1;
+			return true;
+
 		case "--tasks":
 		case "-t":
 			this.tasksFile = needArgsParam(this.tasksFile, args);
@@ -110,6 +116,10 @@ public class JobRunner extends AbstractCommand
 	@Override
 	protected int validateOptions(CommandContext context, ListIterator<String> args) throws Exception
 	{
+		if (this.printDoc != 0) {
+			IOUtils.copy(JobRunner.class.getResourceAsStream("README.md"), System.out);
+			return EXIT_SUCCESS;
+		}
 		if ((this.fullFile != null) == (this.tasksFile != null || this.machinesFile != null || this.machinesGroupsFile != null)) {
 			return usage(context, "Either --spec must be specified or all of --tasks, --machines, --machine-groups but not both set at the same time");
 		}
@@ -126,6 +136,7 @@ public class JobRunner extends AbstractCommand
 	protected Map<String, String> configOptionsDescription(CommandContext context)
 	{
 		return ImmutableMap.of(
+			"--doc", "prints concise documentation",
 			"-s,--spec", "definition file of tasks",
 			"-t,--tasks", "definition file of tasks",
 			"-m,--machines", "definition file of machines",

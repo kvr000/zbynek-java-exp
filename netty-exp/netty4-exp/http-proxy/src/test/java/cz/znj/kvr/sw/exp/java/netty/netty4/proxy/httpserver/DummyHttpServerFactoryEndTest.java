@@ -72,6 +72,7 @@ public class DummyHttpServerFactoryEndTest
 	{
 		AtomicInteger pending = new AtomicInteger();
 		return tester.runNettyClientLoop(
+			attempts,
 			serverAddress,
 			(future) -> new ChannelInitializer<DuplexChannel>()
 			{

@@ -126,7 +126,7 @@ public class ProxyRunner extends AbstractCommand
 	@Override
 	protected int validateOptions(CommandContext context, ListIterator<String> args) throws Exception
 	{
-		if (this.forwards.isEmpty() && this.httpProxies.isEmpty()) {
+		if (this.forwards.isEmpty() && this.httpProxies.isEmpty() && this.httpServers.isEmpty()) {
 			return usage(context, "nothing to run, type -h for help");
 		}
 		return EXIT_CONTINUE;

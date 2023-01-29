@@ -19,6 +19,7 @@ import net.dryuf.cmdline.app.guice.GuiceBeanFactory;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
+import org.apache.commons.io.IOUtils;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -58,6 +59,7 @@ public class ProcessWatcher extends AbstractCommand
 
 	private final ProcessWatcherExecutor processExecutor;
 
+	private int printDoc;
 	private String properties;
 	private String spec;
 
@@ -78,6 +80,10 @@ public class ProcessWatcher extends AbstractCommand
 	protected boolean parseOption(CommandContext context, String arg, ListIterator<String> args) throws Exception
 	{
 		switch (arg) {
+		case "--doc":
+			this.printDoc = 1;
+			return true;
+
 		case "--properties":
 		case "-p":
 			this.properties = needArgsParam(this.properties, args);
@@ -96,6 +102,10 @@ public class ProcessWatcher extends AbstractCommand
 	@Override
 	protected int validateOptions(CommandContext context, ListIterator<String> args) throws Exception
 	{
+		if (this.printDoc != 0) {
+			IOUtils.copy(ProcessWatcher.class.getResourceAsStream("README.md"), System.out);
+			return EXIT_SUCCESS;
+		}
 		if (this.spec == null) {
 			return usage(context, "--spec must be specified");
 		}
@@ -112,6 +122,7 @@ public class ProcessWatcher extends AbstractCommand
 	protected Map<String, String> configOptionsDescription(CommandContext context)
 	{
 		return ImmutableMap.of(
+			"--doc", "prints concise documentation",
 			"-s,--spec", "definition file of processes",
 			"-p,--properties", "definition file of tasks"
 		);

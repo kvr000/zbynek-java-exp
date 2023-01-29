@@ -40,7 +40,7 @@ public class ClientServerTester implements AutoCloseable
 		servers.add(server);
 	}
 
-	public double runClientLoop(Function<NettyEngine, CompletableFuture<Void>> runClient)
+	public double runClientLoop(int batchSize, Function<NettyEngine, CompletableFuture<Void>> runClient)
 	{
 		long started = System.currentTimeMillis();
 		Stopwatch stopwatch = Stopwatch.createStarted();
@@ -67,18 +67,21 @@ public class ClientServerTester implements AutoCloseable
 			futures.add(future);
 		}
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-		double performance = counter.get() * 1_000_000_000.0 / stopwatch.elapsed(TimeUnit.NANOSECONDS);
-		log.info("Performance: time={} count={} ops/s={}", stopwatch.toString(), counter.get(), performance);
+		double performance = counter.get() * 1_000_000_000.0 * batchSize / stopwatch.elapsed(TimeUnit.NANOSECONDS);
+		log.info("Performance: time={} count={} ops/s={}", stopwatch.toString(), counter.get() * batchSize, performance);
 		return performance;
 	}
 
 	public <T extends DuplexChannel> double runNettyClientLoop(
+		int batchSize,
 		SocketAddress connectAddress,
 		Function<CompletableFuture<Void>, ChannelInitializer<T>> clientInitializer,
 		Function<DuplexChannel, ? extends CompletionStage<Void>> runner
 	)
 	{
-		return runClientLoop((runtime) -> new CompletableFuture<Void>()
+		return runClientLoop(
+			batchSize,
+			(runtime) -> new CompletableFuture<Void>()
 			{
 				{
 					nettyEngine.connect("tcp4",

@@ -22,7 +22,7 @@ public class PortForwarderFactoryEndTest
 
 			SocketAddress forward0Address = runForward(tester, serverAddress);
 
-			EchoEndTest.runEchoClient(tester, forward0Address);
+			EchoEndTest.runEchoClient(tester, forward0Address, 2);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class PortForwarderFactoryEndTest
 				last = runForward(tester, last);
 			}
 
-			EchoEndTest.runEchoClient(tester, last);
+			EchoEndTest.runEchoClient(tester, last, 10);
 		}
 	}
 

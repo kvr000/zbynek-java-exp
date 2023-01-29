@@ -43,7 +43,7 @@ public class EchoEndTest
 			InetSocketAddress serverAddress = runEchoServer(tester);
 
 			try (ClientServerTester tester2 = new ClientServerTester()) {
-				runEchoClient(tester2, serverAddress);
+				runEchoClient(tester2, serverAddress, 1);
 			}
 		}
 	}
@@ -77,10 +77,11 @@ public class EchoEndTest
 		return address;
 	}
 
-	public static double runEchoClient(ClientServerTester tester, SocketAddress serverAddress)
+	public static double runEchoClient(ClientServerTester tester, SocketAddress serverAddress, int attempts)
 	{
 		AtomicInteger pending = new AtomicInteger();
 		return tester.runNettyClientLoop(
+			attempts * 1000,
 			serverAddress,
 			(future) -> new ChannelInitializer<DuplexChannel>()
 			{

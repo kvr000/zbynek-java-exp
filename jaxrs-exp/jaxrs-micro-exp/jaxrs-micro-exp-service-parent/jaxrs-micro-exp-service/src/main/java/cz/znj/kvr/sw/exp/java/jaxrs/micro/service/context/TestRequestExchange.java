@@ -3,7 +3,7 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.context;
 import net.dryuf.bigio.iostream.CommittableOutputStream;
 import net.dryuf.bigio.iostream.FilterCommittableOutputStream;
 
-import javax.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.Cookie;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

@@ -10,9 +10,9 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.response.ServicerResponse;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.router.ServicerRouter;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.concurrent.CompletableFuture;
 
 

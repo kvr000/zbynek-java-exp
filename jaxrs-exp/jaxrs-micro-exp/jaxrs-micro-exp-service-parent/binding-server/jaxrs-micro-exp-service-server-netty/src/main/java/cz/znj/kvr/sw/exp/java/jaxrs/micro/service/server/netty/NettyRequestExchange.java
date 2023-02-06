@@ -16,7 +16,7 @@ import io.netty.handler.codec.http.LastHttpContent;
 import lombok.Getter;
 import net.dryuf.bigio.iostream.CommittableOutputStream;
 
-import javax.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.Cookie;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;

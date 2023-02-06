@@ -12,10 +12,10 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.router.RootServicer;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.test.server.common.controller.HomeController;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.test.server.common.controller.sub.RestController;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
 
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.serialization.jackson.ObjectMapperMessageBodyReader;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.serialization.jackson.ObjectMapperMessageBodyWriter;

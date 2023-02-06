@@ -12,12 +12,36 @@
 	<name>Maven experiments base</name>
 	<description>Parent of JaxRs experiments</description>
 
+	<properties>
+		<javac.version>11</javac.version>
+	</properties>
+
 	<parent>
 		<groupId>cz.znj.kvr.sw.exp.java</groupId>
 		<artifactId>java-exp</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${javac.version}</source>
+					<target>${javac.version}</target>
+					<compilerArgs>
+						<arg>-Xlint:all</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+
+
+		</plugins>
+	</build>
 
 	<dependencyManagement>
 		<dependencies>

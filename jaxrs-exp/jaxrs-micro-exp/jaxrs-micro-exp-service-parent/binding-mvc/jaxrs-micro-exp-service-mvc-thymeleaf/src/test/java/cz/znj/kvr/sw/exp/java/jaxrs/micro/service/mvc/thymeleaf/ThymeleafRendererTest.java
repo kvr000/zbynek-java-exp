@@ -3,13 +3,13 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.thymeleaf;
 import com.google.common.collect.ImmutableMap;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view.PageView;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view.Widget;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import net.dryuf.base.util.BasicLocaleContext;
 import org.testng.annotations.Test;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.RuntimeDelegate;
 import java.time.ZoneOffset;
 import java.util.Locale;
 

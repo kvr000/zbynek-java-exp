@@ -5,14 +5,14 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.thymeleaf.impl.ViewContext
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view.CompositeWidget;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view.ModelView;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view.Widget;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.thymeleaf.TemplateEngine;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.RuntimeDelegate;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;

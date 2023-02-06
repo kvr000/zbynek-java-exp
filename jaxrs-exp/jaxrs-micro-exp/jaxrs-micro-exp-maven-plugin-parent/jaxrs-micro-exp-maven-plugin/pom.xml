@@ -56,11 +56,11 @@
 		<maven-plugin-api.version>${maven-core.version}</maven-plugin-api.version>
 		<maven-plugin-tools.version>3.4</maven-plugin-tools.version>
 
-		<lombok.version>1.18.22</lombok.version>
+		<lombok.version>1.18.30</lombok.version>
 
 		<reflections.version>0.9.10</reflections.version>
 
-		<javax.ws.rs.version>2.1.1</javax.ws.rs.version>
+		<jakarta.ws.rs.version>3.1.0</jakarta.ws.rs.version>
 
 		<testng.version>6.9.10</testng.version>
 
@@ -203,9 +203,9 @@
 
 		<!--
 		<dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>javax.ws.rs-api</artifactId>
-			<version>${javax.ws.rs.version}</version>
+			<groupId>jakarta.ws.rs</groupId>
+			<artifactId>jakarta.ws.rs-api</artifactId>
+			<version>${jakarta.ws.rs.version}</version>
 		</dependency>
 		-->
 

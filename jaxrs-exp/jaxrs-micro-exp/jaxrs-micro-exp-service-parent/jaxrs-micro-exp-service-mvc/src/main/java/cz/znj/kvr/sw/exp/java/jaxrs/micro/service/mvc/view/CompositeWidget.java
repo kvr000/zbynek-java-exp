@@ -1,14 +1,13 @@
 package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.ws.rs.core.Link;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import net.dryuf.bigio.compare.FilenameVersionComparators;
 
-import javax.ws.rs.core.Link;
-import java.io.InputStream;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;

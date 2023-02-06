@@ -3,9 +3,9 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.bodies;
 import lombok.RequiredArgsConstructor;
 import net.dryuf.base.collection.LazilyBuiltLoadingCache;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.MessageBodyWriter;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.MessageBodyWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;

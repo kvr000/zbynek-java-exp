@@ -8,7 +8,7 @@ import net.dryuf.bigio.iostream.FilterCommittableOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;

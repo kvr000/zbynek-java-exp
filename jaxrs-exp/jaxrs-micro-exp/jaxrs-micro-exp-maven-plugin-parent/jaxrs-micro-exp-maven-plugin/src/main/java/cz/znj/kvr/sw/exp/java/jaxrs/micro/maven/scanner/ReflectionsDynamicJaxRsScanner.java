@@ -56,7 +56,7 @@ public class ReflectionsDynamicJaxRsScanner extends AbstractJaxRsScanner
 //		Class<? extends Annotation> httpMethodClass;
 //		try {
 //			@SuppressWarnings("unchecked")
-//			Class<? extends Annotation> httpMethodClass0 = (Class<? extends Annotation>) classLoader.loadClass("javax.ws.rs.HttpMethod");
+//			Class<? extends Annotation> httpMethodClass0 = (Class<? extends Annotation>) classLoader.loadClass("jakarta.ws.rs.HttpMethod");
 //			httpMethodClass = httpMethodClass0;
 //		}
 //		catch (ClassNotFoundException e) {
@@ -103,12 +103,12 @@ public class ReflectionsDynamicJaxRsScanner extends AbstractJaxRsScanner
 //		TreeSet<String> methods = new TreeSet<>();
 //		for (Annotation annotation: function.getAnnotations()) {
 //			log.error("Processing function {}, annotation: {}", function, annotation);
-//			String method = this.<String>checkAnnotation(annotation.getClass(), "javax.ws.rs.HttpMethod", "value");
+//			String method = this.<String>checkAnnotation(annotation.getClass(), "jakarta.ws.rs.HttpMethod", "value");
 //			log.error("Found {}, method={}", annotation.getClass(), method);
 //			if (method != null)
 //				methods.add(method);
 //		}
-//		String method = checkAnnotation(function, "javax.ws.rs.HttpMethod", "value");
+//		String method = checkAnnotation(function, "jakarta.ws.rs.HttpMethod", "value");
 //		if (method != null) {
 //			methods.add(method);
 //		}
@@ -142,8 +142,8 @@ public class ReflectionsDynamicJaxRsScanner extends AbstractJaxRsScanner
 	protected void configureClasses(Runtime runtime)
 	{
 		try {
-			runtime.classHttpMethod = (Class<? extends Annotation>) runtime.classLoader.loadClass("javax.ws.rs.HttpMethod");
-			runtime.classPath = (Class<? extends Annotation>) runtime.classLoader.loadClass("javax.ws.rs.Path");
+			runtime.classHttpMethod = (Class<? extends Annotation>) runtime.classLoader.loadClass("jakarta.ws.rs.HttpMethod");
+			runtime.classPath = (Class<? extends Annotation>) runtime.classLoader.loadClass("jakarta.ws.rs.Path");
 		}
 		catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);

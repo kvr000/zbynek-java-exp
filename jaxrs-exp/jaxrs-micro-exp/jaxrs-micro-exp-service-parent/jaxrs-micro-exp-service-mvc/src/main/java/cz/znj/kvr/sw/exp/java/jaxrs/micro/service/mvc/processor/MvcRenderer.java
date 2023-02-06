@@ -3,7 +3,7 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.processor;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view.ModelView;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view.Widget;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 
 public interface MvcRenderer

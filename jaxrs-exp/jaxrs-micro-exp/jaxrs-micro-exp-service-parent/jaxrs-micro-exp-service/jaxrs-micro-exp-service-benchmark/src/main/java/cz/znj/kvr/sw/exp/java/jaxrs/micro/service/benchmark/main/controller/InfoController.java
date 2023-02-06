@@ -3,10 +3,10 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.benchmark.main.controller;
 import com.google.common.collect.ImmutableMap;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.context.RequestExchange;
 
-import javax.inject.Singleton;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

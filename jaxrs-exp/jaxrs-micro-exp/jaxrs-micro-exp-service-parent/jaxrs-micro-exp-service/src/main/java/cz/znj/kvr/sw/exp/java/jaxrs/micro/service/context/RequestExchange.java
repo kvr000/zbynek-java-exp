@@ -2,8 +2,8 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.context;
 
 import net.dryuf.bigio.iostream.CommittableOutputStream;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;

@@ -3,8 +3,7 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
-import javax.ws.rs.core.Link;
-import java.io.InputStream;
+import jakarta.ws.rs.core.Link;
 import java.io.Reader;
 import java.util.Map;
 

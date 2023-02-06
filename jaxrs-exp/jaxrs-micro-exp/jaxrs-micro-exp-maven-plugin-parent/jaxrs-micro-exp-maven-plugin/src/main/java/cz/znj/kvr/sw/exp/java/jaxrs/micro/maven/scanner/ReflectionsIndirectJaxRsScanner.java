@@ -148,11 +148,11 @@ public class ReflectionsIndirectJaxRsScanner extends AbstractJaxRsScanner
 	protected void configureClasses(Runtime runtime)
 	{
 		try {
-			runtime.classHttpMethod = (Class<? extends Annotation>) runtime.classLoader.loadClass("javax.ws.rs.HttpMethod");
-			runtime.classPath = (Class<? extends Annotation>) runtime.classLoader.loadClass("javax.ws.rs.Path");
-			runtime.classProduces = (Class<? extends Annotation>) runtime.classLoader.loadClass("javax.ws.rs.Produces");
-			runtime.classConsumes = (Class<? extends Annotation>) runtime.classLoader.loadClass("javax.ws.rs.Consumes");
-			runtime.classQueryParam= (Class<? extends Annotation>) runtime.classLoader.loadClass("javax.ws.rs.QueryParam");
+			runtime.classHttpMethod = (Class<? extends Annotation>) runtime.classLoader.loadClass("jakarta.ws.rs.HttpMethod");
+			runtime.classPath = (Class<? extends Annotation>) runtime.classLoader.loadClass("jakarta.ws.rs.Path");
+			runtime.classProduces = (Class<? extends Annotation>) runtime.classLoader.loadClass("jakarta.ws.rs.Produces");
+			runtime.classConsumes = (Class<? extends Annotation>) runtime.classLoader.loadClass("jakarta.ws.rs.Consumes");
+			runtime.classQueryParam= (Class<? extends Annotation>) runtime.classLoader.loadClass("jakarta.ws.rs.QueryParam");
 		}
 		catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);

@@ -7,8 +7,8 @@ import org.xmlunit.assertj.XmlAssert;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 import java.io.IOException;
 import java.io.InputStream;
 

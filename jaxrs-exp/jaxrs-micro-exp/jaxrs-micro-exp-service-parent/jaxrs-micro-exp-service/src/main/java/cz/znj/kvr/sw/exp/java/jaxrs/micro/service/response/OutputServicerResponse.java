@@ -3,7 +3,7 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.response;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 
 public class OutputServicerResponse extends AbstractServicerResponse

@@ -12,8 +12,8 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.router.RootServicer;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.test.server.common.guice.TestModule;
 import lombok.extern.java.Log;
 
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
 import java.net.InetSocketAddress;
 
 

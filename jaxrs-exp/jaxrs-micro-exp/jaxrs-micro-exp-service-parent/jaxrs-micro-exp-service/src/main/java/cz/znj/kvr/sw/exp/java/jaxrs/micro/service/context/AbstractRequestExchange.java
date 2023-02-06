@@ -2,9 +2,9 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.context;
 
 import net.dryuf.base.collection.LazilyBuiltLoadingCache;
 
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

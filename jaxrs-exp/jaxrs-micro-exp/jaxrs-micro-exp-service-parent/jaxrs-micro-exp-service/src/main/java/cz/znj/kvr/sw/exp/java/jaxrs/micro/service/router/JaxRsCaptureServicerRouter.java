@@ -17,7 +17,7 @@ import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.response.UnsupportedRequestSer
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.router.impl.CallContext;
 import cz.znj.kvr.sw.exp.java.jaxrs.micro.service.router.impl.FunctionData;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;

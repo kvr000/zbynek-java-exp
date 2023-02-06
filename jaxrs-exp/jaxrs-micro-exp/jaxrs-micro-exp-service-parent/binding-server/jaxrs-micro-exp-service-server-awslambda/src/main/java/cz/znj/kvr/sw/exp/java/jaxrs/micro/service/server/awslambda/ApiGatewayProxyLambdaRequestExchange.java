@@ -11,7 +11,7 @@ import net.dryuf.bigio.iostream.FilterCommittableOutputStream;
 import net.dryuf.base.collection.LazilyBuiltLoadingCache;
 import org.apache.commons.io.IOUtils;
 
-import javax.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.Cookie;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;

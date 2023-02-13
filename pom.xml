@@ -143,6 +143,8 @@
 		<spring-boot.version>3.1.5</spring-boot.version>
 		<spring-data-jpa.version>3.1.5</spring-data-jpa.version>
 
+		<jersey-mvc.version>3.1.1</jersey-mvc.version>
+
 		<netty.version>4.1.90.Final</netty.version>
 
 		<aws-java-sdk.version>1.12.581</aws-java-sdk.version>
@@ -875,6 +877,12 @@
 				<groupId>net.lingala.zip4j</groupId>
 				<artifactId>zip4j</artifactId>
 				<version>${zip4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.glassfish.jersey.ext</groupId>
+				<artifactId>jersey-mvc</artifactId>
+				<version>${jersey-mvc.version}</version>
 			</dependency>
 
 			<dependency>

@@ -26,7 +26,8 @@
 
 	<modules>
 		<module>jaxrs-micro-exp-maven-plugin-parent</module>
-		<module>jaxrs-micro-exp-controller-parent</module>
+		<module>jaxrs-micro-exp-inject-parent</module>
+		<module>jaxrs-micro-exp-service-parent</module>
 	</modules>
 
 	<dependencyManagement>

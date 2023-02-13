@@ -18,9 +18,14 @@ import java.util.Collections;
 
 
 /**
- * CSV to localization messages generator.
+ * JaxRs controller serializer.
  */
-@Mojo(name = "capture-jaxrs", defaultPhase = LifecyclePhase.PROCESS_CLASSES, requiresDependencyResolution = ResolutionScope.RUNTIME)
+@Mojo(
+	name = "capture-jaxrs",
+	defaultPhase = LifecyclePhase.PROCESS_CLASSES,
+	requiresDependencyResolution = ResolutionScope.RUNTIME,
+	threadSafe = true
+)
 public class CapturerMojo extends AbstractMojo
 {
 	@SuppressWarnings("unchecked")

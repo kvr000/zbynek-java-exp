@@ -1,0 +1,25 @@
+#!/usr/bin/env -S java -Xmx16M --source 8
+
+
+package com.github.kvr000.zbynek.java.exp;
+
+public class Main
+{
+	public static void main(String[] args)
+	{
+		System.out.println("Hello world");
+		System.exit(new Sub().getExit());
+	}
+}
+
+
+// No package allowed, everything needs to be in single package:
+//package com.github.kvr000.zbynek.java.exp.sub;
+
+class Sub
+{
+	public int getExit()
+	{
+		return 0;
+	}
+}

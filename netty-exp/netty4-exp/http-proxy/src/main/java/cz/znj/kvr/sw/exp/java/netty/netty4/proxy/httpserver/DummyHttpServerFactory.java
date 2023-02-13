@@ -21,6 +21,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
@@ -92,8 +93,7 @@ public class DummyHttpServerFactory
 		return new CompletableFuture<Void>() {
 			{
 				client.pipeline().addLast(
-					new HttpRequestDecoder(),
-					new HttpResponseEncoder(),
+					new HttpServerCodec(),
 					new RequestHandler(this, requestHandler)
 				);
 				whenComplete((v, ex) -> {

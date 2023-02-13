@@ -1,4 +1,4 @@
-# Simple HTTP server based on Netty
+# Simple HTTP proxy server based on Netty
 
 In fact, it supports HTTP proxy, port forwarding and dummy HTTP server for testing purposes.
 

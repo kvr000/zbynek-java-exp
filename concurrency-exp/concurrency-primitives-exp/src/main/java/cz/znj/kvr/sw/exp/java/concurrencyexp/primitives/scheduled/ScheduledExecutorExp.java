@@ -3,20 +3,16 @@ package cz.znj.kvr.sw.exp.java.concurrencyexp.primitives.scheduled;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 
-/**
- * Created by rat on 2015-09-20.
- */
-public class ScheduledExecutor
+public class ScheduledExecutorExp
 {
 	public static void		main(String[] args)
 	{
-		System.exit(new ScheduledExecutor().run(args));
+		System.exit(new ScheduledExecutorExp().run(args));
 	}
 
 	public int			run(String[] args)
@@ -45,9 +41,8 @@ public class ScheduledExecutor
 			throw new RuntimeException(e);
 		}
 		catch (CancellationException e) {
-			// ok
+			System.out.println("ok, done");
 		}
-		System.out.println("ok, done");
 		return 0;
 	}
 }

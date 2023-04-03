@@ -1,9 +1,5 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpserver;
 
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.test.ClientServerTester;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -23,6 +19,10 @@ import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.util.ReferenceCountUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.dryuf.netty.address.AddressSpec;
+import net.dryuf.netty.core.NettyEngine;
+import net.dryuf.netty.core.Server;
+import net.dryuf.netty.test.ClientServerTester;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class DummyHttpServerFactoryEndTest
 	{
 		AtomicInteger pending = new AtomicInteger();
 		return tester.runNettyClientLoop(
-			attempts,
+			ClientServerTester.TestConfig.builder().batchSize(attempts).build(),
 			serverAddress,
 			(future) -> new ChannelInitializer<DuplexChannel>()
 			{

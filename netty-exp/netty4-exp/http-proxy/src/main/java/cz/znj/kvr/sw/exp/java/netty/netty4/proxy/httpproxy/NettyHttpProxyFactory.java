@@ -2,11 +2,6 @@ package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy;
 
 import com.google.common.base.Ascii;
 import com.google.common.primitives.Bytes;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyFutures;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyServer;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.pipeline.FullFlowControlHandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -22,10 +17,16 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.concurrent.function.ThrowingFunction;
+import net.dryuf.netty.core.NettyEngine;
+import net.dryuf.netty.core.NettyServer;
+import net.dryuf.netty.core.Server;
+import net.dryuf.netty.pipeline.FullFlowControlHandler;
+import net.dryuf.netty.util.NettyFutures;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +42,7 @@ import java.util.regex.Pattern;
 /**
  * HTTP proxy factory.
  */
+@Singleton
 @Log4j2
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 public class NettyHttpProxyFactory implements HttpProxyFactory
@@ -127,17 +129,12 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 	CompletableFuture<SocketAddress> resolveServer(Channel client, SocketAddress unresolved)
 	{
 		return nettyEngine.resolve(unresolved)
-			.thenApply((v) -> {
-				try {
-					if (v.equals(client.localAddress())) {
-						throw new IOException("Request connecting to same proxy");
-					}
-					return v;
+			.thenApply(ThrowingFunction.sneaky(v -> {
+				if (v.equals(client.localAddress())) {
+					throw new IOException("Request connecting to same proxy");
 				}
-				catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			});
+				return v;
+			}));
 	}
 
 	static int findHeader(ByteBuf buffer, byte[] needle) {

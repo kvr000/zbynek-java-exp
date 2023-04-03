@@ -84,7 +84,7 @@
 		<javax.json.version>1.1</javax.json.version>
 		<glassfish-javax.json.version>1.1.4</glassfish-javax.json.version>
 
-		<zip4j.version>2.10.0</zip4j.version>
+		<zip4j.version>2.11.5</zip4j.version>
 
 		<testng.version>7.7.1</testng.version>
 
@@ -122,15 +122,15 @@
 
 		<dagger.version>2.41</dagger.version>
 
-		<spring.version>6.0.0</spring.version>
-		<spring-security.version>6.0.0</spring-security.version>
-		<spring-boot.version>2.7.5</spring-boot.version>
+		<spring.version>6.0.7</spring.version>
+		<spring-security.version>6.0.7</spring-security.version>
+		<spring-boot.version>3.0.5</spring-boot.version>
 
-		<netty.version>4.1.86.Final</netty.version>
+		<netty.version>4.1.90.Final</netty.version>
 
-		<aws-java-sdk.version>1.11.587</aws-java-sdk.version>
-		<aws-lambda-java-core.version>1.2.0</aws-lambda-java-core.version>
-		<aws-lambda-java-events.version>2.2.7</aws-lambda-java-events.version>
+		<aws-java-sdk.version>1.12.440</aws-java-sdk.version>
+		<aws-lambda-java-core.version>1.2.2</aws-lambda-java-core.version>
+		<aws-lambda-java-events.version>3.11.1</aws-lambda-java-events.version>
 
 		<appengine-maven-plugin.version>2.0.0</appengine-maven-plugin.version>
 
@@ -156,10 +156,10 @@
 		<ehcache.version>3.9.6</ehcache.version>
 		<redisson.version>3.18.0</redisson.version>
 
-		<dryuf-concurrent.version>1.6.1</dryuf-concurrent.version>
+		<dryuf-concurrent.version>1.7.1</dryuf-concurrent.version>
 		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
-
 		<dryuf-bigio.version>1.1.0</dryuf-bigio.version>
+		<dryuf-netty.version>0.0.2</dryuf-netty.version>
 
 		<tomcat-embed-jasper.version>9.0.14</tomcat-embed-jasper.version>
 
@@ -1090,6 +1090,11 @@
 				<groupId>net.dryuf</groupId>
 				<artifactId>dryuf-bigio</artifactId>
 				<version>${dryuf-bigio.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.dryuf</groupId>
+				<artifactId>dryuf-netty</artifactId>
+				<version>${dryuf-netty.version}</version>
 			</dependency>
 
 			<dependency>

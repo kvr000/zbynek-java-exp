@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static jdk.nashorn.internal.runtime.regexp.joni.Config.log;
-
 
 @State(value = Scope.Benchmark)
 @Fork(0)

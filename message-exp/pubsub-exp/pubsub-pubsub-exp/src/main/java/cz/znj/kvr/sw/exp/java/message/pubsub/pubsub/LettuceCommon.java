@@ -13,6 +13,7 @@ import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands;
 import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.concurrent.sync.RunSingle;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -66,31 +67,23 @@ public class LettuceCommon implements AutoCloseable
 
 	public CompletableFuture<StatefulRedisPubSubConnection<String, String>> getPubSub()
 	{
-		MutableObject<ScheduledFuture<?>> scheduled = new MutableObject<>();
-		CompletableFuture<StatefulRedisPubSubConnection<String, String>> future = new CompletableFuture<>() {
-			@Override
-			public boolean cancel(boolean interrupt)
-			{
-				scheduled.getValue().cancel(true);
-				return super.cancel(interrupt);
-			}
-		};
-		synchronized (scheduled) {
-			scheduled.setValue(getRedisClient().getResources().eventExecutorGroup().scheduleWithFixedDelay(
-				() -> {
+		CompletableFuture<StatefulRedisPubSubConnection<String, String>> future = new CompletableFuture<>();
+		RunSingle singleRun = new RunSingle();
+		getRedisClient().getResources().eventExecutorGroup().scheduleWithFixedDelay(
+			() -> {
+				if (future.isDone()) {
+					throw new RuntimeException("done");
+				}
+				singleRun.compose(() ->
 					getRedisClient().connectPubSubAsync(new StringCodec(), RedisURI.create(redisUrl))
-						.thenAccept((connection) -> {
-							future.complete(connection);
-							synchronized (scheduled) {
-								scheduled.getValue().cancel(false);
-							}
-						});
-				},
-				0,
-				1,
-				TimeUnit.SECONDS
-			));
-		}
+						.thenAccept(future::complete)
+						.toCompletableFuture()
+				);
+			},
+			0,
+			1,
+			TimeUnit.SECONDS
+		);
 		return future;
 	}
 

@@ -1,10 +1,10 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy;
 
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
 import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpserver.DummyHttpServerFactoryEndTest;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.test.ClientServerTester;
 import lombok.extern.log4j.Log4j2;
+import net.dryuf.netty.address.AddressSpec;
+import net.dryuf.netty.core.Server;
+import net.dryuf.netty.test.ClientServerTester;
 import org.testng.annotations.Test;
 
 import java.net.InetSocketAddress;

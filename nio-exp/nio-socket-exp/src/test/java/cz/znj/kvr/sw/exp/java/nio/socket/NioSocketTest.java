@@ -1,5 +1,6 @@
 package cz.znj.kvr.sw.exp.java.nio.socket;
 
+import net.dryuf.concurrent.function.ThrowingCallable;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -49,14 +50,9 @@ public class NioSocketTest
 						try {
 							Socket socket = new Socket(address.getAddress(), address.getPort());
 							CompletableFuture<byte[]> reader =
-								CompletableFuture.supplyAsync(() -> {
-									try {
-										return IOUtils.toByteArray(socket.getInputStream());
-									}
-									catch (IOException ex) {
-										throw new UncheckedIOException(ex);
-									}
-								},
+								CompletableFuture.supplyAsync(ThrowingCallable.sneakySupplier(() ->
+									IOUtils.toByteArray(socket.getInputStream())
+								),
 								executor
 							);
 							socket.getOutputStream().write(DATA);

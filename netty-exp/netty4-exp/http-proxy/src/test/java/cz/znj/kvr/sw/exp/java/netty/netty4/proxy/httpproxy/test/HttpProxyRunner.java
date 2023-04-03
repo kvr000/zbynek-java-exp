@@ -1,9 +1,9 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy.test;
 
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
 import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy.HttpProxyFactory;
 import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy.NettyHttpProxyFactory;
+import net.dryuf.netty.address.AddressSpec;
+import net.dryuf.netty.core.NettyEngine;
 
 
 /**

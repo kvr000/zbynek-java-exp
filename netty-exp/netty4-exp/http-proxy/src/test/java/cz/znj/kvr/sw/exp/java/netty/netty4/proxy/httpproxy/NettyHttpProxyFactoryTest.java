@@ -1,6 +1,5 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy;
 
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelConfig;
@@ -11,7 +10,9 @@ import io.netty.channel.socket.DuplexChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.netty.core.NettyEngine;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.MatcherAssert;
@@ -428,16 +429,12 @@ public class NettyHttpProxyFactoryTest
 	}
 
 	@SuppressWarnings("unchecked")
+	@SneakyThrows
 	private <V> ChannelFuture succeededChannelFuture()
 	{
 		ChannelFuture future = mock(ChannelFuture.class);
-		try {
-			when(future.get())
-				.thenReturn(null);
-		}
-		catch (InterruptedException|ExecutionException e) {
-			throw new RuntimeException(e);
-		}
+		when(future.get())
+			.thenReturn(null);
 		when(future.addListener(any()))
 			.thenAnswer((answer) -> {
 				((GenericFutureListener<Future<Void>>)answer.getArgument(0)).operationComplete(future);

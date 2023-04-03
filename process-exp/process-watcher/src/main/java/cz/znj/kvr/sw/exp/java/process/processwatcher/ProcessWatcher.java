@@ -11,6 +11,7 @@ import cz.znj.kvr.sw.exp.java.process.processwatcher.watcher.ProcessWatcherExecu
 import cz.znj.kvr.sw.exp.java.process.processwatcher.watcher.RuntimeProcessWatcherExecutor;
 import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Specification;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.cmdline.app.AppContext;
 import net.dryuf.cmdline.app.BeanFactory;
@@ -180,26 +181,22 @@ public class ProcessWatcher extends AbstractCommand
 		return EXIT_SUCCESS;
 	}
 
+	@SneakyThrows
 	private Specification readSpecification()
 	{
-		try {
-			Specification specification = OBJECT_MAPPER.readValue(new File(spec), Specification.class);
-			if (properties != null) {
-				try (Reader reader = Files.newBufferedReader(Paths.get(properties))) {
-					Properties propertiesFile = new Properties();
-					propertiesFile.load(reader);
-					@SuppressWarnings("unchecked")
-					Set<Map.Entry<String, String>> entries = (Set) propertiesFile.entrySet();
-					specification = specification.toBuilder()
-						.properties(ImmutableMap.copyOf(entries))
-						.build();
-				}
+		Specification specification = OBJECT_MAPPER.readValue(new File(spec), Specification.class);
+		if (properties != null) {
+			try (Reader reader = Files.newBufferedReader(Paths.get(properties))) {
+				Properties propertiesFile = new Properties();
+				propertiesFile.load(reader);
+				@SuppressWarnings("unchecked")
+				Set<Map.Entry<String, String>> entries = (Set) propertiesFile.entrySet();
+				specification = specification.toBuilder()
+					.properties(ImmutableMap.copyOf(entries))
+					.build();
 			}
-			return specification;
 		}
-		catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return specification;
 	}
 
 	public static class GuiceModule extends AbstractModule

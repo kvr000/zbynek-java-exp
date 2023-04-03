@@ -168,6 +168,10 @@
 			<groupId>net.dryuf</groupId>
 			<artifactId>dryuf-cmdline</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.dryuf</groupId>
+			<artifactId>dryuf-netty</artifactId>
+		</dependency>
 
 	</dependencies>
 

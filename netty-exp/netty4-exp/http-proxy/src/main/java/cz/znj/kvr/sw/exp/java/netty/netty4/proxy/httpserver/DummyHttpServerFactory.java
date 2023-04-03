@@ -1,9 +1,5 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpserver;
 
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyServer;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -18,8 +14,6 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpUtil;
@@ -30,7 +24,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.concurrent.FutureUtil;
-import org.apache.commons.lang3.SystemUtils;
+import net.dryuf.netty.address.AddressSpec;
+import net.dryuf.netty.core.NettyEngine;
+import net.dryuf.netty.core.NettyServer;
+import net.dryuf.netty.core.Server;
 
 import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;

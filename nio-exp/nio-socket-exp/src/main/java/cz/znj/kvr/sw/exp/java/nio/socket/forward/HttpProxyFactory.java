@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.concurrent.function.ThrowingFunction;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -260,17 +261,12 @@ public class HttpProxyFactory
 	CompletableFuture<SocketAddress> resolveServer(AsynchronousSocketChannel client, SocketAddress unresolved)
 	{
 		return portForwarder.resolve(unresolved)
-			.thenApply((v) -> {
-				try {
-					if (v.equals(client.getLocalAddress())) {
-						throw new IOException("Request connecting to same proxy");
-					}
-					return v;
+			.thenApply(ThrowingFunction.sneaky((v) -> {
+				if (v.equals(client.getLocalAddress())) {
+					throw new IOException("Request connecting to same proxy");
 				}
-				catch (IOException e) {
-					throw new UncheckedIOException(e);
-				}
-			});
+				return v;
+			}));
 	}
 
 	static int findHeader(ByteBuffer buffer, byte[] needle, int start, int end) {

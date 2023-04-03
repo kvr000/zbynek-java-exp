@@ -2,8 +2,11 @@ package cz.znj.kvr.sw.exp.java.nio.socket.forward;
 
 import com.google.common.base.Preconditions;
 import lombok.Builder;
+import lombok.SneakyThrows;
 import lombok.Value;
 import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.concurrent.function.ThrowingBiConsumer;
+import net.dryuf.concurrent.function.ThrowingFunction;
 import org.apache.commons.io.IOUtils;
 import org.newsclub.net.unix.AFUNIXServerSocket;
 import org.newsclub.net.unix.AFUNIXSocket;
@@ -33,7 +36,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -194,26 +196,21 @@ public class PortForwarder implements AutoCloseable
 	public void connect(Function<SocketAddress, CompletableFuture<SocketAddress>> resolver, SocketAddress address, Consumer<AsynchronousSocketChannel> initializer, CompletionHandler<Void, Integer> handler)
 	{
 		resolver.apply(address)
-			.thenApply(address1 -> {
+			.thenApply(ThrowingFunction.sneaky(address1 -> {
 				AsynchronousSocketChannel socket = null;
 				try {
-					try {
-						socket = AsynchronousSocketChannel.open();
-						createdChannel(socket);
-						initializer.accept(socket);
-						socket.connect(address1, 0, handler);
-						return socket;
-					}
-					catch (IOException e) {
-						throw new UncheckedIOException(e);
-					}
+					socket = AsynchronousSocketChannel.open();
+					createdChannel(socket);
+					initializer.accept(socket);
+					socket.connect(address1, 0, handler);
+					return socket;
 				}
 				catch (Throwable ex) {
 					if (socket != null)
 						closeChannel(null, socket);
 					throw ex;
 				}
-			})
+			}))
 			.whenComplete((socket, ex) -> {
 				if (ex != null) {
 					if (ex instanceof IOException) {
@@ -276,16 +273,11 @@ public class PortForwarder implements AutoCloseable
 	public CompletableFuture<Void> writeAndShutdown(AsynchronousSocketChannel socket, ByteBuffer buffer)
 	{
 		return writeFully(socket, buffer)
-			.whenComplete((v, ex) -> {
+			.whenComplete(ThrowingBiConsumer.sneaky((v, ex) -> {
 				if (ex == null) {
-					try {
-						socket.shutdownOutput();
-					}
-					catch (IOException e) {
-						throw new UncheckedIOException(e);
-					}
+					socket.shutdownOutput();
 				}
-			});
+			}));
 	}
 
 	public CompletableFuture<Void> runListener(Function<AsynchronousServerSocketChannel, CompletableFuture<Void>> initializer)
@@ -413,16 +405,12 @@ public class PortForwarder implements AutoCloseable
 		return result;
 	}
 
+	@SneakyThrows
 	private void loopListener(ServerSocket listener, ForwardConfig config)
 	{
 		for (;;) {
 			Socket server;
-			try {
-				server = listener.accept();
-			}
-			catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			server = listener.accept();
 			runConnectionForward(server, config)
 				.whenComplete(FutureUtil.whenException(Throwable::printStackTrace));
 		}

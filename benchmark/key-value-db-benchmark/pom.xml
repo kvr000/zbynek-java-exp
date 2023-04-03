@@ -15,7 +15,7 @@
 
 	<properties>
 		<mapdb.version>3.0.0</mapdb.version>
-		<chronicle-map.version>3.13.0</chronicle-map.version>
+		<chronicle-map.version>3.24ea2</chronicle-map.version>
 		<one-nio.version>1.0</one-nio.version>
 	</properties>
 

@@ -5,14 +5,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.AddressSpec;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyFutures;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.netty.NettyEngine;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.common.Server;
 import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy.HttpProxyFactory;
 import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy.NettyHttpProxyFactory;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.NettyPortForwarderFactory;
-import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.forward.PortForwarderFactory;
 import cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpserver.DummyHttpServerFactory;
 import lombok.RequiredArgsConstructor;
 import net.dryuf.cmdline.app.AppContext;
@@ -22,6 +16,12 @@ import net.dryuf.cmdline.app.guice.GuiceBeanFactory;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
+import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.netty.address.AddressSpec;
+import net.dryuf.netty.core.NettyEngine;
+import net.dryuf.netty.core.Server;
+import net.dryuf.netty.forward.NettyPortForwarderFactory;
+import net.dryuf.netty.forward.PortForwarderFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -158,7 +158,7 @@ public class ProxyRunner extends AbstractCommand
 		forwards.forEach(config -> tasks.add(portForwarderFactory.runForward(config)));
 		httpProxies.forEach(config -> tasks.add(httpProxyFactory.runProxy(config)));
 		httpServers.forEach(config -> tasks.add(dummyHttpServerFactory.runServer(config, (m, p) -> "Hello World\n")));
-		Server.waitOneAndClose(NettyFutures.nestedAllOrCancel(tasks).get()).get();
+		Server.waitOneAndClose(FutureUtil.nestedAllOrCancel(tasks).get()).get();
 		return EXIT_SUCCESS;
 	}
 

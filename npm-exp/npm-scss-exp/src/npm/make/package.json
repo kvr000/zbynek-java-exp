@@ -1,0 +1,10 @@
+{
+  "name": "npm-scss-exp",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node-sass ../../src/main/scss/ -o ../../target/static/"
+  },
+  "devDependencies": {
+    "node-sass": "^6.0.1"
+  }
+}

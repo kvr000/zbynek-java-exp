@@ -1,0 +1,68 @@
+@keyframes msg_type_blinking
+{
+	0% {
+		opacity:			1;
+	}
+	30% {
+		opacity:			0.5;
+	}
+	40% {
+		opacity:			0.25;
+	}
+	60% {
+		opacity:			1;
+	}
+}
+
+@-webkit-keyframes msg_type_blinking
+{
+	0% {
+		opacity:			1;
+	}
+	30% {
+		opacity:			0.5;
+	}
+	40% {
+		opacity:			0.25;
+	}
+	60% {
+		opacity:			1;
+	}
+}
+
+@mixin msg_type_template($background, $color)
+{
+	font-width:			bold;
+	width:				95%;
+	border:				2px solid $color;
+	background:			$background;
+	color:				$color;
+	padding:			5px;
+	animation:			msg_type_blinking 3s 16;
+	-webkit-animation:		msg_type_blinking 3s 16;
+}
+
+// fatal
+.msg_type_100
+{
+	@include msg_type_template($error_background, $error_color);
+}
+
+// error
+.msg_type_200
+{
+	@include msg_type_template($error_background, $error_color);
+}
+
+// warning
+.msg_type_300
+{
+	@include msg_type_template($warning_background, $warning_color);
+}
+
+// info
+.msg_type_400
+{
+	@include msg_type_template($info_background, $info_color);
+}
+

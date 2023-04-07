@@ -1,0 +1,33 @@
+@import "_vars/net/dryuf/_vars/_messages-generic";
+
+@import "_templates/net/dryuf/_templates/_messages";
+
+
+img
+{
+	border:			0px;
+}
+
+img.page-logo
+{
+	width:			100%;
+}
+
+a.page-links:link
+{
+	color:			#ffffff;
+}
+a.page-links:visited
+{
+	color:			#ffffff;
+}
+
+body
+{
+	/*background-color: #eff7ff;*/
+	background-color:	#afa7ff;
+	font-family:		sans-serif;
+	font-size:		80%;
+	padding:		0;
+}
+

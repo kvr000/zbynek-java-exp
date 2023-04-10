@@ -1,7 +1,7 @@
 package cz.znj.kvr.sw.exp.java.nio.socket.forward;
 
 import com.google.common.collect.ImmutableList;
-import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.base.concurrent.future.FutureUtil;
 import org.junit.Test;
 
 import java.io.IOException;

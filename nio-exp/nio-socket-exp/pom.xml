@@ -105,7 +105,7 @@
 
 		<dependency>
 			<groupId>net.dryuf</groupId>
-			<artifactId>dryuf-concurrent</artifactId>
+			<artifactId>dryuf-base</artifactId>
 		</dependency>
 
 		<!-- Netty, we use it just for testing -->

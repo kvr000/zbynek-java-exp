@@ -2,9 +2,9 @@ package cz.znj.kvr.sw.exp.java.message.pubsub.pubsub.benchmark;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.dryuf.base.concurrent.future.ScheduledUtil;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
-import net.dryuf.concurrent.SharedScheduledExecutorInstance;
 
 import javax.inject.Inject;
 import java.util.ListIterator;
@@ -59,7 +59,7 @@ public abstract class AbstractSubscribeCommand extends AbstractCommand
 	{
 		RECEIVED_COUNT_UPDATER.incrementAndGet(this);
 		if (RECEIVED_UPDATE_SCHEDULED_UPDATER.compareAndSet(this, 0, 1)) {
-			SharedScheduledExecutorInstance.getScheduledExecutorService().schedule(
+			ScheduledUtil.sharedExecutor().schedule(
 				() -> {
 					RECEIVED_UPDATE_SCHEDULED_UPDATER.set(this, 0);
 					log.info("Received messages: {}", RECEIVED_COUNT_UPDATER.get(this));

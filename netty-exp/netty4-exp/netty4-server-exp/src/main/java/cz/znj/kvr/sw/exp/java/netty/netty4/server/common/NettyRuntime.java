@@ -37,7 +37,7 @@ import io.netty.resolver.dns.DnsNameResolverBuilder;
 import io.netty.util.concurrent.Future;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.base.concurrent.future.FutureUtil;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.Closeable;
@@ -392,7 +392,7 @@ public class NettyRuntime implements Closeable
 		}
 
 		@Override
-		public Class<? extends Channel> getClientChannel(SocketAddress address)
+		public Class<? extends Channel> getStreamChannel(SocketAddress address)
 		{
 			if (address instanceof InetSocketAddress) {
 				return KQueueSocketChannel.class;

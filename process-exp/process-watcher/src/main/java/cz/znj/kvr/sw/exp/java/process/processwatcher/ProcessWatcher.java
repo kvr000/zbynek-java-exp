@@ -13,6 +13,7 @@ import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Specification;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import net.dryuf.base.concurrent.future.ScheduledUtil;
 import net.dryuf.cmdline.app.AppContext;
 import net.dryuf.cmdline.app.BeanFactory;
 import net.dryuf.cmdline.app.CommonAppContext;
@@ -20,7 +21,6 @@ import net.dryuf.cmdline.app.guice.GuiceBeanFactory;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
-import net.dryuf.concurrent.SharedScheduledExecutorInstance;
 import org.apache.commons.io.IOUtils;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
@@ -225,7 +225,7 @@ public class ProcessWatcher extends AbstractCommand
 		@Singleton
 		public ScheduledExecutorService scheduledExecutorService()
 		{
-			return SharedScheduledExecutorInstance.getScheduledExecutorService();
+			return ScheduledUtil.sharedExecutor();
 		}
 
 		@Provides

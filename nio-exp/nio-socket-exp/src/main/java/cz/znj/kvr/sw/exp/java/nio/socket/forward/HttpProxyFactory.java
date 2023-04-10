@@ -5,8 +5,8 @@ import com.google.common.primitives.Bytes;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import net.dryuf.concurrent.FutureUtil;
-import net.dryuf.concurrent.function.ThrowingFunction;
+import net.dryuf.base.concurrent.future.FutureUtil;
+import net.dryuf.base.function.ThrowingFunction;
 
 import javax.inject.Inject;
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package cz.znj.kvr.sw.exp.java.nio.socket;
 
-import net.dryuf.concurrent.function.ThrowingCallable;
+import net.dryuf.base.function.ThrowingCallable;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;

@@ -10,11 +10,10 @@ import io.lettuce.core.codec.StringCodec;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import io.lettuce.core.pubsub.api.reactive.ChannelMessage;
 import io.lettuce.core.pubsub.api.reactive.RedisPubSubReactiveCommands;
-import io.netty.util.concurrent.ScheduledFuture;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.FutureUtil;
-import net.dryuf.concurrent.sync.RunSingle;
-import org.apache.commons.lang3.mutable.MutableObject;
+import net.dryuf.base.concurrent.future.FutureUtil;
+import net.dryuf.base.concurrent.future.ScheduledUtil;
+import net.dryuf.base.concurrent.sync.RunSingle;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -27,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,24 +67,12 @@ public class LettuceCommon implements AutoCloseable
 
 	public CompletableFuture<StatefulRedisPubSubConnection<String, String>> getPubSub()
 	{
-		CompletableFuture<StatefulRedisPubSubConnection<String, String>> future = new CompletableFuture<>();
-		RunSingle singleRun = new RunSingle();
-		getRedisClient().getResources().eventExecutorGroup().scheduleWithFixedDelay(
-			() -> {
-				if (future.isDone()) {
-					throw new RuntimeException("done");
-				}
-				singleRun.compose(() ->
-					getRedisClient().connectPubSubAsync(new StringCodec(), RedisURI.create(redisUrl))
-						.thenAccept(future::complete)
-						.toCompletableFuture()
-				);
-			},
-			0,
+		return ScheduledUtil.scheduleWithFixedDelayUntilComposedSuccess(
+			getRedisClient().getResources().eventExecutorGroup(),
+			() -> getRedisClient().connectPubSubAsync(new StringCodec(), RedisURI.create(redisUrl)),
 			1,
 			TimeUnit.SECONDS
 		);
-		return future;
 	}
 
 	public Subscription createSubscription(RedisConnectionStateListener listener)

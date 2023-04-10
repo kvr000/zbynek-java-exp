@@ -7,8 +7,7 @@ import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Process;
 import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Specification;
 import lombok.Builder;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.executor.FinishingSequencingExecutor;
-import net.dryuf.concurrent.queue.SingleConsumerQueue;
+import net.dryuf.base.concurrent.executor.FinishingSequencingExecutor;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -57,14 +56,6 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 		RuntimeContext context = populateContext(specification);
 		scheduleReview(context);
 		return context;
-	}
-
-	private void queueFinisher(RuntimeContext context)
-	{
-		if (context.needReview) {
-			context.needReview = false;
-			handleReview(context);
-		}
 	}
 
 	private void needReview(RuntimeContext context)
@@ -117,10 +108,15 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 
 	private void handleReview(RuntimeContext context)
 	{
+		if (!context.needReview) {
+			return;
+		}
+		context.needReview = false;
+
 		for (ProcessState processState: context.processes.values()) {
 			switch (processState.desired) {
 			case RUNNING:
-				if (processState.taskHandle == null) {
+				if (!context.cancelling && processState.taskHandle == null) {
 					if (!processState.process.getDependencies().stream()
 						.allMatch(dependency -> Optional.ofNullable(context.processes.get(dependency))
 							.map(ProcessState::isUp)
@@ -297,7 +293,8 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 		Map<String, ProcessState> processes;
 
 		final Executor tasksExecutor = FinishingSequencingExecutor.createFromFinisher(
-				() -> queueFinisher(RuntimeContext.this));
+				() -> handleReview(RuntimeContext.this)
+		);
 
 		boolean needReview = true;
 
@@ -314,18 +311,18 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 		}
 
 		@Override
-		public CompletableFuture<Void> cancel()
+		public synchronized CompletableFuture<Void> cancel()
 		{
-			scheduleStep(this, () -> {
-				if (!cancelling) {
-					cancelling = true;
+			if (!cancelling) {
+				cancelling = true;
+				scheduleStep(this, () -> {
 					for (ProcessState state : processes.values()) {
 						if (!state.isDesiredInactive())
 							state.desired = ProcessState.Status.STOPPED;
 					}
 					needReview(this);
-				}
-			});
+				});
+			}
 			return exitFuture;
 		}
 

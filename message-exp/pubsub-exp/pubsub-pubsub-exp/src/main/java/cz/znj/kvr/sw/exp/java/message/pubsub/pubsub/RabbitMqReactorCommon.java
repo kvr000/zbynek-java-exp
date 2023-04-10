@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.rabbitmq.client.Address;
 import io.lettuce.core.RedisConnectionStateListener;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.SharedScheduledExecutorInstance;
+import net.dryuf.base.concurrent.future.ScheduledUtil;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -68,36 +68,12 @@ public class RabbitMqReactorCommon implements AutoCloseable
 
 	public CompletableFuture<Sender> getPublisher()
 	{
-		MutableObject<Future<?>> scheduled = new MutableObject<>();
-		CompletableFuture<Sender> future = new CompletableFuture<>() {
-			@Override
-			public boolean cancel(boolean interrupt)
-			{
-				scheduled.getValue().cancel(true);
-				return super.cancel(interrupt);
-			}
-		};
-		synchronized (scheduled) {
-			scheduled.setValue(SharedScheduledExecutorInstance.getScheduledExecutorService().schedule(
-				() -> {
-//					getSender().connectPubSubAsync(new StringCodec(), RedisURI.create(serverUrl))
-//						.thenAccept((connection) -> {
-//							future.complete(connection);
-//							synchronized (scheduled) {
-//								scheduled.getValue().cancel(false);
-//							}
-//						});
-					future.complete(getPoolPublisher());
-							synchronized (scheduled) {
-								scheduled.getValue().cancel(false);
-							}
-				},
-				0,
-				1,
-				TimeUnit.SECONDS
-			));
-		}
-		return future;
+		return ScheduledUtil.scheduleWithFixedDelayUntilSuccess(
+			ScheduledUtil.sharedExecutor(), // TODO: should use blocking executor
+			this::getPoolPublisher,
+			0,
+			TimeUnit.SECONDS
+		);
 	}
 
 	public synchronized Receiver getPoolReceiver()

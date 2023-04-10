@@ -11,7 +11,7 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.base.concurrent.future.FutureUtil;
 import net.dryuf.netty.core.NettyEngine;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

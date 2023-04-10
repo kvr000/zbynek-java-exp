@@ -156,10 +156,10 @@
 		<ehcache.version>3.9.6</ehcache.version>
 		<redisson.version>3.18.0</redisson.version>
 
-		<dryuf-concurrent.version>1.7.1</dryuf-concurrent.version>
+		<dryuf-base.version>1.7.3</dryuf-base.version>
 		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
 		<dryuf-bigio.version>1.1.0</dryuf-bigio.version>
-		<dryuf-netty.version>0.0.2</dryuf-netty.version>
+		<dryuf-netty.version>1.0.0</dryuf-netty.version>
 
 		<tomcat-embed-jasper.version>9.0.14</tomcat-embed-jasper.version>
 
@@ -1078,8 +1078,8 @@
 			<!-- dryuf -->
 			<dependency>
 				<groupId>net.dryuf</groupId>
-				<artifactId>dryuf-concurrent</artifactId>
-				<version>${dryuf-concurrent.version}</version>
+				<artifactId>dryuf-base</artifactId>
+				<version>${dryuf-base.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.dryuf</groupId>

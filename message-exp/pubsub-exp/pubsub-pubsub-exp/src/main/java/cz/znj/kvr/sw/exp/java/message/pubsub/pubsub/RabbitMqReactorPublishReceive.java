@@ -3,7 +3,7 @@ package cz.znj.kvr.sw.exp.java.message.pubsub.pubsub;
 import io.lettuce.core.RedisChannelHandler;
 import io.lettuce.core.RedisConnectionStateAdapter;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.SharedScheduledExecutorInstance;
+import net.dryuf.base.concurrent.future.ScheduledUtil;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.io.BufferedReader;
@@ -179,7 +179,7 @@ public class RabbitMqReactorPublishReceive
 				},
 				() -> {
 					Optional.ofNullable(publisherRef.getValue()).ifPresent(p -> p.publish("Channel-read", "Welcome Message"));
-					SharedScheduledExecutorInstance.getScheduledExecutorService().schedule(() ->
+					ScheduledUtil.sharedExecutor().schedule(() ->
 							Optional.ofNullable(publisherRef.getValue()).ifPresent(p -> p.publish("Channel-read", "Delayed Message")),
 						1,
 						TimeUnit.SECONDS

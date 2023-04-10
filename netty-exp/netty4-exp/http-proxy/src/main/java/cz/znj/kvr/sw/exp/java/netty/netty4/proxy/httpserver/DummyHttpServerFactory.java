@@ -23,7 +23,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.base.concurrent.future.FutureUtil;
 import net.dryuf.netty.address.AddressSpec;
 import net.dryuf.netty.core.NettyEngine;
 import net.dryuf.netty.core.NettyServer;

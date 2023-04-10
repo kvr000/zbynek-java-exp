@@ -1,6 +1,6 @@
 package cz.znj.kvr.sw.exp.java.nio.socket.test;
 
-import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.base.concurrent.future.FutureUtil;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;

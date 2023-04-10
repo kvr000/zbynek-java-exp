@@ -2,9 +2,9 @@ package cz.znj.kvr.sw.exp.java.message.pubsub.pubsub.benchmark;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.executor.ClosingExecutor;
-import net.dryuf.concurrent.executor.SingleWorkExecutor;
-import net.dryuf.concurrent.executor.WorkExecutor;
+import net.dryuf.base.concurrent.executor.ClosingExecutor;
+import net.dryuf.base.concurrent.executor.SingleWorkExecutor;
+import net.dryuf.base.concurrent.executor.WorkExecutor;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPubSub;

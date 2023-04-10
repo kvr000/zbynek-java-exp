@@ -162,7 +162,7 @@
 
 		<dependency>
 			<groupId>net.dryuf</groupId>
-			<artifactId>dryuf-concurrent</artifactId>
+			<artifactId>dryuf-base</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.dryuf</groupId>

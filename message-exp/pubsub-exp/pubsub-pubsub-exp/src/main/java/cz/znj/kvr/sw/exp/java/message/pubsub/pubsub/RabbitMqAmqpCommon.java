@@ -8,7 +8,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import io.lettuce.core.RedisConnectionStateListener;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.SharedScheduledExecutorInstance;
+import net.dryuf.base.concurrent.future.ScheduledUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -85,7 +85,7 @@ public class RabbitMqAmqpCommon implements AutoCloseable
 			}
 		};
 		synchronized (scheduled) {
-			scheduled.setValue(SharedScheduledExecutorInstance.getScheduledExecutorService().schedule(
+			scheduled.setValue(ScheduledUtil.sharedExecutor().schedule(
 				() -> {
 					try {
 						future.complete(getFactory().newConnection());
@@ -95,7 +95,6 @@ public class RabbitMqAmqpCommon implements AutoCloseable
 					}
 				},
 				0,
-				1,
 				TimeUnit.SECONDS
 			));
 		}

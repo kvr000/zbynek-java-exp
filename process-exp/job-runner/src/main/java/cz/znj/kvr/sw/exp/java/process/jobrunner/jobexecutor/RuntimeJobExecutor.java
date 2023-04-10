@@ -9,7 +9,7 @@ import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.Specification;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.dryuf.concurrent.executor.FinishingSequencingExecutor;
+import net.dryuf.base.concurrent.executor.FinishingSequencingExecutor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import javax.inject.Inject;

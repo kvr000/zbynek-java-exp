@@ -1,6 +1,7 @@
 package cz.znj.kvr.sw.exp.java.concurrencyexp.primitives.future;
 
-import net.dryuf.concurrent.function.ThrowingBiFunction;
+import net.dryuf.base.concurrent.future.FutureUtil;
+import net.dryuf.base.function.ThrowingBiFunction;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -33,8 +34,6 @@ public class CompletableFutureTest
 				.handle(ThrowingBiFunction.sneaky((v, ex) -> {
 					throw new IOException();
 				}));
-		ExecutionException ex = expectThrows(ExecutionException.class, future::get);
-
-		assertThat(ex.getCause(), instanceOf(IOException.class));
+		expectThrows(IOException.class, () -> FutureUtil.sneakyGet(future));
 	}
 }

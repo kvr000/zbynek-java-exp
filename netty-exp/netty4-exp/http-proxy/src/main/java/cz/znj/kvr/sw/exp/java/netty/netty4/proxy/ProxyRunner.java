@@ -16,7 +16,7 @@ import net.dryuf.cmdline.app.guice.GuiceBeanFactory;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
-import net.dryuf.concurrent.FutureUtil;
+import net.dryuf.base.concurrent.future.FutureUtil;
 import net.dryuf.netty.address.AddressSpec;
 import net.dryuf.netty.core.NettyEngine;
 import net.dryuf.netty.core.Server;

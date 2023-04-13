@@ -471,13 +471,8 @@ public class NettyHttpProxyFactory implements HttpProxyFactory
 		}
 	}
 
-	@RequiredArgsConstructor
-	private static class ContinuousByteBuf
+	private record ContinuousByteBuf(ByteBuf content, ByteBuf source)
 	{
-		private final ByteBuf content;
-
-		private final ByteBuf source;
-
 		public int get(int position)
 		{
 			while (position >= content.writerIndex()) {

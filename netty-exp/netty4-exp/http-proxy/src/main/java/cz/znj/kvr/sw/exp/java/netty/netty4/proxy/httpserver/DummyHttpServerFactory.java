@@ -6,7 +6,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ServerChannel;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.kqueue.AbstractKQueueStreamChannel;
 import io.netty.channel.socket.DuplexChannel;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -24,16 +23,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.base.concurrent.future.FutureUtil;
+import net.dryuf.base.function.ThrowingBiFunction;
+import net.dryuf.base.function.delegate.TypeDelegatingTriFunction3;
 import net.dryuf.netty.address.AddressSpec;
 import net.dryuf.netty.core.NettyEngine;
 import net.dryuf.netty.core.NettyServer;
 import net.dryuf.netty.core.Server;
+import net.dryuf.netty.pipeline.TypeDistributingInboundHandler;
 
 import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 
 
 @Log4j2
@@ -42,7 +43,7 @@ public class DummyHttpServerFactory
 {
 	private final NettyEngine nettyEngine;
 
-	public CompletableFuture<Server> runServer(Config config, BiFunction<String, String, String> requestHandler)
+	public CompletableFuture<Server> runServer(Config config, ThrowingBiFunction<String, String, String, Exception> requestHandler)
 	{
 		try {
 			return new CompletableFuture<Server>() {
@@ -85,7 +86,7 @@ public class DummyHttpServerFactory
 		}
 	}
 
-	private CompletableFuture<Void> runServer(Channel client, BiFunction<String, String, String> requestHandler)
+	private CompletableFuture<Void> runServer(Channel client, ThrowingBiFunction<String, String, String, Exception> requestHandler)
 	{
 		return new CompletableFuture<Void>() {
 			{
@@ -110,49 +111,63 @@ public class DummyHttpServerFactory
 		AddressSpec listenAddress;
 	}
 
-	@RequiredArgsConstructor
-	private class RequestHandler extends SimpleChannelInboundHandler<HttpObject>
+	private class RequestHandler extends TypeDistributingInboundHandler<RequestHandler, HttpObject, Exception>
 	{
+		public static final TypeDelegatingTriFunction3<RequestHandler, ChannelHandlerContext, HttpObject, Void, Exception> READ_DISTRIBUTION =
+			TypeDelegatingTriFunction3.<RequestHandler, ChannelHandlerContext, HttpObject, Void, Exception>callbacksBuilder()
+				.add(HttpRequest.class, RequestHandler::channelReadRequest)
+				.add(LastHttpContent.class, RequestHandler::channelReadLastContent)
+				.add(HttpObject.class, (a, b, c) -> null)
+				.build();
+
 		private final CompletableFuture<Void> connectionFuture;
 
-		private final BiFunction<String, String, String> requestHandler;
+		private final ThrowingBiFunction<String, String, String, Exception> requestHandler;
 
 		HttpRequest request;
 
-		@Override
-		public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception
+		public RequestHandler(CompletableFuture<Void> connectionFuture, ThrowingBiFunction<String, String, String, Exception> requestHandler)
 		{
-			if (msg instanceof HttpRequest) {
-				this.request = (HttpRequest) msg;
-				ctx.read();
+			super(READ_DISTRIBUTION);
+			this.connectionFuture = connectionFuture;
+			this.requestHandler = requestHandler;
+		}
+
+		private Void channelReadRequest(ChannelHandlerContext ctx, HttpRequest msg)
+		{
+			this.request = msg;
+			ctx.read();
+			return null;
+		}
+
+		private Void channelReadLastContent(ChannelHandlerContext ctx, LastHttpContent msg)
+		{
+			String result;
+			try {
+				result = requestHandler.apply(request.method().toString(), request.uri());
 			}
-			else if (msg instanceof LastHttpContent) {
-				String result;
-				try {
-					result = requestHandler.apply(request.method().toString(), request.uri());
-				}
-				catch (Exception ex) {
-					writeResponse(ctx, new DefaultFullHttpResponse(
-						HttpVersion.HTTP_1_1,
-						HttpResponseStatus.INTERNAL_SERVER_ERROR,
-						Unpooled.wrappedBuffer(ex.toString().getBytes(StandardCharsets.UTF_8))
-					));
-					return;
-				}
-				if (result == null) {
-					writeResponse(ctx, new DefaultFullHttpResponse(
-						HttpVersion.HTTP_1_1,
-						HttpResponseStatus.NOT_FOUND
-					));
-				}
-				else {
-					writeResponse(ctx, new DefaultFullHttpResponse(
-						HttpVersion.HTTP_1_1,
-						HttpResponseStatus.OK,
-						Unpooled.wrappedBuffer(result.getBytes(StandardCharsets.UTF_8))
-					));
-				}
+			catch (Exception ex) {
+				writeResponse(ctx, new DefaultFullHttpResponse(
+					HttpVersion.HTTP_1_1,
+					HttpResponseStatus.INTERNAL_SERVER_ERROR,
+					Unpooled.wrappedBuffer(ex.toString().getBytes(StandardCharsets.UTF_8))
+				));
+				return null;
 			}
+			if (result == null) {
+				writeResponse(ctx, new DefaultFullHttpResponse(
+					HttpVersion.HTTP_1_1,
+					HttpResponseStatus.NOT_FOUND
+				));
+			}
+			else {
+				writeResponse(ctx, new DefaultFullHttpResponse(
+					HttpVersion.HTTP_1_1,
+					HttpResponseStatus.OK,
+					Unpooled.wrappedBuffer(result.getBytes(StandardCharsets.UTF_8))
+				));
+			}
+			return null;
 		}
 
 		public void channelActive(ChannelHandlerContext ctx) throws Exception {

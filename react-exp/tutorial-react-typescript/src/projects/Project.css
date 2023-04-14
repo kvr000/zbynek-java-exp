@@ -1,0 +1,8 @@
+ul.row {
+    display: block;
+}
+
+ul.row li {
+    float: left;
+    clear: left;
+}

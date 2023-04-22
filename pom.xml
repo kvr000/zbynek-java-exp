@@ -156,9 +156,9 @@
 		<ehcache.version>3.9.6</ehcache.version>
 		<redisson.version>3.18.0</redisson.version>
 
-		<dryuf-base.version>1.7.3</dryuf-base.version>
+		<dryuf-base.version>1.7.4</dryuf-base.version>
 		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
-		<dryuf-bigio.version>1.1.0</dryuf-bigio.version>
+		<dryuf-bigio.version>1.1.1</dryuf-bigio.version>
 		<dryuf-netty.version>1.0.1</dryuf-netty.version>
 
 		<tomcat-embed-jasper.version>9.0.14</tomcat-embed-jasper.version>

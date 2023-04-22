@@ -8,6 +8,19 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
+Install:
+
+```
+sudo npm install -g node-sass
+sudo npm install -g serve
+```
+
+Initialize (after reset):
+
+```
+yarn add react-app-polyfill
+```
+
 In the project directory, you can run:
 
 ### `yarn start`

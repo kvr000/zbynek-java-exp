@@ -24,30 +24,24 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service</groupId>
-	<artifactId>jaxrs-micro-exp-service-parent</artifactId>
+	<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc</groupId>
+	<artifactId>jaxrs-micro-exp-service-mvc-parent</artifactId>
 	<version>0.0.1</version>
 	<packaging>pom</packaging>
-	<name>jaxrs-micro-exp-processor-parent</name>
+	<name>jaxrs-micro-exp-service-mvc-parent</name>
 	<description>
-		JaxRs micro processor projects
+		JaxRs micro service mvc binding projects
 	</description>
 
 	<parent>
-		<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro</groupId>
-		<artifactId>jaxrs-micro-exp-base</artifactId>
+		<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service</groupId>
+		<artifactId>jaxrs-micro-exp-service-parent</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<modules>
-		<module>jaxrs-micro-exp-service</module>
-		<module>jaxrs-micro-exp-service/jaxrs-micro-exp-service-benchmark</module>
-		<module>jaxrs-micro-exp-service-mvc</module>
-		<module>binding-server</module>
-		<module>binding-serialization</module>
-		<module>binding-mvc</module>
-		<module>test-server</module>
+		<module>jaxrs-micro-exp-service-mvc-thymeleaf</module>
 	</modules>
 
 	<build>

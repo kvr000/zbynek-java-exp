@@ -9,6 +9,7 @@ import net.dryuf.bigio.compare.FilenameVersionComparators;
 
 import javax.ws.rs.core.Link;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
@@ -17,23 +18,30 @@ import java.util.Map;
 @Accessors(fluent = true)
 @RequiredArgsConstructor
 @Value
-public class CompositeViewResult implements ViewResult
+public class CompositeWidget implements Widget
 {
 	int status;
 
 	boolean isFinal;
 
+	long size;
+
 	Map<String, Object> metadata;
 
 	Map<String, Link> links;
 
-	InputStream content;
+	Reader content;
 
-	public static CompositeViewResult compose(ViewResult main, List<Map<String, Object>> metadata, List<Map<String, Link>> links, InputStream content)
+	public static CompositeWidget compose(
+		Widget main,
+		List<Map<String, Object>> metadata,
+		List<Map<String, Link>> links,
+		Reader content)
 	{
-		return new CompositeViewResult(
+		return new CompositeWidget(
 			main.status(),
 			main.isFinal(),
+			main.size(),
 			metadata.stream().flatMap(map -> map.entrySet().stream())
 				.collect(ImmutableMap.toImmutableMap(
 					Map.Entry::getKey,

@@ -5,20 +5,23 @@ import lombok.experimental.Accessors;
 
 import javax.ws.rs.core.Link;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Map;
 
 
 @Getter
 @Accessors(fluent = true)
-public class AbstractViewResult implements ViewResult
+public class AbstractWidget implements Widget
 {
 	int status;
 
 	boolean isFinal;
 
+	long size;
+
 	Map<String, Object> metadata;
 
 	Map<String, Link> links;
 
-	InputStream content;
+	Reader content;
 }

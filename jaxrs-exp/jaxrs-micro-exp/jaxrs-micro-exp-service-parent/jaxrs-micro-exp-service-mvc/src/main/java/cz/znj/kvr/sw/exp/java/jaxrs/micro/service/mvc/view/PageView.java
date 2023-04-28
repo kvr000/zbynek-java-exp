@@ -1,10 +1,21 @@
 package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
+import net.dryuf.base.util.LocaleContext;
 
-public class PageView<T> extends ModelView<T>
+import java.util.Map;
+
+
+@Getter
+@Accessors(fluent = true)
+@RequiredArgsConstructor
+public class PageView implements ModelView
 {
-	public PageView(String name, T model)
-	{
-		super(name, model);
-	}
+	private final String name;
+
+	private final LocaleContext localeContext;
+
+	private final Map<String, Object> model;
 }

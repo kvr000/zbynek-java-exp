@@ -24,21 +24,24 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc</groupId>
-	<artifactId>jaxrs-micro-exp-service-mvc</artifactId>
+	<artifactId>jaxrs-micro-exp-service-mvc-thymeleaf</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
-	<name>jaxrs-micro-exp-service-mvc</name>
+	<name>jaxrs-micro-exp-service-mvc-thymeleaf</name>
 	<description>
-		JaxRs micro service MVC support
+		JaxRs micro service, Thymeleaf binding
 	</description>
 
 	<parent>
-		<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service</groupId>
-		<artifactId>jaxrs-micro-exp-service-parent</artifactId>
+		<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc</groupId>
+		<artifactId>jaxrs-micro-exp-service-mvc-parent</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
+
+	<properties>
+		<thymeleaf.version>3.1.1.RELEASE</thymeleaf.version>
+	</properties>
 
 	<build>
 		<plugins>
@@ -55,27 +58,6 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.maven</groupId>
-				<artifactId>jaxrs-micro-exp-maven-plugin</artifactId>
-				<version>0.0.1</version>
-				<executions>
-					<execution>
-						<phase>process-test-classes</phase>
-						<goals>
-							<goal>capture-jaxrs</goal>
-						</goals>
-						<configuration>
-							<useTestClasspath>true</useTestClasspath>
-							<packageRoots>
-								<packageRoot>cz.znj.kvr.sw.exp.java.jaxrs.micro.service.test</packageRoot>
-							</packageRoots>
-							<output>${project.build.directory}/test-classes/cz/znj/kvr/sw/exp/java/jaxrs/micro/processor/test/JaxRsMetadata.xml</output>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 
@@ -87,26 +69,18 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.inject</groupId>
-			<artifactId>javax.inject</artifactId>
-			<version>${javax.inject.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
-			<version>${javax.servlet-api.version}</version>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.core/jersey-common -->
+
 		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-common</artifactId>
-			<version>2.29.1</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
 		</dependency>
 
 		<dependency>
@@ -117,28 +91,6 @@
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-matchers</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-assertj</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.xmlunit</groupId>
-			<artifactId>xmlunit-placeholders</artifactId>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -147,24 +99,25 @@
 		</dependency>
 
 		<dependency>
-			<groupId>net.dryuf</groupId>
-			<artifactId>dryuf-base</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>net.dryuf</groupId>
-			<artifactId>dryuf-bigio</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glassfish.jersey.ext</groupId>
-			<artifactId>jersey-mvc</artifactId>
-			<version>${jersey-mvc.version}</version>
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<version>${thymeleaf.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service</groupId>
 			<artifactId>jaxrs-micro-exp-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc</groupId>
+			<artifactId>jaxrs-micro-exp-service-mvc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

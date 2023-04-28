@@ -63,6 +63,31 @@ public class JaxRsPathResolverLoaderBenchmark
 		}
 	}
 
+	@Benchmark()
+	public void benchmarkLoad1000() throws IOException
+	{
+		try (
+			InputStream stream = Objects.requireNonNull(
+				JaxRsPathResolver.class.getResourceAsStream("/cz/znj/kvr/sw/exp/java" +
+					"/jaxrs/micro/processor/benchmark/main/controller" +
+					"/JaxRsMetadata-1000.xml"),
+				() -> "Cannot open resource by class: /cz/znj/kvr/sw/exp/java/jaxrs/micro/controller/benchmark/main/controller/JaxRsMetadata.xml");
+			JaxRsCaptureReader reader = new JaxRsCaptureReaderImpl(stream)
+		) {
+			JaxRsPathResolver.Builder<Object, Handler> builder = new JaxRsPathResolver.Builder<>();
+			ControllerMeta controller;
+			while ((controller = reader.next()) != null) {
+				for (MethodMeta method: controller.getMethods()) {
+					builder.registerPath(builder.concatPaths(controller.getPath(), method.getPath()), new Handler());
+				}
+			}
+			builder.build();
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private static class Handler implements Predicate<Object>
 	{
 		@Override

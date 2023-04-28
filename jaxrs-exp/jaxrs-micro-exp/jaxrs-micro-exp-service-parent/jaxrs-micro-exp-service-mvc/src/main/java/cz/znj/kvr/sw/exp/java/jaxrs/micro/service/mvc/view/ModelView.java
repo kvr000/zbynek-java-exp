@@ -2,13 +2,18 @@ package cz.znj.kvr.sw.exp.java.jaxrs.micro.service.mvc.view;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.dryuf.base.util.LocaleContext;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 
-@Getter
-@AllArgsConstructor
-public abstract class ModelView<T> implements View
+public interface ModelView
 {
-	private final String name;
+	String name();
 
-	private final T model;
+	LocaleContext localeContext();
+
+	Map<String, Object> model();
 }

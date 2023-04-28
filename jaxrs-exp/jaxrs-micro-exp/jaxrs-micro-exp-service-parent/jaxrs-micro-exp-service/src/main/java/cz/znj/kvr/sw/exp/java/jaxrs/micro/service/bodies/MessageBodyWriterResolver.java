@@ -48,7 +48,7 @@ public class MessageBodyWriterResolver
 	{
 		private final Class<?> clazz;
 		private final Type genericType;
-		private final Annotation annotations[];
+		private final Annotation[] annotations;
 		private final MediaType mediaType;
 	}
 }

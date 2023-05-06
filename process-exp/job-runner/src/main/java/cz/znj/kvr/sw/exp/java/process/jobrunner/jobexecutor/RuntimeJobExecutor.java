@@ -53,7 +53,7 @@ public class RuntimeJobExecutor implements JobExecutor
 			@SuppressWarnings("unused") // debugging
 			private final Context context = context1;
 		};
-		scheduleDoNext(context1);
+		context1.taskExecutor.execute(() -> {});
 		return context1.result;
 	}
 
@@ -137,12 +137,6 @@ public class RuntimeJobExecutor implements JobExecutor
 		taskState.exitCode = exitCode;
 		log.debug("Finishing: {}", taskState.id);
 		context.taskExecutor.execute(() -> doFinished(context, taskState));
-	}
-
-	private void scheduleDoNext(Context context)
-	{
-		log.trace("Scheduling doNext");
-		CompletableFuture.runAsync(() -> doReview(context));
 	}
 
 	private Collection<TaskState> allocateMachine(Context context, Map.Entry<String, JobTask> taskEntry)

@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "serverless-dependson-plugin": "^1.1.2",
+    "serverless-python-requirements": "^6.0.0",
+    "serverless-vpc-plugin": "^1.0.6"
+  }
+}

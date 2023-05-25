@@ -128,7 +128,7 @@
 
 		<netty.version>4.1.90.Final</netty.version>
 
-		<aws-java-sdk.version>1.12.440</aws-java-sdk.version>
+		<aws-java-sdk.version>1.12.472</aws-java-sdk.version>
 		<aws-lambda-java-core.version>1.2.2</aws-lambda-java-core.version>
 		<aws-lambda-java-events.version>3.11.1</aws-lambda-java-events.version>
 
@@ -156,7 +156,7 @@
 		<ehcache.version>3.9.6</ehcache.version>
 		<redisson.version>3.18.0</redisson.version>
 
-		<dryuf-base.version>1.7.4</dryuf-base.version>
+		<dryuf-base.version>1.8.0</dryuf-base.version>
 		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
 		<dryuf-bigio.version>1.1.1</dryuf-bigio.version>
 		<dryuf-netty.version>1.0.1</dryuf-netty.version>

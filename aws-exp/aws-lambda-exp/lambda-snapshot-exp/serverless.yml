@@ -1,0 +1,22 @@
+service: zbynek-lambda-snapstart-exp
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: java17
+  region: us-west-2
+  memorySize: 256
+  timeout: 30
+
+package:
+  artifact: target/zbynek-lambda-snapstart.jar
+
+functions:
+  currentTime:
+    handler: com.github.kvr000.aws.lambda.snapstart.Handler
+    events:
+      - httpApi:
+          path: /time
+          method: get
+    snapStart: true
+

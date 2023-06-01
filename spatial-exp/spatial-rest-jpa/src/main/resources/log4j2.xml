@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="WARN">
+	<appenders>
+		<console name="Console" target="SYSTEM_OUT">
+			<patternLayout pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSS}{UTC} [%-16t] %-5level [%logger{36}] - %msg%n"/>
+		</console>
+	</appenders>
+	<loggers>
+		<logger name="com.github.kvr000.exp.java.spatial.restjpa" level="INFO" />
+
+		<root level="INFO">
+			<appenderRef ref="Console" />
+		</root>
+	</loggers>
+</configuration>

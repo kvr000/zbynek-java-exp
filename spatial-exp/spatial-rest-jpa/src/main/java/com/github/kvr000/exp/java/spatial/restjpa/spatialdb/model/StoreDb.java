@@ -1,5 +1,6 @@
 package com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model;
 
+import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,13 +11,11 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Data;
 
-import org.locationtech.jts.geom.Point;
-
 
 @Entity
-@Table(name = "Place", indexes = @Index(name = "idx_Place_location", columnList = "location", unique = false))
+@Table(name = "Store", indexes = @Index(name = "idx_Store_location", columnList = "location", unique = false))
 @Data
-public class PlaceDb
+public class StoreDb
 {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,5 +27,5 @@ public class PlaceDb
 	private String name;
 
 	@Column(columnDefinition = "geometry(POINT, 4326)")
-	private Point location;
+	private GeoLocation location;
 }

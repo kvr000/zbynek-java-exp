@@ -38,7 +38,7 @@ public class PlaceController
 		@RequestParam(required = false) Double lat)
 	{
 		if ((lon == null) != (lat == null)) {
-			throw new BadRequestException("Both lng and lat query parameters must be specified or neither");
+			throw new BadRequestException("Both lon and lat query parameters must be specified or neither");
 		}
 		List<PlaceDb> result;
 		if (lon != null && lat != null) {

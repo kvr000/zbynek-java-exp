@@ -12,7 +12,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Data;
 import org.hibernate.annotations.Type;
-import org.locationtech.jts.geom.Point;
 
 
 @Entity

@@ -11,6 +11,9 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 
 
+/**
+ * Geo location representation in 4326 coordination system.
+ */
 @Value
 @Builder(builderClassName = "Builder")
 @JsonDeserialize(builder = GeoLocation.Builder.class)

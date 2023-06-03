@@ -3,15 +3,11 @@ package com.github.kvr000.exp.java.spatial.restjpa.jpa;
 import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserTypeSupport;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKBReader;
 import org.locationtech.jts.io.WKBWriter;
-import org.postgresql.geometric.PGpoint;
 import org.postgresql.util.PGobject;
 
 import java.sql.PreparedStatement;

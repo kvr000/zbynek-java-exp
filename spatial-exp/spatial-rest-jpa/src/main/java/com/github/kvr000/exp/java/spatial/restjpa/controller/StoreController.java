@@ -1,9 +1,11 @@
 package com.github.kvr000.exp.java.spatial.restjpa.controller;
 
 import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
+import com.github.kvr000.exp.java.spatial.restjpa.model.Store;
 import com.github.kvr000.exp.java.spatial.restjpa.model.Target;
+import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.StoreDb;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.TargetDb;
-import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.repository.TargetRepository;
+import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.repository.StoreRepository;
 import com.google.common.base.Preconditions;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
@@ -26,52 +28,54 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/target")
-public class TargetController
+@RequestMapping("/store")
+public class StoreController
 {
 	@Inject
-	private TargetRepository targetRepository;
+	private StoreRepository storeRepository;
 
 	@GetMapping("/")
-	public @ResponseBody Iterable<Target> listPlaces(
+	public @ResponseBody Iterable<Store> listPlaces(
 		@RequestParam(required = false) Double lon,
 		@RequestParam(required = false) Double lat)
 	{
 		if ((lon == null) != (lat == null)) {
 			throw new BadRequestException("Both lon and lat query parameters must be specified or neither");
 		}
-		List<TargetDb> result;
+		List<StoreDb> result;
 		if (lon != null && lat != null) {
-			result = targetRepository.listByDistance(GeoLocation.ofLonLat(lon, lat), 1000);
+			result = storeRepository.listByDistance(GeoLocation.ofLonLat(lon, lat), 1000);
 		}
 		else {
-			result = targetRepository.findAll();
+			result = storeRepository.findAll();
 		}
 		return result.stream()
-			.map(Target::fromDb)
+			.map(Store::fromDb)
 			.collect(Collectors.toList());
 	}
 
 	@PostMapping("/")
-	public @ResponseBody Target createPlace(@RequestBody Target target)
+	public @ResponseBody Store createPlace(@RequestBody Store store)
 	{
 		try {
-			Preconditions.checkArgument(target.getId() == null, "id must not be provided");
-			Preconditions.checkArgument(target.getVersion() == null, "version must not be provided");
-			Preconditions.checkNotNull(target.getName(), "name must be provided");
-			Preconditions.checkNotNull(target.getLocation(), "location must be provided");
-			Preconditions.checkArgument(target.getVersion() == null, "version must not be provided");
+			Preconditions.checkArgument(store.getId() == null, "id must not be provided");
+			Preconditions.checkArgument(store.getVersion() == null, "version must not be provided");
+			Preconditions.checkNotNull(store.getName(), "name must be provided");
+			Preconditions.checkNotNull(store.getLocation(), "location must be provided");
+			Preconditions.checkArgument(store.getVersion() == null, "version must not be provided");
 		}
 		catch (IllegalArgumentException|NullPointerException ex) {
 			throw new BadRequestException(ex.getMessage());
 		}
 
-		return Target.fromDb(targetRepository.save(target.toDb()));
+		StoreDb storeDb = store.toDb();
+		storeDb.setVersion(1L);
+		return Store.fromDb(storeRepository.save(storeDb));
 	}
 
 	@Transactional("spatialdb-TransactionManager")
 	@PutMapping("/{id}")
-	public @ResponseBody Target updatePlace(@PathVariable("id") long id, @RequestBody Target target)
+	public @ResponseBody Store updatePlace(@PathVariable("id") long id, @RequestBody Store target)
 	{
 		try {
 			Preconditions.checkArgument(target.getId() == null || target.getId() == id, "id must not be provided or must match the id from URL");
@@ -83,25 +87,25 @@ public class TargetController
 			throw new BadRequestException(ex.getMessage());
 		}
 
-		TargetDb placeDb = targetRepository.updateAndFlush(id, (targetDb0) -> {
-			if (!Objects.equals(targetDb0.getVersion(), target.getVersion())) {
+		StoreDb storeDb = storeRepository.updateAndFlush(id, (storeDb0) -> {
+			if (!Objects.equals(storeDb0.getVersion(), target.getVersion())) {
 				throw new BadRequestException("version does not match");
 			}
-			targetDb0.setName(target.getName());
-			targetDb0.setLocation(target.getLocation());
+			storeDb0.setName(target.getName());
+			storeDb0.setLocation(target.getLocation());
 		});
-		if (placeDb == null) {
+		if (storeDb == null) {
 			throw new NotFoundException();
 		}
 
-		return Target.fromDb(placeDb);
+		return Store.fromDb(storeDb);
 	}
 
 	@DeleteMapping("/{id}")
 	public void deletePlace(@PathVariable("id") long id)
 	{
-		TargetDb placeDb = targetRepository.findById(id).orElseThrow(NotFoundException::new);
+		StoreDb placeDb = storeRepository.findById(id).orElseThrow(NotFoundException::new);
 
-		targetRepository.deleteById(placeDb.getId());
+		storeRepository.deleteById(placeDb.getId());
 	}
 }

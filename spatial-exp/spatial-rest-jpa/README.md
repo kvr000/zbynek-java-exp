@@ -58,3 +58,12 @@ public class StoreDb
 `GeoLocation` is user defined type containing `lon` and `lat` fields.  This class is automatically converted to and
 from database String containing geometry(point) type dump, based on `GeoLocationTypeContributor` registered as 
 META-INF service.
+
+
+## Performance
+
+```shell
+sudo apt -y install siege
+
+siege -c `getconf _NPROCESSORS_ONLN` -t 10s "http://localhost:8080/"
+```

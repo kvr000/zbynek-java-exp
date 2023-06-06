@@ -1,6 +1,5 @@
 package com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model;
 
-import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +9,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import lombok.Data;
+import net.dryuf.geo.model.GeoLocation;
 
 
 @Entity

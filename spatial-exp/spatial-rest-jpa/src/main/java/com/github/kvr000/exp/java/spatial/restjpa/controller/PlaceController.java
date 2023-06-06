@@ -1,12 +1,12 @@
 package com.github.kvr000.exp.java.spatial.restjpa.controller;
 
-import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
 import com.github.kvr000.exp.java.spatial.restjpa.model.Place;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.PlaceDb;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.repository.PlaceRepository;
 import com.google.common.base.Preconditions;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import net.dryuf.geo.model.GeoLocation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +42,8 @@ public class PlaceController
 		}
 		List<PlaceDb> result;
 		if (lon != null && lat != null) {
-			result = placeRepository.listByDistance(GeoLocation.ofLonLat(lon, lat).toPoint(), 1000);
+			result =
+				placeRepository.listByDistance(GeoLocation.toJtsPoint(GeoLocation.ofLonLat(lon, lat)), 1000);
 		}
 		else {
 			result = placeRepository.findAll();
@@ -88,7 +89,7 @@ public class PlaceController
 				throw new BadRequestException("version does not match");
 			}
 			placeDb0.setName(place.getName());
-			placeDb0.setLocation(place.getLocation().toPoint());
+			placeDb0.setLocation(GeoLocation.toJtsPoint(place.getLocation()));
 		});
 		if (placeDb == null) {
 			throw new NotFoundException();

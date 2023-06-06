@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.PlaceDb;
 import lombok.Builder;
 import lombok.Value;
+import net.dryuf.geo.model.GeoLocation;
 
 import java.util.Optional;
 
@@ -31,7 +32,7 @@ public class Place
 			.id(db.getId())
 			.version(db.getVersion())
 			.name(db.getName())
-			.location(GeoLocation.fromPoint(db.getLocation()))
+			.location(GeoLocation.fromJtsPoint(db.getLocation()))
 			.build();
 	}
 
@@ -41,7 +42,7 @@ public class Place
 		db.setId(getId());
 		db.setVersion(getVersion());
 		db.setName(getName());
-		db.setLocation(Optional.ofNullable(getLocation()).map(GeoLocation::toPoint).orElse(null));
+		db.setLocation(Optional.ofNullable(getLocation()).map(GeoLocation::toJtsPoint).orElse(null));
 		return db;
 	}
 

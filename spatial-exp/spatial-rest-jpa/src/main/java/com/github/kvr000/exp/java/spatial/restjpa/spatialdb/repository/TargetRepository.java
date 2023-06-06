@@ -1,15 +1,13 @@
 package com.github.kvr000.exp.java.spatial.restjpa.spatialdb.repository;
 
-import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
-import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.PlaceDb;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.TargetDb;
+import net.dryuf.geo.model.GeoLocation;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -21,7 +19,7 @@ public interface TargetRepository extends JpaRepository<TargetDb, Long>
 
 	default List<TargetDb> listByDistance(GeoLocation location, double distance)
 	{
-		return listByDistance(location.toPoint(), distance);
+		return listByDistance(GeoLocation.toJtsPoint(location), distance);
 	}
 
 	@Query("SELECT t from TargetDb t WHERE ST_DistanceSpheroid(t.location, ?1) <= ?2")

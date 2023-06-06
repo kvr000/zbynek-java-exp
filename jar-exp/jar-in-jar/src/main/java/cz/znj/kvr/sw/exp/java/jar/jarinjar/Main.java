@@ -16,28 +16,54 @@
 
 package cz.znj.kvr.sw.exp.java.jar.jarinjar;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.jdotsoft.jarloader.JarClassLoader;
 
-import java.io.File;
-import java.util.Arrays;
+import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 
 public class Main
 {
-	public static void main(String[] args) throws Exception, Throwable
+	public static void main(String[] args) throws Exception
 	{
-		{
-			String classpathStr = System.getProperty("java.class.path");
-			System.out.println(Arrays.asList(classpathStr.split(Pattern.quote(File.pathSeparator))));
-		}
-
-		JarClassLoader jcl = new JarClassLoader();
-		jcl.invokeMain(Main.class.getPackageName() + ".LoadedMain", args);
+		ImmutableMap.of("key", "value");
 		ExecutorService executor = Executors.newSingleThreadExecutor();
-		CompletableFuture.runAsync(() -> System.out.println("main main")).get();
+		try {
+			CompletableFuture.runAsync(() -> ImmutableList.of("list"), executor).get();
+			CompletableFuture.runAsync(() -> ImmutableSet.of("set")).get();
+
+			System.out.println("lsof :");
+			System.out.println("lsof exit: "+
+				new ProcessBuilder("lsof", "-p", String.valueOf(ProcessHandle.current().pid()))
+					.redirectOutput(ProcessBuilder.Redirect.INHERIT)
+					.redirectErrorStream(false)
+					.start()
+					.waitFor()
+			);
+			System.out.println();
+
+			try (InputStream in = JarMain.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
+				System.out.println("/META-INF/MANIFEST.MF :");
+				in.transferTo(System.out);
+				System.out.println();
+			}
+
+			try (InputStream in = JarMain.class.getResourceAsStream("/META-INF/maven/com.google.guava/guava/pom.properties")) {
+				System.out.println("/META-INF/maven/com.google.guava/guava/pom.properties :");
+				in.transferTo(System.out);
+				System.out.println();
+			}
+
+			System.out.println("OK");
+			System.exit(0);
+		}
+		finally {
+			executor.shutdown();
+		}
 	}
 }

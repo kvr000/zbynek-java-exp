@@ -1,12 +1,12 @@
 package com.github.kvr000.exp.java.spatial.restjpa.controller;
 
-import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
 import com.github.kvr000.exp.java.spatial.restjpa.model.Target;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.TargetDb;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.repository.TargetRepository;
 import com.google.common.base.Preconditions;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import net.dryuf.geo.model.GeoLocation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

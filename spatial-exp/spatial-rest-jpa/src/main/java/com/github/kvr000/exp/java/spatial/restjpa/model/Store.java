@@ -6,6 +6,7 @@ import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.StoreDb;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.TargetDb;
 import lombok.Builder;
 import lombok.Value;
+import net.dryuf.geo.model.GeoLocation;
 
 
 @Value

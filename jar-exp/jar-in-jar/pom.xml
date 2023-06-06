@@ -37,10 +37,10 @@
 							<archive>
 								<manifest>
 									<addClasspath>true</addClasspath>
-									<mainClass>cz.znj.kvr.sw.exp.java.jar.jarinjar.Main</mainClass>
+									<mainClass>cz.znj.kvr.sw.exp.java.jar.jarinjar.JarMain</mainClass>
 								</manifest>
 							</archive>
-							<finalName>jar-in-jar</finalName>
+							<finalName>${project.name}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors><descriptor>
 								src/main/assembly/jar-in-jar-assembly.xml
@@ -73,7 +73,7 @@
 									<minimalCompress>100</minimalCompress>
 								</resourceConfig>
 							</resourceConfigs>
-							<input>target/jar-in-jar.jar</input>
+							<input>${project.build.directory}/${project.name}.jar</input>
 						</configuration>
 					</execution>
 				</executions>

@@ -1,9 +1,7 @@
 package com.github.kvr000.exp.java.spatial.restjpa.spatialdb.repository;
 
-import com.github.kvr000.exp.java.spatial.restjpa.model.GeoLocation;
 import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.StoreDb;
-import com.github.kvr000.exp.java.spatial.restjpa.spatialdb.model.TargetDb;
-import org.locationtech.jts.geom.Point;
+import net.dryuf.geo.model.GeoLocation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

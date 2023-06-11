@@ -1,25 +1,16 @@
 package cz.znj.kvr.sw.exp.java.commons.csv;
 
+import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.junit.Test;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.Reader;
+import java.io.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -34,48 +25,77 @@ public class ParsersBenchmark
 {
 	public static final int DOCUMENT_LENGTH = 100_000;
 
-	protected static InputStream getInput()
+	protected static PipedInputStream getInput()
 	{
 		PipedOutputStream out = new PipedOutputStream();
+		PipedInputStream in;
+		try {
+			in = new PipedInputStream(out);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 		new Thread(() -> {
 			try {
 				out.write("col0,another,more,evenmore,col4,col5,col6,col7,col8,col9\n".getBytes());
-				for (int i = 0; i < DOCUMENT_LENGTH; ++i) {
+				for (;;) {
 					out.write("val0,another,more,evenmore,val4,val5,val6,val7,val8,val9\n".getBytes());
 				}
-				out.close();
 			}
 			catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new UncheckedIOException(e);
 			}
 		}).start();
-		try {
-			return new PipedInputStream(out);
+		return in;
+	}
+
+	@State(value = Scope.Benchmark)
+	public static class SplitReadState
+	{
+		PipedInputStream input = getInput();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+
+		@TearDown
+		public void teardown() throws IOException
+		{
+			input.close();
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+	}
+
+	@State(value = Scope.Benchmark)
+	public static class CsvReadState
+	{
+		PipedInputStream input = getInput();
+		CSVParser reader;
+
+		Iterator<CSVRecord> recordIterator;
+
+		@SneakyThrows
+		public CsvReadState()
+		{
+			reader = CSVFormat.DEFAULT.withHeader().parse(new InputStreamReader(input));
+			recordIterator = reader.iterator();
+		}
+
+		@TearDown
+		public void teardown() throws IOException
+		{
+			input.close();
 		}
 	}
 
 	@Benchmark
-	public void                     benchmarkSplitRead() throws Exception
+	public void                     benchmarkSplitRead(SplitReadState state, Blackhole blackhole) throws Exception
 	{
-		List<String[]> records = new LinkedList<>();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(getInput()));
 		String line;
-		while ((line = reader.readLine()) != null) {
-			String[] values = line.split(",");
-			records.add(new String[]{ values[0], values[9] });
-		}
+		line = state.reader.readLine();
+		String[] values = line.split(",");
+		blackhole.consume(new String[]{ values[0], values[9] });
 	}
 
 	@Benchmark
-	public void                     benchmarkCsvRead() throws Exception
+	public void                     benchmarkCsvRead(CsvReadState state, Blackhole blackhole) throws Exception
 	{
-		List<String[]> records = new LinkedList<>();
-		CSVParser reader = CSVFormat.DEFAULT.withHeader().parse(new InputStreamReader(getInput()));
-		for (CSVRecord record: reader) {
-			records.add(new String[]{ record.get("col0"), record.get("col9") });
-		}
+		CSVRecord record = state.recordIterator.next();
+		blackhole.consume(new String[]{ record.get("col0"), record.get("col9") });
 	}
 }

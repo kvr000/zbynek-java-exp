@@ -25,11 +25,11 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -433,8 +433,7 @@ public class NettyHttpProxyFactoryTest
 	private <V> ChannelFuture succeededChannelFuture()
 	{
 		ChannelFuture future = mock(ChannelFuture.class);
-		when(future.get())
-			.thenReturn(null);
+		doNothing().when(future).get();
 		when(future.addListener(any()))
 			.thenAnswer((answer) -> {
 				((GenericFutureListener<Future<Void>>)answer.getArgument(0)).operationComplete(future);

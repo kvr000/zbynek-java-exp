@@ -16,17 +16,56 @@
 	<build>
 		<plugins>
 
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-assembly-plugin</artifactId>
-                                <version>${maven-assembly-plugin.version}</version>
-                                <executions>
-                                        <execution>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven-resources-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>copy-resource-docker</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+
+						<configuration>
+							<outputDirectory>${basedir}/target/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/docker/</directory>
+									<includes>
+										<include>*</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<source>${javac.version}</source>
+					<target>${javac.version}</target>
+					<compilerArgs>
+						<arg>-Xlint:all</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven-assembly-plugin.version}</version>
+				<executions>
+					<execution>
 						<id>uber</id>
-                                                <phase>package</phase>
-                                                <goals>
-                                                        <goal>single</goal>
-                                                </goals>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
 						<configuration>
 							<archive>
 								<manifest>
@@ -36,11 +75,13 @@
 							</archive>
 							<finalName>${project.name}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors><descriptor>src/main/assembly/uber.xml</descriptor></descriptors>
+							<descriptors>
+								<descriptor>src/main/assembly/uber.xml</descriptor>
+							</descriptors>
 						</configuration>
-                                        </execution>
-                                </executions>
-                        </plugin>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>net.dryuf.maven.plugin</groupId>

@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  app:
+    image: 'docker-spatial-rest-jpa:latest'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+    environment:
+      - spatialdb.datasource.url=jdbc:postgresql://db:5432/spatialexp
+
+  db:
+    image: 'postgis/postgis:16-3.4-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_DB=spatialexp
+      - POSTGRES_USER=spatialexp
+      - POSTGRES_PASSWORD=spatialexp

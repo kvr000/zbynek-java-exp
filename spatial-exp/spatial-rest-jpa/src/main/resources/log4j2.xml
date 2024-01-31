@@ -8,7 +8,7 @@
 	<loggers>
 		<logger name="com.github.kvr000.exp.java.spatial.restjpa" level="INFO" />
 
-		<root level="INFO">
+		<root level="ERROR">
 			<appenderRef ref="Console" />
 		</root>
 	</loggers>

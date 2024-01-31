@@ -17,11 +17,11 @@
 		<javac.target.version>${javac.version}</javac.target.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-		<maven-javadoc-plugin.version>3.3.2</maven-javadoc-plugin.version>
-		<maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
-		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
+		<maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+		<maven-source-plugin.version>3.3.0</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+		<maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
+		<maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
 		<maven-war-plugin.version>3.3.2</maven-war-plugin.version>
@@ -59,8 +59,8 @@
 		<frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
 
 		<spring-boot-maven-plugin.version>2.0.6.RELEASE</spring-boot-maven-plugin.version>
-		<dryuf-executable-jar-maven-plugin.version>1.2.2</dryuf-executable-jar-maven-plugin.version>
-		<dryuf-jmh-review-maven-plugin.version>1.1.0</dryuf-jmh-review-maven-plugin.version>
+		<dryuf-executable-jar-maven-plugin.version>1.2.5</dryuf-executable-jar-maven-plugin.version>
+		<dryuf-jmh-review-maven-plugin.version>1.2.0</dryuf-jmh-review-maven-plugin.version>
 
 		<lombok.version>1.18.30</lombok.version>
 
@@ -72,8 +72,8 @@
 		<perl5.executable>perl</perl5.executable>
 		<python2.executable>python</python2.executable>
 
-		<jmh.version>1.21</jmh.version>
-		<jcstress.version>0.5</jcstress.version>
+		<jmh.version>1.37</jmh.version>
+		<jcstress.version>0.16</jcstress.version>
 
 		<javax.inject.version>1</javax.inject.version>
 		<jakarta.inject-api.version>2.0.1</jakarta.inject-api.version>

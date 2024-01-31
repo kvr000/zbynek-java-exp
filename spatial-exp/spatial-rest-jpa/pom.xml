@@ -103,7 +103,7 @@
 								</resourceConfig>
 								<resourceConfig>
 									<pattern>glob:*.jar</pattern>
-									<minimalCompress>8</minimalCompress>
+									<minimalCompress>100</minimalCompress>
 								</resourceConfig>
 							</resourceConfigs>
 							<input>${project.build.directory}/${project.name}.jar</input>

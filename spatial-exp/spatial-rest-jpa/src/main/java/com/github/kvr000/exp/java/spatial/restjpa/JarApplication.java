@@ -16,6 +16,7 @@
 
 package com.github.kvr000.exp.java.spatial.restjpa;
 
+import com.github.kvr000.exp.java.spatial.restjpa.jarloader.OneJarLoader;
 import com.jdotsoft.jarloader.JarClassLoader;
 
 import java.io.File;
@@ -25,14 +26,21 @@ import java.util.regex.Pattern;
 
 public class JarApplication
 {
-	public static void main(String[] args) throws Exception, Throwable
+	public static void main(String[] args) throws Throwable
 	{
 		{
 			String classpathStr = System.getProperty("java.class.path");
 			System.out.println(Arrays.asList(classpathStr.split(Pattern.quote(File.pathSeparator))));
 		}
 
-		JarClassLoader jcl = new JarClassLoader();
-		jcl.invokeMain(JarApplication.class.getPackageName() + ".Application", args);
+		System.setProperty("JarApplication.start", String.valueOf(System.currentTimeMillis()));
+		if (true) {
+			OneJarLoader cl = new OneJarLoader();
+			cl.invokeMain(JarApplication.class.getPackageName() + ".Application", args);
+		}
+		else {
+			JarClassLoader jcl = new JarClassLoader();
+			jcl.invokeMain(JarApplication.class.getPackageName() + ".Application", args);
+		}
 	}
 }

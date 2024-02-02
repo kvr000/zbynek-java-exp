@@ -14,6 +14,7 @@
 			<unpack>false</unpack>
 			<scope>runtime</scope>
 			<excludes>
+				<exclude>net.dryuf:dryuf-onejarloader</exclude>
 				<exclude>de.scrum-master:jar-class-loader</exclude>
 			</excludes>
 		</dependencySet>
@@ -23,6 +24,7 @@
 			<unpack>true</unpack>
 			<scope>runtime</scope>
 			<includes>
+				<include>net.dryuf:dryuf-onejarloader</include>
 				<include>de.scrum-master:jar-class-loader</include>
 			</includes>
 		</dependencySet>
@@ -33,7 +35,6 @@
 			<outputDirectory>/</outputDirectory>
 			<includes>
 				<include>com/github/kvr000/exp/java/spatial/restjpa/JarApplication.class</include>
-				<include>com/github/kvr000/exp/java/spatial/restjpa/jarloader/**</include>
 			</includes>
 			<useDefaultExcludes>true</useDefaultExcludes>
 		</fileSet>

@@ -128,6 +128,10 @@
 		</dependency>
 
 		<dependency>
+			<groupId>net.dryuf</groupId>
+			<artifactId>dryuf-onejarloader</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>de.scrum-master</groupId>
 			<artifactId>jar-class-loader</artifactId>
 		</dependency>

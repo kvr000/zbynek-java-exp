@@ -16,8 +16,8 @@
 
 package com.github.kvr000.exp.java.spatial.restjpa;
 
-import com.github.kvr000.exp.java.spatial.restjpa.jarloader.OneJarLoader;
 import com.jdotsoft.jarloader.JarClassLoader;
+import net.dryuf.onejarloader.OneJarLoader;
 
 import java.io.File;
 import java.util.Arrays;

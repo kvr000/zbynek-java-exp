@@ -32,7 +32,7 @@
 		<directory>${project.build.directory}/classes/</directory>
 		<outputDirectory>/</outputDirectory>
 		<includes>
-			<include>cz/znj/kvr/sw/exp/java/jar/jarinjar/JarMain.class</include>
+			<include>cz/znj/kvr/sw/exp/java/jar/jarinjar_jarclassloader/JarMain.class</include>
 		</includes>
 		<useDefaultExcludes>true</useDefaultExcludes>
 	</fileSet>

@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package cz.znj.kvr.sw.exp.java.jar.jarinjar;
+package cz.znj.kvr.sw.exp.java.jar.jarinjar_onejarloader;
 
-import com.jdotsoft.jarloader.JarClassLoader;
+import net.dryuf.onejarloader.OneJarLoader;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 
@@ -35,9 +33,8 @@ public class JarMain
 			System.out.println(Arrays.asList(classpathStr.split(Pattern.quote(File.pathSeparator))));
 		}
 
-		JarClassLoader jcl = new JarClassLoader();
-		jcl.invokeMain(JarMain.class.getPackageName() + ".Main", args);
-		ExecutorService executor = Executors.newSingleThreadExecutor();
+		OneJarLoader cl = new OneJarLoader();
+		cl.invokeMain(JarMain.class.getPackageName() + ".Main", args);
 		CompletableFuture.runAsync(() -> System.out.println("main main")).get();
 	}
 }

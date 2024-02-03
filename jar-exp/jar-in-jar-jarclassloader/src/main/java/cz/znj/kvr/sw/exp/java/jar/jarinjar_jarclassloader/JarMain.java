@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package com.github.kvr000.exp.java.springboot.basicwebapp;
+package cz.znj.kvr.sw.exp.java.jar.jarinjar_jarclassloader;
 
-import net.dryuf.onejarloader.OneJarLoader;
+import com.jdotsoft.jarloader.JarClassLoader;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 
-public class JarApplication
+public class JarMain
 {
 	public static void main(String[] args) throws Exception, Throwable
 	{
@@ -32,7 +35,9 @@ public class JarApplication
 			System.out.println(Arrays.asList(classpathStr.split(Pattern.quote(File.pathSeparator))));
 		}
 
-		OneJarLoader cl = new OneJarLoader();
-		cl.invokeMain(JarApplication.class.getPackageName() + ".Application", args);
+		JarClassLoader jcl = new JarClassLoader();
+		jcl.invokeMain(JarMain.class.getPackageName() + ".Main", args);
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		CompletableFuture.runAsync(() -> System.out.println("main main")).get();
 	}
 }

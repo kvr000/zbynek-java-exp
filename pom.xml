@@ -176,7 +176,7 @@
 		<ehcache.version>3.9.6</ehcache.version>
 		<redisson.version>3.18.0</redisson.version>
 
-		<dryuf-onejarloader.version>1.0.0</dryuf-onejarloader.version>
+		<dryuf-onejarloader.version>1.0.1</dryuf-onejarloader.version>
 		<dryuf-base.version>1.8.0</dryuf-base.version>
 		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
 		<dryuf-bigio.version>1.1.1</dryuf-bigio.version>

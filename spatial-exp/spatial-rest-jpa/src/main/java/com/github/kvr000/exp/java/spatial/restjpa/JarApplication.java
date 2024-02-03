@@ -28,6 +28,13 @@ public class JarApplication
 {
 	public static void main(String[] args) throws Throwable
 	{
+		String launch;
+		if (true) {
+			launch = JarApplication.class.getPackageName() + ".Application";
+		}
+		else {
+			launch = JarApplication.class.getPackageName() + ".Empty";
+		}
 		{
 			String classpathStr = System.getProperty("java.class.path");
 			System.out.println(Arrays.asList(classpathStr.split(Pattern.quote(File.pathSeparator))));
@@ -36,11 +43,11 @@ public class JarApplication
 		System.setProperty("JarApplication.start", String.valueOf(System.currentTimeMillis()));
 		if (true) {
 			OneJarLoader cl = new OneJarLoader();
-			cl.invokeMain(JarApplication.class.getPackageName() + ".Application", args);
+			cl.invokeMain(launch, args);
 		}
 		else {
 			JarClassLoader jcl = new JarClassLoader();
-			jcl.invokeMain(JarApplication.class.getPackageName() + ".Application", args);
+			jcl.invokeMain(launch, args);
 		}
 	}
 }

@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>cz.znj.kvr.sw.exp.java.jar</groupId>
-	<artifactId>jar-in-jar</artifactId>
+	<artifactId>jar-in-jar-jarclassloader</artifactId>
 	<version>0.0.1</version>
 
 	<parent>
@@ -21,34 +21,35 @@
 
 	<build>
 		<plugins>
-
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-assembly-plugin</artifactId>
-                                <version>${maven-assembly-plugin.version}</version>
-                                <executions>
-                                        <execution>
-						<id>jar-in-jar</id>
-                                                <phase>package</phase>
-                                                <goals>
-                                                        <goal>single</goal>
-                                                </goals>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven-assembly-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>jar-in-jar-jarclassloader</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
 						<configuration>
 							<archive>
 								<manifest>
 									<addClasspath>true</addClasspath>
-									<mainClass>cz.znj.kvr.sw.exp.java.jar.jarinjar.JarMain</mainClass>
+									<mainClass>cz.znj.kvr.sw.exp.java.jar.jarinjar_jarclassloader.JarMain</mainClass>
 								</manifest>
 							</archive>
 							<finalName>${project.name}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
-							<descriptors><descriptor>
-								src/main/assembly/jar-in-jar-assembly.xml
-							</descriptor></descriptors>
+							<descriptors>
+								<descriptor>
+									src/main/assembly/jar-in-jar-jarclassloader-assembly.xml
+								</descriptor>
+							</descriptors>
 						</configuration>
-                                        </execution>
-                                </executions>
-                        </plugin>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>net.dryuf.maven.plugin</groupId>

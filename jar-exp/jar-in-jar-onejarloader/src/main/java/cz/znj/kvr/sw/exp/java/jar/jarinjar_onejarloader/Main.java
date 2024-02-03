@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package cz.znj.kvr.sw.exp.java.jar.jarinjar;
+package cz.znj.kvr.sw.exp.java.jar.jarinjar_onejarloader;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.jdotsoft.jarloader.JarClassLoader;
 
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
@@ -47,13 +46,13 @@ public class Main
 			);
 			System.out.println();
 
-			try (InputStream in = JarMain.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
+			try (InputStream in = Main.class.getResourceAsStream("/META-INF/MANIFEST.MF")) {
 				System.out.println("/META-INF/MANIFEST.MF :");
 				in.transferTo(System.out);
 				System.out.println();
 			}
 
-			try (InputStream in = JarMain.class.getResourceAsStream("/META-INF/maven/com.google.guava/guava/pom.properties")) {
+			try (InputStream in = Main.class.getResourceAsStream("/META-INF/maven/com.google.guava/guava/pom.properties")) {
 				System.out.println("/META-INF/maven/com.google.guava/guava/pom.properties :");
 				in.transferTo(System.out);
 				System.out.println();

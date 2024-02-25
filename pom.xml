@@ -58,7 +58,7 @@
 		<grunt-maven-plugin.version>1.5.1</grunt-maven-plugin.version>
 		<frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
 
-		<spring-boot-maven-plugin.version>2.0.6.RELEASE</spring-boot-maven-plugin.version>
+		<spring-boot-maven-plugin.version>3.2.3</spring-boot-maven-plugin.version>
 		<dryuf-executable-jar-maven-plugin.version>1.2.5</dryuf-executable-jar-maven-plugin.version>
 		<dryuf-jmh-review-maven-plugin.version>1.2.0</dryuf-jmh-review-maven-plugin.version>
 
@@ -138,14 +138,14 @@
 
 		<opencv.version>4.9.0-0</opencv.version>
 
-		<spring.version>6.0.13</spring.version>
-		<spring-security.version>6.1.5</spring-security.version>
-		<spring-boot.version>3.1.5</spring-boot.version>
-		<spring-data-jpa.version>3.1.5</spring-data-jpa.version>
+		<spring.version>6.1.4</spring.version>
+		<spring-security.version>6.2.2</spring-security.version>
+		<spring-boot.version>3.2.3</spring-boot.version>
+		<spring-data-jpa.version>${spring-boot.version}</spring-data-jpa.version>
 
 		<netty.version>4.1.90.Final</netty.version>
 
-		<aws-java-sdk.version>1.12.581</aws-java-sdk.version>
+		<aws-java-sdk.version>1.12.665</aws-java-sdk.version>
 		<aws-lambda-java-core.version>1.2.2</aws-lambda-java-core.version>
 		<aws-lambda-java-events.version>3.11.1</aws-lambda-java-events.version>
 

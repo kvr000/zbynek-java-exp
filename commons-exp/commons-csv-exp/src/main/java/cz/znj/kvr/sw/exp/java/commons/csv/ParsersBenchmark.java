@@ -4,15 +4,16 @@ import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.junit.Test;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.UncheckedIOException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -25,15 +26,12 @@ public class ParsersBenchmark
 {
 	public static final int DOCUMENT_LENGTH = 100_000;
 
+	@SneakyThrows
 	protected static PipedInputStream getInput()
 	{
 		PipedOutputStream out = new PipedOutputStream();
 		PipedInputStream in;
-		try {
-			in = new PipedInputStream(out);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		in = new PipedInputStream(out);
 		new Thread(() -> {
 			try {
 				out.write("col0,another,more,evenmore,col4,col5,col6,col7,col8,col9\n".getBytes());
@@ -93,7 +91,14 @@ public class ParsersBenchmark
 	}
 
 	@Benchmark
-	public void                     benchmarkCsvRead(CsvReadState state, Blackhole blackhole) throws Exception
+	public void                     benchmarkCsvColumnRead(CsvReadState state, Blackhole blackhole) throws Exception
+	{
+		CSVRecord record = state.recordIterator.next();
+		blackhole.consume(new String[]{record.get(0), record.get(9)});
+	}
+
+	@Benchmark
+	public void                     benchmarkCsvKeyRead(CsvReadState state, Blackhole blackhole) throws Exception
 	{
 		CSVRecord record = state.recordIterator.next();
 		blackhole.consume(new String[]{ record.get("col0"), record.get("col9") });

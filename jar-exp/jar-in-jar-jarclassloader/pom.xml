@@ -39,7 +39,7 @@
 									<mainClass>cz.znj.kvr.sw.exp.java.jar.jarinjar_jarclassloader.JarMain</mainClass>
 								</manifest>
 							</archive>
-							<finalName>${project.name}</finalName>
+							<finalName>${project.artifactId}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors>
 								<descriptor>
@@ -74,7 +74,7 @@
 									<minimalCompress>100</minimalCompress>
 								</resourceConfig>
 							</resourceConfigs>
-							<input>${project.build.directory}/${project.name}.jar</input>
+							<input>${project.build.directory}/${project.artifactId}.${project.packaging}</input>
 						</configuration>
 					</execution>
 				</executions>

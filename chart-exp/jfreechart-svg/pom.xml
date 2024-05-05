@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.kvr000.exp.java.spatial</groupId>
-	<artifactId>spatial-rest-jpa</artifactId>
+	<groupId>com.github.kvr000.exp.java.chart</groupId>
+	<artifactId>jfreechart-svg</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
 	<parent>
-		<groupId>com.github.kvr000.exp.java.spatial</groupId>
-		<artifactId>spatial-exp-base</artifactId>
+		<groupId>com.github.kvr000.exp.java.chart</groupId>
+		<artifactId>chart-exp-base</artifactId>
 		<version>0.0.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
@@ -17,6 +17,7 @@
 		<plugins>
 
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>${maven-resources-plugin.version}</version>
 				<executions>
@@ -70,7 +71,7 @@
 							<archive>
 								<manifest>
 									<addClasspath>true</addClasspath>
-									<mainClass>com.github.kvr000.exp.java.spatial.restjpa.JarApplication</mainClass>
+									<mainClass>com.github.kvr000.exp.java.chart.jfreechart.svg.JarApplication</mainClass>
 								</manifest>
 							</archive>
 							<finalName>${project.artifactId}</finalName>
@@ -106,7 +107,7 @@
 									<minimalCompress>100</minimalCompress>
 								</resourceConfig>
 							</resourceConfigs>
-							<input>${project.build.directory}/${project.artifactId}.${project.packaging}</input>
+							<input>${project.build.directory}/${project.artifactId}.jar</input>
 						</configuration>
 					</execution>
 				</executions>
@@ -168,98 +169,25 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-spatial</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>jakarta.ws.rs</groupId>
-			<artifactId>jakarta.ws.rs-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-common</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>net.dryuf</groupId>
 			<artifactId>dryuf-geo</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-dom</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-svggen</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-to-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-to-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-svg-dom</artifactId>
 		</dependency>
 
 		<dependency>

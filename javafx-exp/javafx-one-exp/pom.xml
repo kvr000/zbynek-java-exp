@@ -56,7 +56,7 @@
 							<JavaFX-Version>2.0</JavaFX-Version>
 							<Main-Class>cz.znj.kvr.sw.exp.java.javafx.one.Main</Main-Class>
 							<implementation-vendor>zbynek</implementation-vendor>
-							<implementation-title>${project.name}</implementation-title>
+							<implementation-title>${project.artifactId}</implementation-title>
 							<implementation-version>1.0</implementation-version>
 							<JavaFX-Application-Class>cz.znj.kvr.sw.exp.java.javafx.one.Main</JavaFX-Application-Class>
 							<JavaFX-Class-Path><!--

@@ -15,17 +15,17 @@
 
 	<build>
 		<plugins>
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-assembly-plugin</artifactId>
-                                <version>${maven-assembly-plugin.version}</version>
-                                <executions>
-                                        <execution>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>${maven-assembly-plugin.version}</version>
+				<executions>
+					<execution>
 						<id>uber</id>
-                                                <phase>package</phase>
-                                                <goals>
-                                                        <goal>single</goal>
-                                                </goals>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
 						<configuration>
 							<archive>
 								<manifest>
@@ -33,19 +33,42 @@
 									<mainClass>com.github.kvr000.exp.java.springboot.basicwebapp.JarApplication</mainClass>
 								</manifest>
 							</archive>
-							<finalName>${project.name}</finalName>
+							<finalName>${project.artifactId}</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors><descriptor>src/main/assembly/uber.xml</descriptor></descriptors>
 						</configuration>
-                                        </execution>
-                                </executions>
-                        </plugin>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>${project.artifactId}-shade</finalName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>com.github.kvr000.exp.java.springboot.basicwebapp.Application</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<groupId>net.dryuf.maven.plugin</groupId>
 				<artifactId>dryuf-executable-jar-maven-plugin</artifactId>
 				<executions>
 					<execution>
+						<id>exec-onejar</id>
 						<phase>package</phase>
 						<goals>
 							<goal>create-executable</goal>
@@ -64,7 +87,25 @@
 									<minimalCompress>10</minimalCompress>
 								</resourceConfig>
 							</resourceConfigs>
-							<input>${project.build.directory}/${project.name}.jar</input>
+							<input>${project.build.directory}/${project.artifactId}.${project.packaging}</input>
+						</configuration>
+					</execution>
+					<execution>
+						<id>exec-shade</id>
+						<phase>package</phase>
+						<goals>
+							<goal>create-executable</goal>
+						</goals>
+						<configuration>
+							<vmParams>-Xmx256m</vmParams>
+							<sort>true</sort>
+							<resourceConfigs>
+								<resourceConfig>
+									<pattern>glob:*.jar</pattern>
+									<minimalCompress>10</minimalCompress>
+								</resourceConfig>
+							</resourceConfigs>
+							<input>${project.build.directory}/${project.artifactId}-shade.${project.packaging}</input>
 						</configuration>
 					</execution>
 				</executions>

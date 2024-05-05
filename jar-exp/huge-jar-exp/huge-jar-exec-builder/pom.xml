@@ -55,8 +55,8 @@
 						<phase>package</phase>
 						<goals><goal>generate</goal></goals>
 						<configuration>
-							<input>${project.build.directory}/${project.name}.jar</input>
-							<output>${project.build.directory}/${project.name}-count.jar</output>
+							<input>${project.build.directory}/${project.artifactId}.${project.packaging}</input>
+							<output>${project.build.directory}/${project.artifactId}-count.${project.packaging}</output>
 							<entryCount>265000</entryCount>
 							<entrySize>0</entrySize>
 						</configuration>
@@ -66,8 +66,8 @@
 						<phase>package</phase>
 						<goals><goal>generate</goal></goals>
 						<configuration>
-							<input>${project.build.directory}/${project.name}.jar</input>
-							<output>${project.build.directory}/${project.name}-huged.jar</output>
+							<input>${project.build.directory}/${project.artifactId}.${project.packaging}</input>
+							<output>${project.build.directory}/${project.artifactId}-huged.${project.packaging}</output>
 							<entryCount>265000</entryCount>
 							<entrySize>1000</entrySize>
 						</configuration>
@@ -77,8 +77,8 @@
 						<phase>package</phase>
 						<goals><goal>generate</goal></goals>
 						<configuration>
-							<input>${project.build.directory}/${project.name}.jar</input>
-							<output>${project.build.directory}/${project.name}-prepend.jar</output>
+							<input>${project.build.directory}/${project.artifactId}.${project.packaging}</input>
+							<output>${project.build.directory}/${project.artifactId}-prepend.${project.packaging}</output>
 							<entryCount>265000</entryCount>
 							<entrySize>1000</entrySize>
 							<append>false</append>

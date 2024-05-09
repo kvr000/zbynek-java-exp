@@ -1,0 +1,7 @@
+documentId: hello
+
+instructions:
+  - include: this
+  - exclude: that
+  - include: more
+  - exclude: none

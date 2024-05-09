@@ -1,0 +1,11 @@
+documentId: hello
+
+instructions:
+  - code: include
+    value: this
+  - code: exclude
+    value: that
+  - code: include
+    value: more
+  - code: exclude
+    value: none

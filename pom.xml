@@ -201,6 +201,8 @@
 		<amqp-client.version>5.16.0</amqp-client.version>
 		<reactor-rabbitmq.version>1.5.5</reactor-rabbitmq.version>
 
+		<javacv.version>1.5.10</javacv.version>
+
 		<org.mongodb.version>3.12.8</org.mongodb.version>
 		<fakemongo-fongo.version>2.1.1</fakemongo-fongo.version>
 		<flapdoodle.embed.mongo.version>3.4.8</flapdoodle.embed.mongo.version>
@@ -1416,6 +1418,19 @@
 				<artifactId>lettuce-core</artifactId>
 				<version>${lettuce.version}</version>
 			</dependency>
+
+			<!-- ffmpeg -->
+			<dependency>
+				<groupId>org.bytedeco</groupId>
+				<artifactId>javacv</artifactId>
+				<version>${javacv.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bytedeco</groupId>
+				<artifactId>javacv-platform</artifactId>
+				<version>${javacv.version}</version>
+			</dependency>
+
 
 			<!-- RabbitMq -->
 			<dependency>

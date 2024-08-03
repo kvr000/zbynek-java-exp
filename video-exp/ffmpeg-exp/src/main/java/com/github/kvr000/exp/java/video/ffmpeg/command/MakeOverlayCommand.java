@@ -9,7 +9,6 @@ import lombok.extern.log4j.Log4j2;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 import org.bytedeco.ffmpeg.global.avcodec;
-import org.bytedeco.ffmpeg.global.avutil;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.FFmpegFrameRecorder;
 import org.bytedeco.javacv.FFmpegLogCallback;
@@ -48,8 +47,12 @@ public class MakeOverlayCommand extends AbstractCommand
 			options.bitrateRatio = Integer.valueOf(needArgsParam(options.bitrateRatio, args));
 			return true;
 
-		case "--max-time":
-			options.maxTime = Double.valueOf(needArgsParam(options.maxTime, args));
+		case "--start-time":
+			options.startTime = Double.valueOf(needArgsParam(options.startTime, args));
+			return true;
+
+		case "--end-time":
+			options.endTime = Double.valueOf(needArgsParam(options.endTime, args));
 			return true;
 
 		default:
@@ -132,13 +135,17 @@ public class MakeOverlayCommand extends AbstractCommand
 
 			recorder.start();
 
+			if (options.startTime != null) {
+				grabber.setTimestamp((long) (options.startTime * 1_000_000));
+			}
+
 			// Frame processing loop
 			Frame frame;
 			BufferedImage bufferedImage = null;
 			int imageType = -1;
 			while ((frame = grabber.grab()) != null) {
 				if (frame.type == Frame.Type.VIDEO) {
-					if (options.maxTime != null && frame.timestamp >= Math.ceil(options.maxTime * 1_000_000)) {
+					if (options.endTime != null && frame.timestamp >= Math.ceil(options.endTime * 1_000_000)) {
 						break;
 					}
 					if (imageType != Java2DFrameConverter.getBufferedImageType(frame)) {
@@ -203,7 +210,9 @@ public class MakeOverlayCommand extends AbstractCommand
 
 		String videoEncoder;
 
-		Double maxTime;
+		Double startTime;
+
+		Double endTime;
 
 		Integer bitrateRatio;
 	}

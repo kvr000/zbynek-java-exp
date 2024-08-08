@@ -19,12 +19,6 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<properties>
-		<mongodb.version>3.3.0</mongodb.version>
-		<fongodb.version>3.4.8</fongodb.version>
-		<spring-data.version>1.9.5.RELEASE</spring-data.version>
-	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 

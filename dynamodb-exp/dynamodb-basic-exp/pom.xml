@@ -23,11 +23,6 @@
 	<name>DynamoDb basic experiment</name>
 	<description>DynamoDb basic experiment</description>
 
-	<properties>
-		<log4j2.version>2.6.2</log4j2.version>
-		<commons-lang3.version>3.4</commons-lang3.version>
-	</properties>
-
 	<dependencies>
 
 		<!-- lombok -->
@@ -91,12 +86,10 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
 		</dependency>
 
 

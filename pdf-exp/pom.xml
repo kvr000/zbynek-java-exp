@@ -19,10 +19,6 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<properties>
-		<spring-data.version>1.9.5.RELEASE</spring-data.version>
-	</properties>
-
 	<modules>
 		<module>pdfbox-basic-exp</module>
 		<module>tabula-basic-exp</module>

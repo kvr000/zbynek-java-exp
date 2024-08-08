@@ -27,11 +27,6 @@ public class JarFfmpegExp
 {
 	public static void main(String[] args) throws Exception, Throwable
 	{
-		{
-			String classpathStr = System.getProperty("java.class.path");
-			System.out.println(Arrays.asList(classpathStr.split(Pattern.quote(File.pathSeparator))));
-		}
-
 		OneJarLoader cl = new OneJarLoader();
 		cl.invokeMain(JarFfmpegExp.class.getPackageName() + ".Application", args);
 	}

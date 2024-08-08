@@ -1,5 +1,6 @@
 package com.github.kvr000.exp.java.video.ffmpeg;
 
+import com.github.kvr000.exp.java.video.ffmpeg.command.CopyCommand;
 import com.github.kvr000.exp.java.video.ffmpeg.command.MakeOverlayCommand;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -73,7 +74,8 @@ public class FfmpegExp extends AbstractParentCommand
 	protected Map<String, Class<? extends Command>> configSubCommands(CommandContext context)
 	{
 		return ImmutableMap.of(
-			"make-overlay", MakeOverlayCommand.class
+			"make-overlay", MakeOverlayCommand.class,
+			"copy", CopyCommand.class
 		);
 	}
 
@@ -90,6 +92,7 @@ public class FfmpegExp extends AbstractParentCommand
 	{
 		return ImmutableMap.of(
 			"make-overlay", "Creates overlay video",
+			"copy", "Copies file (tests straight copy)",
 			"help [command]", "Prints help"
 		);
 	}

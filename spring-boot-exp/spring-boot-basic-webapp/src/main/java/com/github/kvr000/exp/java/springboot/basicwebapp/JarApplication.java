@@ -16,6 +16,7 @@
 
 package com.github.kvr000.exp.java.springboot.basicwebapp;
 
+import com.jdotsoft.jarloader.JarClassLoader;
 import net.dryuf.onejarloader.OneJarLoader;
 
 import java.io.File;
@@ -32,7 +33,7 @@ public class JarApplication
 			System.out.println(Arrays.asList(classpathStr.split(Pattern.quote(File.pathSeparator))));
 		}
 
-		OneJarLoader cl = new OneJarLoader();
+		JarClassLoader cl = new JarClassLoader();
 		cl.invokeMain(JarApplication.class.getPackageName() + ".Application", args);
 	}
 }

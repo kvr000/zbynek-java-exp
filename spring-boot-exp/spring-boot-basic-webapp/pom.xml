@@ -15,6 +15,39 @@
 
 	<build>
 		<plugins>
+
+			<!-- the order matters - maven-shade-plugin somehow consumes the jar created by assembly-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>${project.artifactId}-shade</finalName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<filters>
+								<filter>
+									<artifact>*:${project.artifactId}-onejar</artifact>
+									<excludes>
+										<exclude>*</exclude>
+										<exclude>**/*</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>com.github.kvr000.exp.java.springboot.basicwebapp.Application</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -33,31 +66,10 @@
 									<mainClass>com.github.kvr000.exp.java.springboot.basicwebapp.JarApplication</mainClass>
 								</manifest>
 							</archive>
-							<finalName>${project.artifactId}</finalName>
+							<skipAssembly>false</skipAssembly>
+							<finalName>${project.artifactId}-onejar</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 							<descriptors><descriptor>src/main/assembly/uber.xml</descriptor></descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<finalName>${project.artifactId}-shade</finalName>
-							<createDependencyReducedPom>false</createDependencyReducedPom>
-							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.github.kvr000.exp.java.springboot.basicwebapp.Application</mainClass>
-								</transformer>
-							</transformers>
 						</configuration>
 					</execution>
 				</executions>
@@ -80,14 +92,14 @@
 								<resourceConfig>
 									<pattern>glob:**</pattern>
 									<type>dir</type>
-									<remove>true</remove>
+									<remove>false</remove>
 								</resourceConfig>
 								<resourceConfig>
 									<pattern>glob:*.jar</pattern>
 									<minimalCompress>10</minimalCompress>
 								</resourceConfig>
 							</resourceConfigs>
-							<input>${project.build.directory}/${project.artifactId}.${project.packaging}</input>
+							<input>${project.build.directory}/${project.artifactId}-onejar.${project.packaging}</input>
 						</configuration>
 					</execution>
 					<execution>

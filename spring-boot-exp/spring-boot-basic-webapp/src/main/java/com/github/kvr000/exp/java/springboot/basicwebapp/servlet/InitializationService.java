@@ -17,8 +17,8 @@ import java.util.Arrays;
 @Service
 public class InitializationService
 {
-	@Inject
-	private ServerProperties serverProperties;
+	//@Inject
+	//private ServerProperties serverProperties;
 
 	@Bean
 	public CommandLineRunner commandLineRunner(ApplicationContext ctx)

@@ -18,10 +18,6 @@
 	<name>PdfBox basic experiment</name>
 	<description>PdfBox basic experiment</description>
 
-	<properties>
-		<pdfbox.version>2.0.12</pdfbox.version>
-	</properties>
-
 	<dependencies>
 
 		<!-- lombok -->
@@ -80,7 +76,6 @@
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
-			<version>${pdfbox.version}</version>
 		</dependency>
 
 	</dependencies>

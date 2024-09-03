@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support;
+package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support;
 
 import java.util.function.Function;
 

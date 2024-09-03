@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support;
+package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.time.StopWatch;

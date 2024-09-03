@@ -1,7 +1,6 @@
-package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support;
+package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support;
 
-import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.time.StopWatch;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,25 +11,23 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 
 /**
- * Database populator.
+ * Sequential, multi threaded, benchmarker.
  */
-@Log4j2
-public class MultiThreadedPopulator implements Populator
+public class SequentialMultiThreadedBenchmarker implements Benchmarker
 {
-	public void populate(long numItems, Function<Long, CloseableConsumer<Long>> writerSupplier) {
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-
+	@Override
+	public void benchmark(long steps, long numItems, Function<Long, CloseableConsumer<Long>> performerSupplier) {
 		int processors = Runtime.getRuntime().availableProcessors();
 
 		ExecutorService executor = Executors.newFixedThreadPool(processors);
 		List<Future<Void>> futures = new ArrayList<>();
+		long start = RandomUtils.nextLong(0, numItems-steps-processors);
 		for (int p = 0; p < processors; ++p) {
 			int cp = p;
 			futures.add(executor.submit(() -> {
-				try (CloseableConsumer<Long> writer = writerSupplier.apply((long)cp)) {
-					for (long i = cp; i < numItems; i += processors) {
-						writer.accept(i);
+				try (CloseableConsumer<Long> performer = performerSupplier.apply((long)cp)) {
+					for (long i = cp; i < steps; i += processors) {
+						performer.accept(start+i);
 					}
 				}
 				return (Void)null;
@@ -47,6 +44,6 @@ public class MultiThreadedPopulator implements Populator
 				throw new RuntimeException(e);
 			}
 		});
-		log.info("Populating done in "+stopWatch.getTime()+" ms");
+		executor.shutdown();
 	}
 }

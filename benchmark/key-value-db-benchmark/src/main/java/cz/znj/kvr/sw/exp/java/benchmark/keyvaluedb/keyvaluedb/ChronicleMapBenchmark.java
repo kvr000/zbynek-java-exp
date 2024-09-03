@@ -1,14 +1,11 @@
-package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb;
+package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb;
 
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support.AbstractCloseableConsumer;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support.ByteArray;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support.MultiThreadedPopulator;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support.SequentialMultiThreadedBenchmarker;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support.SequentialSingleThreadedBenchmarker;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support.SingleThreadedPopulator;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.support.SmallKeyValueSupplier;
+import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.AbstractCloseableConsumer;
+import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.MultiThreadedPopulator;
+import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialMultiThreadedBenchmarker;
+import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialSingleThreadedBenchmarker;
+import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SmallKeyValueSupplier;
 import lombok.extern.log4j.Log4j2;
-import net.openhft.chronicle.bytes.MappedBytes;
 import net.openhft.chronicle.map.ChronicleMap;
 import net.openhft.chronicle.map.ChronicleMapBuilder;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -24,13 +21,12 @@ import org.openjdk.jmh.annotations.Warmup;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
 @State(value = Scope.Benchmark)
-@Fork(0)
+@Fork(value = 1, jvmArgs = { "--add-opens=java.base/java.lang=ALL-UNNAMED", "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED", "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED", "--add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED" })
 @Warmup(iterations = 1)
 @Measurement(iterations = 2, time = 10)
 @BenchmarkMode(Mode.AverageTime)

@@ -193,7 +193,8 @@
 
 		<bootstrap.version>4.1.1</bootstrap.version>
 
-		<org.mapdb.version>1.0.9</org.mapdb.version>
+		<chronicle-map.version>3.26ea4</chronicle-map.version>
+		<org.mapdb.version>3.1.0</org.mapdb.version>
 
 		<jedis.version>4.3.1</jedis.version>
 		<lettuce.version>6.2.2.RELEASE</lettuce.version>
@@ -1320,6 +1321,12 @@
 				<groupId>org.eclipse.jdt.core.compiler</groupId>
 				<artifactId>ecj</artifactId>
 				<version>${org.eclipse.jdt.core.compiler-ecj.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.openhft</groupId>
+				<artifactId>chronicle-map</artifactId>
+				<version>${chronicle-map.version}</version>
 			</dependency>
 
 			<dependency>

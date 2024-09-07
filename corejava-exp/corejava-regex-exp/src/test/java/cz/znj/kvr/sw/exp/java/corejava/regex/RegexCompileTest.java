@@ -1,16 +1,12 @@
 package cz.znj.kvr.sw.exp.java.corejava.regex;
 
-import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 
 /**

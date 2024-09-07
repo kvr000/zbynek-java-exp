@@ -13,6 +13,24 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<myproptest>thevalue321</myproptest>
+					</systemPropertyVariables>
+					<environmentVariables>
+						<myenvtest>thevalue123</myenvtest>
+					</environmentVariables>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 
 		<dependency>
@@ -28,6 +46,16 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit-pioneer</groupId>
+			<artifactId>junit-pioneer</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

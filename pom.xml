@@ -211,6 +211,8 @@
 		<fakemongo-fongo.version>2.1.1</fakemongo-fongo.version>
 		<flapdoodle.embed.mongo.version>3.4.8</flapdoodle.embed.mongo.version>
 
+		<oshi.version>6.6.5</oshi.version>
+
 		<snmp4j.version>3.0.6</snmp4j.version>
 		<snmp4j-agent.version>3.0.3</snmp4j-agent.version>
 
@@ -1360,7 +1362,13 @@
 				<version>${flapdoodle.embed.mongo.version}</version>
 			</dependency>
 
-			<dependency>
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
+
+            <dependency>
 				<groupId>org.snmp4j</groupId>
 				<artifactId>snmp4j-agent</artifactId>
 				<version>${snmp4j-agent.version}</version>

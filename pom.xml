@@ -192,7 +192,7 @@
 
 		<org.eclipse.jdt.core.compiler-ecj.version>4.6.1</org.eclipse.jdt.core.compiler-ecj.version>
 
-		<bootstrap.version>4.1.1</bootstrap.version>
+		<bootstrap.version>5.0.0</bootstrap.version>
 
 		<chronicle-map.version>3.26ea4</chronicle-map.version>
 		<org.mapdb.version>3.1.0</org.mapdb.version>

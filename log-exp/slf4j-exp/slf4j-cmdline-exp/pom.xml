@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cz.znj.kvr.sw.exp.java.logexp.slf4j</groupId>
+	<artifactId>slf4j-cmdline-exp</artifactId>
+	<version>0.0.1</version>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java.logexp.slf4j</groupId>
+		<artifactId>slf4j-exp-base</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<build>
+		<plugins>
+
+			<!-- the order matters - maven-shade-plugin somehow consumes the jar created by assembly-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>${project.artifactId}-shade</finalName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<filters>
+								<filter>
+									<artifact>*:${project.artifactId}-onejar</artifact>
+									<excludes>
+										<exclude>*</exclude>
+										<exclude>**/*</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>cz.znj.kvr.sw.exp.java.logexp.slf4j.cmdline.Print</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>net.dryuf.maven.plugin</groupId>
+				<artifactId>dryuf-executable-jar-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>exec-shade</id>
+						<phase>package</phase>
+						<goals>
+							<goal>create-executable</goal>
+						</goals>
+						<configuration>
+							<vmParams>-Xmx256m</vmParams>
+							<sort>true</sort>
+							<resourceConfigs>
+								<resourceConfig>
+									<pattern>glob:*.jar</pattern>
+									<minimalCompress>10</minimalCompress>
+								</resourceConfig>
+							</resourceConfigs>
+							<input>${project.build.directory}/${project.artifactId}-shade.${project.packaging}</input>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+
+	</dependencies>
+
+</project>

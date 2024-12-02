@@ -199,7 +199,7 @@
 		<org.mapdb.version>3.1.0</org.mapdb.version>
 
 		<jedis.version>4.3.1</jedis.version>
-		<lettuce.version>6.2.2.RELEASE</lettuce.version>
+		<lettuce.version>6.5.1.RELEASE</lettuce.version>
 
 		<amqp-client.version>5.21.0</amqp-client.version>
 		<reactor-rabbitmq.version>1.5.5</reactor-rabbitmq.version>

@@ -24,6 +24,7 @@
 
 	<modules>
 		<module>log4j2-logging-exp</module>
+		<module>log4j2-pattern-exp</module>
 	</modules>
 
 	<dependencyManagement>

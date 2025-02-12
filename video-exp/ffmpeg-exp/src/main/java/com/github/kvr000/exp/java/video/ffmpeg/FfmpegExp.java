@@ -1,6 +1,7 @@
 package com.github.kvr000.exp.java.video.ffmpeg;
 
 import com.github.kvr000.exp.java.video.ffmpeg.command.CopyCommand;
+import com.github.kvr000.exp.java.video.ffmpeg.command.H265EncodeCommand;
 import com.github.kvr000.exp.java.video.ffmpeg.command.MakeOverlayCommand;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
@@ -75,7 +76,8 @@ public class FfmpegExp extends AbstractParentCommand
 	{
 		return ImmutableMap.of(
 			"make-overlay", MakeOverlayCommand.class,
-			"copy", CopyCommand.class
+			"copy", CopyCommand.class,
+			"h265-encode", H265EncodeCommand.class
 		);
 	}
 
@@ -93,6 +95,7 @@ public class FfmpegExp extends AbstractParentCommand
 		return ImmutableMap.of(
 			"make-overlay", "Creates overlay video",
 			"copy", "Copies file (tests straight copy)",
+			"h265-encode", "Encodes in H265",
 			"help [command]", "Prints help"
 		);
 	}

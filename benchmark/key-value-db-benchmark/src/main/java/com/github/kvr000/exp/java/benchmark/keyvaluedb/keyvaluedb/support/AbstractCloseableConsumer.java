@@ -1,4 +1,4 @@
-package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support;
+package com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support;
 
 import java.io.IOException;
 

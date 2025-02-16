@@ -6,7 +6,7 @@
 		</console>
 	</appenders>
 	<loggers>
-		<logger name="cz.znj.kvr.sw.exp.java" level="DEBUG" />
+		<logger name="com.github.kvr000.exp.java" level="DEBUG" />
 
 		<root level="debug">
 			<appenderRef ref="Console" />

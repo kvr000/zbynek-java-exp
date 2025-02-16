@@ -1,12 +1,14 @@
-package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb;
+package com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb;
 
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.AbstractCloseableConsumer;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.ByteArray;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialMultiThreadedBenchmarker;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialSingleThreadedBenchmarker;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SingleThreadedPopulator;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SmallKeyValueSupplier;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.AbstractCloseableConsumer;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.ByteArray;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialMultiThreadedBenchmarker;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialSingleThreadedBenchmarker;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SingleThreadedPopulator;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SmallKeyValueSupplier;
 import lombok.extern.log4j.Log4j2;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -17,8 +19,8 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,29 +32,48 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Log4j2
-public class JavaHashMapBenchmark
+public class MapDbBenchmark
 {
-	private final int NUM_ITEMS = 10_000_000;
+	private final int NUM_ITEMS = 1_100_000;
 
 	private Map<ByteArray, ByteArray> map = createMap();
 
 	public Map<ByteArray, ByteArray> createMap() {
-		Map<ByteArray, ByteArray> map = new HashMap<>();
-		try (SmallKeyValueSupplier keyValueSupplier = new SmallKeyValueSupplier()) {
-			new SingleThreadedPopulator().populate(NUM_ITEMS, (Long partition) -> new AbstractCloseableConsumer<Long>() {
-				@Override
-				public void accept(Long object) {
-					map.put(
-							new ByteArray(keyValueSupplier.generateKey(object)),
-							new ByteArray(keyValueSupplier.generateValue(object))
-					);
+		File file = new File("target/MapDb.mapdb");
+		if (!file.exists()) {
+			try (DB db = DBMaker.fileDB(file)
+					.allocateStartSize(NUM_ITEMS)
+					.fileChannelEnable()
+					.fileMmapEnableIfSupported()
+					.make()
+			) {
+				Map<ByteArray, ByteArray> map = (Map<ByteArray, ByteArray>) db.hashMap("test").createOrOpen();
+				try (SmallKeyValueSupplier keyValueSupplier = new SmallKeyValueSupplier()) {
+					new SingleThreadedPopulator().populate(NUM_ITEMS, (Long partition) -> new AbstractCloseableConsumer<Long>()
+					{
+						@Override
+						public void accept(Long object)
+						{
+							map.put(
+									new ByteArray(keyValueSupplier.generateKey(object)),
+									new ByteArray(keyValueSupplier.generateValue(object))
+							);
+						}
+					});
 				}
-			});
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		log.info("Populating finished");
+		DB db = DBMaker.fileDB(file)
+				.readOnly()
+				.allocateStartSize(NUM_ITEMS)
+				.fileChannelEnable()
+				.fileMmapEnableIfSupported()
+				.make();
+		Map<ByteArray, ByteArray> map = (Map<ByteArray, ByteArray>) db.hashMap("test").open();
 		return map;
 	}
 

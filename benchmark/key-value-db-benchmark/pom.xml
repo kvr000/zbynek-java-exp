@@ -54,8 +54,6 @@
 		</plugins>
 	</build>
 
-
-
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -102,6 +100,12 @@
 		<dependency>
 			<groupId>net.openhft</groupId>
 			<artifactId>chronicle-map</artifactId>
+			<version>${chronicle-map.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.rocksdb</groupId>
+			<artifactId>rocksdbjni</artifactId>
 		</dependency>
 
 		<!--

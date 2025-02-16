@@ -1,10 +1,10 @@
-package cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb;
+package com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb;
 
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.AbstractCloseableConsumer;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.MultiThreadedPopulator;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialMultiThreadedBenchmarker;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialSingleThreadedBenchmarker;
-import cz.znj.kvr.sw.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SmallKeyValueSupplier;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.AbstractCloseableConsumer;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.MultiThreadedPopulator;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialMultiThreadedBenchmarker;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SequentialSingleThreadedBenchmarker;
+import com.github.kvr000.exp.java.benchmark.keyvaluedb.keyvaluedb.support.SmallKeyValueSupplier;
 import lombok.extern.log4j.Log4j2;
 import net.openhft.chronicle.map.ChronicleMap;
 import net.openhft.chronicle.map.ChronicleMapBuilder;

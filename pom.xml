@@ -195,8 +195,9 @@
 
 		<bootstrap.version>4.1.1</bootstrap.version>
 
-		<chronicle-map.version>3.26ea4</chronicle-map.version>
+		<chronicle-map.version>3.27ea0</chronicle-map.version>
 		<org.mapdb.version>3.1.0</org.mapdb.version>
+		<rocksdb.version>9.10.0</rocksdb.version>
 
 		<jedis.version>4.3.1</jedis.version>
 		<lettuce.version>6.2.2.RELEASE</lettuce.version>
@@ -1364,6 +1365,12 @@
 				<groupId>org.mapdb</groupId>
 				<artifactId>mapdb</artifactId>
 				<version>${org.mapdb.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.rocksdb</groupId>
+				<artifactId>rocksdbjni</artifactId>
+				<version>${rocksdb.version}</version>
 			</dependency>
 
 			<dependency>

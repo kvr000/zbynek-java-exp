@@ -24,6 +24,7 @@
 
 	<modules>
 		<module>jaxb-exp</module>
+		<module>stax-exp</module>
 	</modules>
 
 </project>

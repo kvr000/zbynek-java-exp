@@ -149,7 +149,7 @@
 		<aws-opentelemetry-agent.version>1.33.0</aws-opentelemetry-agent.version>
 
 		<spring.version>6.1.11</spring.version>
-		<spring-security.version>6.3.2</spring-security.version>
+		<spring-security.version>6.3.4</spring-security.version>
 		<spring-boot.version>3.3.2</spring-boot.version>
 		<spring-data-jpa.version>${spring-boot.version}</spring-data-jpa.version>
 

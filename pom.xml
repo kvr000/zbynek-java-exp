@@ -63,6 +63,7 @@
 		<dryuf-jmh-review-maven-plugin.version>1.2.0</dryuf-jmh-review-maven-plugin.version>
 
 		<lombok.version>1.18.32</lombok.version>
+		<vavr.version>0.10.7</vavr.version>
 
 		<maven-core.version>3.8.6</maven-core.version>
 		<maven-plugin-api.version>${maven-core.version}</maven-plugin-api.version>
@@ -111,7 +112,7 @@
 
 		<reflections.version>0.10.2</reflections.version>
 
-		<commons-lang3.version>3.13.0</commons-lang3.version>
+		<commons-lang3.version>3.20.0</commons-lang3.version>
 		<commons-beanutils.version>1.9.4</commons-beanutils.version>
 		<commons-codec.version>1.18.0</commons-codec.version>
 		<commons-compress.version>1.26.2</commons-compress.version>
@@ -153,7 +154,7 @@
 		<spring-boot.version>3.3.2</spring-boot.version>
 		<spring-data-jpa.version>${spring-boot.version}</spring-data-jpa.version>
 
-		<netty.version>4.1.112.Final</netty.version>
+		<netty.version>4.2.7.Final</netty.version>
 
 		<aws-java-sdk.version>1.12.665</aws-java-sdk.version>
 		<aws-lambda-java-core.version>1.2.2</aws-lambda-java-core.version>
@@ -162,6 +163,9 @@
 		<appengine-maven-plugin.version>2.0.0</appengine-maven-plugin.version>
 
 		<httpcomponents.version>4.5.14</httpcomponents.version>
+		<httpcomponents5.version>5.5.1</httpcomponents5.version>
+
+		<vertx.version>5.0.5</vertx.version>
 
 		<mina-sshd.version>2.13.2</mina-sshd.version>
 		<jsch.version>0.1.55</jsch.version>
@@ -496,6 +500,13 @@
 				<artifactId>lombok</artifactId>
 				<version>${lombok.version}</version>
 				<scope>provided</scope>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/io.vavr/vavr -->
+			<dependency>
+				<groupId>io.vavr</groupId>
+				<artifactId>vavr</artifactId>
+				<version>${vavr.version}</version>
 			</dependency>
 
 			<dependency>
@@ -855,6 +866,44 @@
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient-win</artifactId>
 				<version>${httpcomponents.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents.client5</groupId>
+				<artifactId>httpclient5</artifactId>
+				<version>${httpcomponents5.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-core</artifactId>
+				<version>${vertx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-web</artifactId>
+				<version>${vertx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-web-client</artifactId>
+				<version>${vertx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-codegen</artifactId>
+				<version>${vertx.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-unit</artifactId>
+				<version>${vertx.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.vertx</groupId>
+				<artifactId>vertx-junit5</artifactId>
+				<version>${vertx.version}</version>
+				<scope>test</scope>
 			</dependency>
 
 			<dependency>

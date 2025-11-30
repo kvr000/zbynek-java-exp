@@ -6,6 +6,7 @@ import io.vavr.control.Try;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
@@ -18,6 +19,9 @@ import io.vertx.ext.web.client.WebClientOptions;
 import io.vertx.ext.web.codec.BodyCodec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -40,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.http.HttpRequest;
 import java.util.concurrent.TimeUnit;
 
 
@@ -47,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Warmup(iterations = BenchmarkSettings.WARMUP_ITERATIONS)
 @Measurement(iterations = BenchmarkSettings.MEASUREMENT_ITERATIONS, batchSize = BenchmarkSettings.BATCH_SIZE, time = BenchmarkSettings.TIMEOUT_SEC)
-@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@OutputTimeUnit(TimeUnit.SECONDS)
 @BenchmarkMode(Mode.AverageTime)
 @Fork(value = 1, jvmArgs = "-Xmx8G")
 public class ClientBenchmark
@@ -61,6 +66,22 @@ public class ClientBenchmark
 		@TearDown
 		public void close() throws Exception
 		{
+			server.close();
+		}
+	}
+
+	@State(value = Scope.Benchmark)
+	public static class HttpClientState
+	{
+		TheServer server = new TheServer();
+		URL url = Try.of(() -> new URL(server.url() + "big_16GB")).get();
+
+		java.net.http.HttpClient httpClient = java.net.http.HttpClient.newHttpClient();
+
+		@TearDown
+		public void close() throws Exception
+		{
+			httpClient.close();
 			server.close();
 		}
 	}
@@ -82,12 +103,27 @@ public class ClientBenchmark
 	}
 
 	@State(value = Scope.Benchmark)
+	public static class OkHttpClientState
+	{
+		TheServer server = new TheServer();
+		URL url = Try.of(() -> new URL(server.url() + "big_16GB")).get();
+
+		OkHttpClient httpClient = new OkHttpClient();
+
+		@TearDown
+		public void close() throws Exception
+		{
+			server.close();
+		}
+	}
+
+	@State(value = Scope.Benchmark)
 	public static class VertxWebClientState
 	{
 		TheServer server = new TheServer();
 		URL url = Try.of(() -> new URL(server.url() + "big_16GB")).get();
 
-		Vertx vertx = Vertx.vertx();
+		Vertx vertx = Vertx.vertx(new VertxOptions().setUseDaemonThread(true));
 		WebClient webClient = WebClient.create(vertx, new WebClientOptions().setSsl(false).setDefaultHost(server.hostname()).setDefaultPort(server.port()));
 
 		@TearDown
@@ -105,7 +141,7 @@ public class ClientBenchmark
 		TheServer server = new TheServer();
 		URL url = Try.of(() -> new URL(server.url() + "big_16GB")).get();
 
-		Vertx vertx = Vertx.vertx();
+		Vertx vertx = Vertx.vertx(new VertxOptions().setUseDaemonThread(true));
 		HttpClient httpClient = vertx.createHttpClient(new WebClientOptions().setSsl(false).setDefaultHost(server.hostname()).setDefaultPort(server.port()));
 
 		@TearDown
@@ -129,7 +165,22 @@ public class ClientBenchmark
 	}
 
 	@Benchmark
-	public void b2_ApacheHttpClient(ApacheHttpClientState state, Blackhole blackhole) throws Exception
+	public void b2_HttpClient(HttpClientState state, Blackhole blackhole) throws Exception
+	{
+		java.net.http.HttpResponse<InputStream> response = state.httpClient.send(HttpRequest.newBuilder().GET().uri(state.url.toURI()).build(), (responseInfo) -> {
+			if (responseInfo.statusCode() != 200) {
+				Try.of(() -> { throw new IOException("Unexpected status: " + responseInfo.statusCode()); });
+			}
+			return java.net.http.HttpResponse.BodySubscribers.ofInputStream();
+		});
+		try (InputStream input = response.body()) {
+			long result = IOUtils.consume(input);
+			blackhole.consume(result);
+		}
+	}
+
+	@Benchmark
+	public void b3_ApacheHttpClient(ApacheHttpClientState state, Blackhole blackhole) throws Exception
 	{
 		HttpGet get = new HttpGet(state.url.toURI());
 		state.httpClient.execute(get, (ClassicHttpResponse response) -> {
@@ -144,7 +195,25 @@ public class ClientBenchmark
 	}
 
 	@Benchmark
-	public void b3_VertxHttpClient(VertxHttpClientState state, Blackhole blackhole) throws Exception
+	public void b4_OkHttpClient(OkHttpClientState state, Blackhole blackhole) throws Exception
+	{
+		HttpGet get = new HttpGet(state.url.toURI());
+		try (Response response = state.httpClient.newCall(new Request.Builder().get().url(state.url).build())
+			.execute()) {
+			if (response.code() != 200) {
+				throw new IOException("Unexpected status: " + response.code());
+			}
+			try (InputStream body = response.body().byteStream()) {
+				long size = IOUtils.consume(body);
+				if (size != 16L*1024*1024*1024) {
+					throw new IOException("Unexpected size: " + size);
+				}
+			}
+		}
+	}
+
+	@Benchmark
+	public void b5_VertxHttpClient(VertxHttpClientState state, Blackhole blackhole) throws Exception
 	{
 		MutableLong size = new MutableLong();
 		HttpClientResponse response = state.httpClient.request(HttpMethod.GET, "/big_16GB")
@@ -163,7 +232,7 @@ public class ClientBenchmark
 	}
 
 	@Benchmark
-	public void b4_VertxWebClient(VertxWebClientState state, Blackhole blackhole) throws Exception
+	public void b6_VertxWebClient(VertxWebClientState state, Blackhole blackhole) throws Exception
 	{
 		MutableLong size = new MutableLong();
 		HttpResponse<Void> response = state.webClient.get("/big_16GB")

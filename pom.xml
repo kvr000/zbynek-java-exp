@@ -165,6 +165,8 @@
 		<httpcomponents.version>4.5.14</httpcomponents.version>
 		<httpcomponents5.version>5.5.1</httpcomponents5.version>
 
+		<okhttp.version>5.3.2</okhttp.version>
+
 		<vertx.version>5.0.5</vertx.version>
 
 		<mina-sshd.version>2.13.2</mina-sshd.version>
@@ -871,6 +873,17 @@
 				<groupId>org.apache.httpcomponents.client5</groupId>
 				<artifactId>httpclient5</artifactId>
 				<version>${httpcomponents5.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>okhttp-jvm</artifactId>
+				<version>${okhttp.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.squareup.okhttp3</groupId>
+				<artifactId>okhttp-android</artifactId>
+				<version>${okhttp.version}</version>
 			</dependency>
 
 			<dependency>

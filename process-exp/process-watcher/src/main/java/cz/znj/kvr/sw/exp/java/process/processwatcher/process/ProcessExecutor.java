@@ -2,8 +2,8 @@ package cz.znj.kvr.sw.exp.java.process.processwatcher.process;
 
 import org.apache.commons.lang3.SystemUtils;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;

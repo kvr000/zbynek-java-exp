@@ -9,7 +9,7 @@ import cz.znj.kvr.sw.exp.java.guice.di.common.Second;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import java.util.concurrent.atomic.AtomicInteger;
 
 

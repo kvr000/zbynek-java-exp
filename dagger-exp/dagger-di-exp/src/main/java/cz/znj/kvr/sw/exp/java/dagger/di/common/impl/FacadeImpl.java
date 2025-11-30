@@ -10,7 +10,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 /**

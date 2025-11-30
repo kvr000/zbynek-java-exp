@@ -6,7 +6,7 @@ import net.dryuf.base.concurrent.future.ScheduledUtil;
 import net.dryuf.cmdline.command.AbstractCommand;
 import net.dryuf.cmdline.command.CommandContext;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;

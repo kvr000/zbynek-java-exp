@@ -4,7 +4,7 @@ import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.Machine;
 import lombok.RequiredArgsConstructor;
 import net.dryuf.cmdline.app.BeanFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;

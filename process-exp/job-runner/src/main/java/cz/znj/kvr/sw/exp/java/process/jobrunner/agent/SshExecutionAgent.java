@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.Machine;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;

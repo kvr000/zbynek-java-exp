@@ -9,7 +9,7 @@ import cz.znj.kvr.sw.exp.java.guice.di.common.impl.FirstImpl;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 public class MultiModuleTest

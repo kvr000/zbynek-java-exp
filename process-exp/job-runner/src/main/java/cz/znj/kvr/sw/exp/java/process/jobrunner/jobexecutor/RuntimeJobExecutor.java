@@ -12,8 +12,8 @@ import lombok.extern.log4j.Log4j2;
 import net.dryuf.base.concurrent.executor.FinishingSequencingExecutor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Collections;

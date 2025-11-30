@@ -5,7 +5,7 @@ import cz.znj.kvr.sw.exp.java.dagger.di.common.First;
 import cz.znj.kvr.sw.exp.java.dagger.di.common.Second;
 import dagger.Component;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 
 /**

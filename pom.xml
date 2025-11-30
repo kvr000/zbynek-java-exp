@@ -62,7 +62,7 @@
 		<dryuf-executable-jar-maven-plugin.version>1.2.5</dryuf-executable-jar-maven-plugin.version>
 		<dryuf-jmh-review-maven-plugin.version>1.2.0</dryuf-jmh-review-maven-plugin.version>
 
-		<lombok.version>1.18.32</lombok.version>
+		<lombok.version>1.18.42</lombok.version>
 		<vavr.version>0.10.7</vavr.version>
 
 		<maven-core.version>3.8.6</maven-core.version>
@@ -126,9 +126,9 @@
 		<guava.version>33.2.1-jre</guava.version>
 
 		<guice.version>7.0.0</guice.version>
-		<mycila-guice-extensions.version>5.0</mycila-guice-extensions.version>
+		<mycila-guice-extensions.version>6.0</mycila-guice-extensions.version>
 
-		<dagger.version>2.41</dagger.version>
+		<dagger.version>2.57.2</dagger.version>
 
 		<h2.version>2.3.230</h2.version>
 		<postgresql.version>42.7.3</postgresql.version>
@@ -197,7 +197,7 @@
 		<dryuf-cmdline.version>1.0.1</dryuf-cmdline.version>
 		<dryuf-bigio.version>1.1.1</dryuf-bigio.version>
 		<dryuf-geo.version>1.0.1</dryuf-geo.version>
-		<dryuf-netty.version>1.0.2</dryuf-netty.version>
+		<dryuf-netty.version>1.0.3</dryuf-netty.version>
 
 		<tomcat-embed-jasper.version>9.0.14</tomcat-embed-jasper.version>
 

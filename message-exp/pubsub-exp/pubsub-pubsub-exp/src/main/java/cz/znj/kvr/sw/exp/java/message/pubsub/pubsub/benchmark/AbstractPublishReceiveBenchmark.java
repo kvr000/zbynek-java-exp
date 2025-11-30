@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.cmdline.command.AbstractCommand;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 

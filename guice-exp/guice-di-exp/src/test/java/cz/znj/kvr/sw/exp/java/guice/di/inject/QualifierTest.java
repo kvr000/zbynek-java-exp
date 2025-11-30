@@ -7,9 +7,9 @@ import com.google.inject.Key;
 import com.google.inject.Provides;
 import org.testng.annotations.Test;
 
-import javax.inject.Inject;
-import javax.inject.Qualifier;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Qualifier;
+import jakarta.inject.Singleton;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 

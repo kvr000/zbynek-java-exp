@@ -31,7 +31,7 @@ import net.dryuf.netty.core.NettyServer;
 import net.dryuf.netty.core.Server;
 import net.dryuf.netty.pipeline.TypeDistributingInboundHandler;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;

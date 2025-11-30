@@ -17,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;

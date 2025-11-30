@@ -25,13 +25,11 @@ import org.apache.commons.io.IOUtils;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import java.io.File;
-import java.io.IOException;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Clock;

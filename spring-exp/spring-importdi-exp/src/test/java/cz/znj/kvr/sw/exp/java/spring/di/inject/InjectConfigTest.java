@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 
 @ContextConfiguration(classes = { InjectConfigTest.MainConfig.class, InjectConfigTest.SecondConfig.class })

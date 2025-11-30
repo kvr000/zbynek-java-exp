@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 
 

@@ -40,8 +40,19 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<finalName>netty-http-proxy</finalName>
+							<finalName>${project.artifactId}</finalName>
 							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>cz.znj.kvr.sw.exp.java.netty.netty4.proxy.ProxyRunner</mainClass>
@@ -72,7 +83,7 @@
 									<remove>true</remove>
 								</resourceConfig>
 							</resourceConfigs>
-							<input>target/netty-http-proxy.jar</input>
+							<input>target/${project.artifactId}.${project.packaging}</input>
 						</configuration>
 					</execution>
 				</executions>
@@ -90,8 +101,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.inject</groupId>
-			<artifactId>javax.inject</artifactId>
+			<groupId>jakarta.inject</groupId>
+			<artifactId>jakarta.inject-api</artifactId>
 		</dependency>
 
 		<dependency>

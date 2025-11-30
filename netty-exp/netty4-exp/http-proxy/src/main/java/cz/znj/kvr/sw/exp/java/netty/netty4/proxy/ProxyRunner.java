@@ -23,8 +23,8 @@ import net.dryuf.netty.core.Server;
 import net.dryuf.netty.forward.NettyPortForwarderFactory;
 import net.dryuf.netty.forward.PortForwarderFactory;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;

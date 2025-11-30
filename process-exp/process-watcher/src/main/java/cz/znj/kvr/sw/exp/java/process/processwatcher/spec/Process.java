@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.Value;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;

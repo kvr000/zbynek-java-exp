@@ -5,8 +5,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.testng.annotations.Test;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;

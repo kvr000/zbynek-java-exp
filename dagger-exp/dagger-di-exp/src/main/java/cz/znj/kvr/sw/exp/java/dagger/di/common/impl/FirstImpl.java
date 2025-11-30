@@ -3,7 +3,7 @@ package cz.znj.kvr.sw.exp.java.dagger.di.common.impl;
 import cz.znj.kvr.sw.exp.java.dagger.di.common.First;
 import lombok.AllArgsConstructor;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 /**

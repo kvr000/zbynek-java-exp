@@ -19,8 +19,8 @@ import net.dryuf.cmdline.command.CommandContext;
 import net.dryuf.cmdline.command.RootCommandContext;
 import rx.Observable;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;

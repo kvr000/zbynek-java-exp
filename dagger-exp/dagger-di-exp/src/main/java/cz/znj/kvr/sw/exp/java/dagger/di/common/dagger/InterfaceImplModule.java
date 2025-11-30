@@ -9,7 +9,7 @@ import cz.znj.kvr.sw.exp.java.dagger.di.common.impl.SecondImpl;
 import dagger.Module;
 import dagger.Provides;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 
 /**

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.Arrays;
 
 

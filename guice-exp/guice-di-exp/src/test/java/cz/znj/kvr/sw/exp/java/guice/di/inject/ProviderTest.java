@@ -15,7 +15,7 @@ import lombok.Getter;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 public class ProviderTest

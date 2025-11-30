@@ -3,7 +3,7 @@ package com.github.kvr000.exp.java.spatial.restjpa.controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 @RestController

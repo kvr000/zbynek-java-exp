@@ -8,7 +8,7 @@ import lombok.Value;
 import net.dryuf.base.concurrent.future.FutureUtil;
 import net.dryuf.base.function.ThrowingFunction;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;

@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 
 /**

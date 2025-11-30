@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

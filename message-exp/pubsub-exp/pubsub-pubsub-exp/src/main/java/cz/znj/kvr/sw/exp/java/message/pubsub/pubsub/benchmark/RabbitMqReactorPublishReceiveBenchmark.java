@@ -6,7 +6,7 @@ import io.lettuce.core.RedisConnectionStateAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 

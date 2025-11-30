@@ -24,7 +24,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 
 /**

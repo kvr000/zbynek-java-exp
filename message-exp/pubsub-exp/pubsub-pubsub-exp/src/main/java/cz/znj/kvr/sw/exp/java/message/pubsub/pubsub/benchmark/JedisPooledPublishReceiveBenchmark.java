@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.JedisPubSub;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 

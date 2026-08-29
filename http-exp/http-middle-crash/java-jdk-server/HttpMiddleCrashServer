@@ -1,0 +1,237 @@
+#!/usr/bin/env -S java --source 17
+/*
+ * Dependency-free HTTP/1.1 server: no framework needed, just the JDK's built-in
+ * com.sun.net.httpserver.HttpServer (bundled in every standard JDK, no external
+ * jar) -- and no javac either, this file *is* the executable. The shebang
+ * line above and `java`'s single-file source-launcher (JEP 330, JDK 17+)
+ * mean the OS runs `java --source 17` on this file directly: it's compiled
+ * in memory and executed in one step. This is the Java counterpart to
+ * ../go-gin-server/main.go -- same four endpoints, same semantics, so it
+ * can be dropped into the run.sh contract as an alternative --server and
+ * exercised by the existing Java client.
+ *
+ * Per JEP 330, the shebang mechanism only kicks in for files that do NOT
+ * end in .java -- hence no extension on this file's name.
+ *
+ * Endpoints:
+ *
+ *   GET /health           - liveness check, used by run.sh to know when the
+ *                            server is ready.
+ *   GET /stream/complete   - streams 5 chunks and finishes normally (the
+ *                            terminating zero-length chunk is written for us
+ *                            by exchange.close()).
+ *   GET /stream/crash      - streams 3 chunks, then throws AbortResponse, a
+ *                            deliberate "abort this response" sentinel
+ *                            (analogous to Go's http.ErrAbortHandler).
+ *   GET /stream/panic      - streams 3 chunks, then throws a plain
+ *                            RuntimeException, simulating a genuine unplanned
+ *                            bug rather than a deliberate abort.
+ *   GET /panic/early       - throws before writing anything at all (no
+ *                            headers, no body). The mirror image of the two
+ *                            above: nothing has reached the client yet, so
+ *                            this should come back as a clean, ordinary 500.
+ *
+ * The two /stream/... crash endpoints leave the terminating chunk unwritten,
+ * so to an HTTP client they're indistinguishable from the server process
+ * actually dying mid-response -- see ../README.md for what that
+ * demonstrates.
+ *
+ * How the recovery split works (recovering(), below): com.sun.net.httpserver
+ * has no built-in Recovery-style middleware, but it has the raw material we
+ * need -- if a handler throws and the exception is never caught, the server
+ * abruptly closes the underlying connection without completing the response
+ * (confirmed empirically: an uncaught exception thrown after a chunk has been
+ * written and flushed leaves the client's read() call throwing an
+ * IOException instead of seeing a clean EOF). recovering() wraps every
+ * handler and tracks, with a plain boolean flag set right after
+ * sendResponseHeaders(), whether the response has already been committed --
+ * the same distinction Go's c.Writer.Written() makes:
+ *
+ *   - Not yet committed: nothing has reached the client, so it's safe to
+ *     catch the exception ourselves and write a normal 500.
+ *   - Already committed: headers (and maybe some body) are already on the
+ *     wire. There's no way to retroactively turn that into a clean error, so
+ *     recovering() re-throws instead, leaving the exchange unclosed -- which
+ *     is what makes the server abruptly tear the connection down instead of
+ *     finishing it "successfully" with silently truncated data.
+ *
+ * Usage (see build.sh/run.sh for the standard way to invoke this):
+ *   PORT=8089 ./HttpMiddleCrashServer
+ *   # (needs the executable bit; run.sh's build.sh check covers the rest)
+ *   # Lives at the module root rather than under src/main/java -- on at
+ *   # least one dev setup, invoking `java --source` via the shebang
+ *   # launcher fails when the script path is long/deeply nested, so this
+ *   # file stays directly in its module directory.
+ */
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public final class HttpMiddleCrashServer {
+
+    private static final int TOTAL_CHUNKS = 5;      // chunks written on a fully successful stream
+    private static final int CRASH_AFTER_CHUNK = 3; // the crash endpoints write this many chunks, then abort
+    private static final int CHUNK_SIZE = 32 * 1024; // bytes per chunk
+
+    private static final byte[] CHUNK = new byte[CHUNK_SIZE];
+    static {
+        Arrays.fill(CHUNK, (byte) 'A');
+    }
+
+    /** How (or whether) streamHandler aborts partway through. */
+    private enum Mode {
+        COMPLETE,       // finish normally
+        ABORT_SENTINEL, // throw AbortResponse: deliberate abort
+        GENERIC_PANIC,  // throw RuntimeException: stand-in for an unplanned bug
+    }
+
+    /**
+     * Deliberate "abandon this response" sentinel, mirroring Go's
+     * http.ErrAbortHandler: recovering() still aborts the connection for it
+     * like any other exception once the response is committed, but skips
+     * logging it as if it were a genuine bug.
+     */
+    private static final class AbortResponse extends RuntimeException {
+        AbortResponse(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * Like HttpHandler, but also receives the shared "has the response been
+     * committed yet" flag that recovering() uses to decide how to react to an
+     * exception.
+     */
+    @FunctionalInterface
+    private interface RecoverableHandler {
+        void handle(HttpExchange exchange, AtomicBoolean committed) throws IOException;
+    }
+
+    public static void main(String[] args) throws IOException {
+        String portEnv = System.getenv("PORT");
+        int port = (portEnv == null || portEnv.isBlank()) ? 8089 : Integer.parseInt(portEnv);
+
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
+        server.setExecutor(Executors.newFixedThreadPool(8));
+
+        server.createContext("/health", exchange -> respondPlain(exchange, 200, "ok"));
+        server.createContext("/stream/complete", recovering(streamHandler(Mode.COMPLETE)));
+        server.createContext("/stream/crash", recovering(streamHandler(Mode.ABORT_SENTINEL)));
+        server.createContext("/stream/panic", recovering(streamHandler(Mode.GENERIC_PANIC)));
+        server.createContext("/panic/early", recovering((exchange, committed) -> {
+            throw new IllegalStateException("simulated application bug before any response was written");
+        }));
+
+        server.start();
+        System.out.println("listening on 127.0.0.1:" + port);
+    }
+
+    /**
+     * Forces chunked transfer encoding by calling sendResponseHeaders(200, 0)
+     * -- a responseLength of 0 is what tells com.sun.net.httpserver to use
+     * chunked encoding instead of computing a Content-Length -- and flushes
+     * after each chunk so it actually hits the wire on its own (rather than
+     * getting coalesced with the next one). That's what makes the crash land
+     * mid-stream from the client's point of view instead of before anything
+     * was sent.
+     */
+    private static RecoverableHandler streamHandler(Mode mode) {
+        return (exchange, committed) -> {
+            exchange.getResponseHeaders().set("Content-Type", "application/octet-stream");
+            exchange.sendResponseHeaders(200, 0);
+            committed.set(true);
+            OutputStream body = exchange.getResponseBody();
+
+            for (int i = 1; i <= TOTAL_CHUNKS; i++) {
+                if (mode != Mode.COMPLETE && i > CRASH_AFTER_CHUNK) {
+                    switch (mode) {
+                        case ABORT_SENTINEL ->
+                            // See the class doc comment: an uncaught exception after the
+                            // response is committed leaves the terminating chunk unwritten,
+                            // which is exactly what a genuine mid-response crash looks like
+                            // to the client.
+                            throw new AbortResponse("deliberate simulated crash");
+                        case GENERIC_PANIC ->
+                            // An ordinary exception, standing in for a real bug (a null
+                            // pointer, an index out of range, whatever) that happens to
+                            // occur partway through an in-flight response. recovering()
+                            // treats this the same as the deliberate abort above, because
+                            // by this point the response is already committed.
+                            throw new IllegalStateException(
+                                    "simulated application bug (not the deliberate abort sentinel)");
+                        default -> {
+                        }
+                    }
+                }
+                body.write(CHUNK);
+                body.flush();
+                sleep(30);
+            }
+            // Normal return: exchange.close() flushes and writes the terminating
+            // zero-length chunk for us.
+            exchange.close();
+        };
+    }
+
+    /**
+     * Wraps a RecoverableHandler so an uncaught exception doesn't just crash
+     * the request-handling thread. See the class doc comment for the
+     * committed/not-committed distinction this makes.
+     */
+    private static HttpHandler recovering(RecoverableHandler delegate) {
+        return exchange -> {
+            AtomicBoolean committed = new AtomicBoolean(false);
+            try {
+                delegate.handle(exchange, committed);
+            } catch (Throwable t) {
+                if (!(t instanceof AbortResponse)) {
+                    System.err.println("Recovered from an exception while serving a request: path="
+                            + exchange.getRequestURI().getPath() + " responseStarted=" + committed.get()
+                            + " err=" + t);
+                    t.printStackTrace();
+                }
+                if (!committed.get()) {
+                    // Nothing has reached the client yet: safe to recover cleanly and
+                    // return a normal error response.
+                    respondPlain(exchange, 500, "internal error\n");
+                    return;
+                }
+                // Already streaming: there's no way to retroactively turn this into a
+                // clean error, so leave the exchange unclosed and propagate instead.
+                // The server then abruptly tears the connection down rather than
+                // completing it -- the same failure mode a genuine crash produces.
+                if (t instanceof RuntimeException re) {
+                    throw re;
+                }
+                throw new RuntimeException(t);
+            }
+        };
+    }
+
+    private static void respondPlain(HttpExchange exchange, int status, String body) throws IOException {
+        byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=utf-8");
+        exchange.sendResponseHeaders(status, bytes.length);
+        try (OutputStream out = exchange.getResponseBody()) {
+            out.write(bytes);
+        }
+    }
+
+    private static void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+    }
+}

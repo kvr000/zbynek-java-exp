@@ -1,0 +1,203 @@
+#!/usr/bin/env -S java --source 17
+/*
+ * Dependency-free test client: no Maven/Gradle, and no javac either -- this
+ * file *is* the executable. The shebang line above and `java`'s single-file
+ * source-launcher (JEP 330) mean the OS runs `java --source 17` on this
+ * file directly: it's compiled in memory and executed in one step, no
+ * build step and no .class files on disk (JDK 17+, uses
+ * java.net.http.HttpClient).
+ *
+ * Per JEP 330, the shebang mechanism only kicks in for files that do NOT
+ * end in .java -- hence no extension on this file's name.
+ *
+ * Exercises the Go/Gin server in ../go-gin-server against four scenarios:
+ *
+ *   1. GET /stream/complete - a normal chunked response that finishes cleanly.
+ *      Expectation: the client reads the whole body with no error.
+ *
+ *   2. GET /stream/crash - the server panics with http.ErrAbortHandler partway
+ *      through the chunked body (see go-gin-server/main.go's streamHandler),
+ *      never sending the terminating chunk.
+ *      Expectation: the client does NOT silently treat this as end-of-stream.
+ *      It must surface an IOException, proving it can tell a truncated
+ *      response apart from a complete one -- which is the whole point of
+ *      forcing chunked encoding instead of relying on connection-close
+ *      framing (see README.md).
+ *
+ *   3. GET /stream/panic - same as /stream/crash, but the server panics with
+ *      a plain error rather than the deliberate ErrAbortHandler sentinel,
+ *      simulating a genuine unplanned bug mid-response instead of a
+ *      deliberate abort. go-gin-server's recoverAbortingIfCommitted middleware is
+ *      what makes this behave the same as /stream/crash instead of being
+ *      recovered into a fake-clean 200 -- this case is what proves that
+ *      general fix actually works, not just the specific sentinel value.
+ *      Expectation: same as /stream/crash -- an IOException partway through.
+ *
+ *   4. GET /panic/early - the server panics before writing anything at all
+ *      (no headers, no body) -- the mirror image of case 3. Since nothing
+ *      has reached the client yet, recoverAbortingIfCommitted takes the
+ *      OTHER branch and converts this into a clean, ordinary 500 rather
+ *      than aborting the connection.
+ *      Expectation: status 500, and the body reads to completion with no
+ *      exception -- a panic that never reached the client should not be
+ *      indistinguishable from a crash; it should look like an ordinary
+ *      handled error.
+ *
+ * Usage (see build.sh/run.sh for the standard way to invoke this):
+ *   ./HttpMiddleCrashTest [baseUrl]
+ *   # baseUrl defaults to http://127.0.0.1:8089
+ *   # (needs the executable bit; run.sh's build.sh check covers the rest)
+ *   # Lives at the module root rather than under src/main/java -- on at
+ *   # least one dev setup, invoking `java --source` via the shebang
+ *   # launcher fails when the script path is long/deeply nested, so this
+ *   # file stays directly in its module directory.
+ *
+ * Exit code is 0 if all cases behave as expected, 1 otherwise.
+ */
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+
+public class HttpMiddleCrashTest {
+
+    public static void main(String[] args) throws Exception {
+        String base = args.length > 0 ? args[0] : "http://127.0.0.1:8089";
+
+        waitForServer(base, Duration.ofSeconds(10));
+
+        boolean allPassed = true;
+        allPassed &= testCompleteStreamReadsFully(base);
+        allPassed &= testIncompleteStreamIsDetected(base, "/stream/crash",
+                "deliberate abort (panic(http.ErrAbortHandler))");
+        allPassed &= testIncompleteStreamIsDetected(base, "/stream/panic",
+                "simulated unplanned bug (panic(error), recovered-then-reaborted)");
+        allPassed &= testEarlyPanicReturnsCleanServerError(base);
+
+        System.out.println();
+        System.out.println(allPassed ? "ALL TESTS PASSED" : "SOME TESTS FAILED");
+        System.exit(allPassed ? 0 : 1);
+    }
+
+    static HttpClient client() {
+        return HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1) // force HTTP/1.1, no h2c upgrade attempt
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+    }
+
+    static void waitForServer(String base, Duration timeout) throws InterruptedException {
+        long deadline = System.nanoTime() + timeout.toNanos();
+        HttpRequest req = HttpRequest.newBuilder(URI.create(base + "/health")).GET().build();
+        while (System.nanoTime() < deadline) {
+            try {
+                HttpResponse<Void> resp = client().send(req, HttpResponse.BodyHandlers.discarding());
+                if (resp.statusCode() == 200) {
+                    return;
+                }
+            } catch (IOException e) {
+                // server not up yet, keep retrying
+            }
+            Thread.sleep(100);
+        }
+        throw new RuntimeException("server at " + base + " never became healthy within " + timeout);
+    }
+
+    static boolean testCompleteStreamReadsFully(String base) {
+        System.out.println("=== /stream/complete: expect a full, error-free read ===");
+        try {
+            HttpRequest req = HttpRequest.newBuilder(URI.create(base + "/stream/complete")).GET().build();
+            HttpResponse<InputStream> resp = client().send(req, HttpResponse.BodyHandlers.ofInputStream());
+            logHeaders(resp);
+
+            byte[] body = resp.body().readAllBytes();
+            System.out.println("read " + body.length + " bytes, no exception");
+
+            boolean pass = resp.statusCode() == 200 && body.length > 0;
+            System.out.println(pass ? "PASS" : "FAIL");
+            return pass;
+        } catch (Exception e) {
+            System.out.println("UNEXPECTED EXCEPTION: " + e);
+            System.out.println("FAIL");
+            return false;
+        }
+    }
+
+    /**
+     * Shared by /stream/crash and /stream/panic: both should leave the
+     * client unable to read to a clean EOF, regardless of which panic value
+     * the server used internally to trigger the abort.
+     */
+    static boolean testIncompleteStreamIsDetected(String base, String path, String label) {
+        System.out.println();
+        System.out.println("=== " + path + ": expect the client to detect an incomplete response (" + label + ") ===");
+        try {
+            HttpRequest req = HttpRequest.newBuilder(URI.create(base + path)).GET().build();
+            HttpResponse<InputStream> resp = client().send(req, HttpResponse.BodyHandlers.ofInputStream());
+            logHeaders(resp);
+
+            byte[] buf = new byte[8192];
+            long totalRead = 0;
+            try (InputStream in = resp.body()) {
+                int n;
+                while ((n = in.read(buf)) != -1) {
+                    totalRead += n;
+                }
+                // Reaching here means the stream reported a clean EOF -- i.e. the client
+                // could NOT tell the truncated response apart from a complete one. That's
+                // exactly the failure mode this whole exercise is about avoiding.
+                System.out.println("read " + totalRead + " bytes, stream reported clean EOF (no exception)");
+                System.out.println("FAIL: client could not distinguish the crash from a complete response");
+                return false;
+            } catch (IOException e) {
+                System.out.println("read " + totalRead + " bytes before the read failed");
+                System.out.println("caught " + e.getClass().getName() + ": " + e.getMessage());
+                System.out.println("PASS: client correctly detected the response as incomplete");
+                return true;
+            }
+        } catch (Exception e) {
+            // A failure inside send() itself (before a body stream is even handed back)
+            // is also a valid detection -- just log it distinctly since it's a different
+            // point of failure than a mid-body read error.
+            System.out.println("send() itself failed: " + e.getClass().getName() + ": " + e.getMessage());
+            System.out.println("PASS (detected before body reading started)");
+            return true;
+        }
+    }
+
+    /**
+     * The mirror image of testIncompleteStreamIsDetected: here the panic happens
+     * before any response bytes go out, so recoverAbortingIfCommitted takes the
+     * other branch and the client should see a normal, complete HTTP exchange --
+     * just with a 500 status -- rather than a truncated/aborted connection.
+     */
+    static boolean testEarlyPanicReturnsCleanServerError(String base) {
+        System.out.println();
+        System.out.println("=== /panic/early: expect a clean 500, not an aborted connection ===");
+        try {
+            HttpRequest req = HttpRequest.newBuilder(URI.create(base + "/panic/early")).GET().build();
+            HttpResponse<byte[]> resp = client().send(req, HttpResponse.BodyHandlers.ofByteArray());
+            logHeaders(resp);
+            System.out.println("read " + resp.body().length + " bytes, no exception");
+
+            boolean pass = resp.statusCode() == 500;
+            System.out.println(pass ? "PASS" : "FAIL: expected status 500, got " + resp.statusCode());
+            return pass;
+        } catch (Exception e) {
+            System.out.println("UNEXPECTED EXCEPTION: " + e);
+            System.out.println("FAIL: a panic before any output should be a clean 500, not a connection failure");
+            return false;
+        }
+    }
+
+    static void logHeaders(HttpResponse<?> resp) {
+        System.out.println("status=" + resp.statusCode()
+                + " transfer-encoding=" + resp.headers().firstValue("transfer-encoding").orElse("<none>")
+                + " content-length=" + resp.headers().firstValue("content-length").orElse("<none>")
+                + " version=" + resp.version());
+    }
+}

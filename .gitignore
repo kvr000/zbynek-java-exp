@@ -6,14 +6,17 @@
 
 # Java:
 target
-.idea
+
+
+# IDEs
+.idea/
 *.iml
+.vscode/
 tags
 
 
 # NodeJs:
-# dependencies
-node_modules
+node_modules/
 
 # testing
 coverage

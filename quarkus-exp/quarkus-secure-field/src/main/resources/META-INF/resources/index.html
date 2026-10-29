@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Quarkus secure field</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<h1>Quarkus secure field experiment</h1>
+
+<h2>Pages</h2>
+<ul>
+	<li><a href="/login">/login</a> - dummy login, <code>super</code> / <code>super</code></li>
+	<li><a href="/login/roles">/login/roles</a> - switch roles of the current session, shows the Bearer token</li>
+	<li><a href="/logout">/logout</a> - clear the session cookie</li>
+</ul>
+
+<h2>Ticket API</h2>
+<ul>
+	<li><a href="/api/ticket">GET /api/ticket</a> - list</li>
+	<li><a href="/api/ticket/1">GET /api/ticket/1</a> - single ticket (increments <code>views</code>)</li>
+	<li><code>POST /api/ticket</code>, <code>PUT /api/ticket/{id}</code>, <code>PATCH /api/ticket/{id}</code> - use the console below</li>
+</ul>
+
+<table>
+	<tr><th>Field</th><th>Read</th><th>Write</th></tr>
+	<tr><td>id</td><td>all</td><td>nobody (server assigned)</td></tr>
+	<tr><td>system</td><td>super, admin</td><td>super, admin</td></tr>
+	<tr><td>title</td><td>all</td><td>super, admin, user</td></tr>
+	<tr><td>views</td><td>super, admin</td><td>super (counter incremented by GET /{id})</td></tr>
+	<tr><td>description</td><td>super, admin, user</td><td>super, admin, user</td></tr>
+</table>
+<p>Reading the API requires any of super/admin/user/guest, writing requires super/admin/user.
+	Sending a field you cannot write returns 403, unless the value is unchanged.
+	<code>PUT</code> resets writable fields missing in the body, <code>PATCH</code> is JSON merge patch.</p>
+
+<h2>API console</h2>
+<p>Uses the session cookie; set the roles on <a href="/login/roles">/login/roles</a> first.</p>
+<div class="row">
+	<select id="method">
+		<option>GET</option>
+		<option>POST</option>
+		<option>PUT</option>
+		<option>PATCH</option>
+	</select>
+	<input id="path" value="/api/ticket" size="30">
+	<button id="send">Send</button>
+</div>
+<textarea id="body" rows="8">{
+  "system": "billing",
+  "title": "New ticket",
+  "description": "Created from the console"
+}</textarea>
+<pre id="result">(no request yet)</pre>
+
+<script>
+	document.getElementById('send').addEventListener('click', async () => {
+		const method = document.getElementById('method').value;
+		const path = document.getElementById('path').value;
+		const options = { method, credentials: 'same-origin', headers: { 'Accept': 'application/json' } };
+		if (method !== 'GET') {
+			options.headers['Content-Type'] = 'application/json';
+			options.body = document.getElementById('body').value;
+		}
+		const result = document.getElementById('result');
+		try {
+			const response = await fetch(path, options);
+			const text = await response.text();
+			let pretty = text;
+			try {
+				pretty = JSON.stringify(JSON.parse(text), null, 2);
+			}
+			catch (e) {
+			}
+			result.textContent = method + ' ' + path + ' -> ' + response.status + ' ' + response.statusText + '\n\n' + pretty;
+		}
+		catch (e) {
+			result.textContent = 'Request failed: ' + e;
+		}
+	});
+</script>
+</body>
+</html>

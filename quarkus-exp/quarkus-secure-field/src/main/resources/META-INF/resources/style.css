@@ -1,0 +1,12 @@
+body { font-family: system-ui, sans-serif; max-width: 960px; margin: 2em auto; padding: 0 16px; color: #222; }
+h1 { font-size: 1.6em; }
+code, pre, textarea { font-family: ui-monospace, monospace; font-size: 0.9em; }
+pre, textarea { background: #f4f4f4; border: 1px solid #ddd; padding: 8px; width: 100%; box-sizing: border-box; overflow-x: auto; }
+textarea.token { height: 9em; word-break: break-all; }
+table { border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 4px 8px; text-align: left; vertical-align: top; }
+.error { color: #b00020; }
+.nav a { margin-right: 1em; }
+fieldset { margin-bottom: 1em; }
+label { margin-right: 1.2em; }
+.row { margin: 0.4em 0; }

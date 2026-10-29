@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Login - Quarkus secure field</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="nav"><a href="/">Home</a><a href="/login/roles">Roles</a><a href="/logout">Logout</a></div>
+<h1>Login</h1>
+{#if currentUser}
+<p>Already logged in as <b>{currentUser}</b> - <a href="/login/roles">change roles</a> or log in again below.</p>
+{/if}
+{#if error}
+<p class="error">{error}</p>
+{/if}
+<form method="post" action="/login">
+	<div class="row"><label for="username">Username</label><input id="username" name="username" value="super" autofocus></div>
+	<div class="row"><label for="password">Password</label><input id="password" name="password" type="password"></div>
+	<div class="row"><button type="submit">Login</button></div>
+</form>
+<p>Dummy credentials: <code>super</code> / <code>super</code>. Login starts with role <code>super</code>.</p>
+</body>
+</html>

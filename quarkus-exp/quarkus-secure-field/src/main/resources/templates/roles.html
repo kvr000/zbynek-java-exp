@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Roles - Quarkus secure field</title>
+	<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="nav"><a href="/">Home</a><a href="/login">Login</a><a href="/api/ticket">/api/ticket</a><a href="/logout">Logout</a></div>
+<h1>Session roles</h1>
+<p>User: <b>{username}</b>, current roles: <b>{currentRoles}</b></p>
+
+<form method="post" action="/login/roles">
+	<fieldset>
+		<legend>Roles in this session</legend>
+		{#for r in roles}
+		<label><input type="checkbox" name="roles" value="{r.name}"{#if r.checked} checked{/if}> {r.name}</label>
+		{/for}
+	</fieldset>
+	<button type="submit">Apply (issues new token)</button>
+</form>
+
+<h2>Bearer token</h2>
+<p>Expires: {expires}. The same token is stored in the HttpOnly session cookie.</p>
+<textarea class="token" readonly onclick="this.select()">{token}</textarea>
+
+<h2>Usage</h2>
+<pre>curl -H 'Authorization: Bearer {token}' {baseUri}/api/ticket</pre>
+
+<h2>Claims</h2>
+<table>
+	<tr><th>Claim</th><th>Value</th></tr>
+	{#for c in claims}
+	<tr><td>{c.name}</td><td><code>{c.value}</code></td></tr>
+	{/for}
+</table>
+</body>
+</html>

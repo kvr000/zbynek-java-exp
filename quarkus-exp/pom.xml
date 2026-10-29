@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.kvr000.exp.java.quarkus</groupId>
+	<artifactId>quarkus-exp-base</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1</version>
+	<name>Quarkus experiments base</name>
+	<description>Parent of Quarkus experiments</description>
+
+	<parent>
+		<groupId>cz.znj.kvr.sw.exp.java</groupId>
+		<artifactId>java-exp</artifactId>
+		<version>0.0.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<properties>
+		<!--
+			Inherited dependencyManagement entries take precedence over the imported quarkus-bom, so the libraries
+			managed globally in the top level pom (Vert.x 5, Netty 4.2, ...) would win over the Quarkus ones.
+			Re-point those version properties to the Quarkus aligned versions (defined in top level pom).
+		-->
+		<vertx.version>${quarkus.vertx.version}</vertx.version>
+		<netty.version>${quarkus.netty.version}</netty.version>
+		<jackson.version>${quarkus.jackson.version}</jackson.version>
+		<jupiter.version>${quarkus.jupiter.version}</jupiter.version>
+		<jakarta.validation-api.version>${quarkus.jakarta.validation-api.version}</jakarta.validation-api.version>
+	</properties>
+
+</project>

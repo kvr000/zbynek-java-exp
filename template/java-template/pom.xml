@@ -55,7 +55,7 @@
 		<commons-lang3.version>3.12.0</commons-lang3.version>
 
 		<guice.version>5.1.0</guice.version>
-		<guava.version>31.1-jre</guava.version>
+		<guava.version>33.7.2-jre</guava.version>
 	</properties>
 
 	<licenses>

@@ -6,7 +6,6 @@ import com.github.kvr000.exp.java.quarkus.securefield.security.SecureFieldWriter
 import io.quarkus.security.identity.CurrentIdentityAssociation;
 import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.security.RolesAllowed;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -18,6 +17,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
 import org.jboss.resteasy.reactive.ResponseStatus;
 
 import java.util.List;
@@ -31,19 +31,17 @@ import java.util.List;
 @Path("/api/ticket")
 @Produces(MediaType.APPLICATION_JSON)
 @RolesAllowed({ Roles.SUPER, Roles.ADMIN, Roles.USER, Roles.GUEST })
+@RequiredArgsConstructor
 public class TicketResource
 {
 	public static final String MERGE_PATCH_JSON = "application/merge-patch+json";
 
-	@Inject
-	TicketRepository repository;
+	private final TicketRepository repository;
 
-	@Inject
-	SecureFieldWriter writer;
+	private final SecureFieldWriter writer;
 
 	/** Request scoped (proxied); getIdentity() returns the real immutable identity of the current request. */
-	@Inject
-	CurrentIdentityAssociation identityAssociation;
+	private final CurrentIdentityAssociation identityAssociation;
 
 	@GET
 	public List<Ticket> list()
@@ -110,7 +108,7 @@ public class TicketResource
 
 	private static void validate(Ticket ticket)
 	{
-		if (ticket.title == null || ticket.title.isBlank()) {
+		if (ticket.getTitle() == null || ticket.getTitle().isBlank()) {
 			throw SecureFieldWriter.error(Response.Status.BAD_REQUEST, "title is required");
 		}
 	}

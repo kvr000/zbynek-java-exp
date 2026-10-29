@@ -4,53 +4,47 @@ import com.github.kvr000.exp.java.quarkus.securefield.security.Roles;
 import com.github.kvr000.exp.java.quarkus.securefield.security.SecureWriteField;
 import io.quarkus.resteasy.reactive.jackson.SecureField;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 /**
  * Ticket entity.
  *
  * Read access is enforced by Quarkus REST {@link SecureField} during serialization, write access by
- * {@link com.github.kvr000.exp.java.quarkus.securefield.security.SecureFieldWriter} based on {@link SecureWriteField}.
+ * {@link com.github.kvr000.exp.java.quarkus.securefield.security.SecureFieldWriter} based on {@link SecureWriteField}
+ * (found by Jackson introspection on the field backing the getter / setter).
  */
-@RegisterForReflection
 @Data
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@RegisterForReflection
 public class Ticket
 {
 	/** Server assigned. */
 	@SecureWriteField
-	public Long id;
+	private Long id;
 
-	@SecureField(rolesAllowed = { Roles.SUPER })
+	@SecureField(rolesAllowed = { Roles.SUPER, Roles.ADMIN })
 	@SecureWriteField(rolesAllowed = { Roles.SUPER, Roles.ADMIN })
-	public String system;
+	private String system;
 
-	public String title;
+	private String title;
 
 	/** View counter, incremented by GET /api/ticket/{id}; readable by admin, writable by super only. */
 	@SecureField(rolesAllowed = { Roles.SUPER, Roles.ADMIN })
 	@SecureWriteField(rolesAllowed = { Roles.SUPER })
-	public int views;
+	private int views;
 
 	@SecureField(rolesAllowed = { Roles.SUPER, Roles.ADMIN, Roles.USER })
 	@SecureWriteField(rolesAllowed = { Roles.SUPER, Roles.ADMIN, Roles.USER })
-	public String description;
-
-	public Ticket()
-	{
-	}
-
-	public Ticket(Long id, String system, String title, int views, String description)
-	{
-		this.id = id;
-		this.system = system;
-		this.title = title;
-		this.views = views;
-		this.description = description;
-	}
+	private String description;
 
 	public Ticket copy()
 	{
-		return new Ticket(id, system, title, views, description);
+		return toBuilder().build();
 	}
 }

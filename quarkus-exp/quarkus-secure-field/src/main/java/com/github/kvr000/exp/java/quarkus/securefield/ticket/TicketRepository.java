@@ -23,15 +23,18 @@ public class TicketRepository
 
 	public TicketRepository()
 	{
-		create(new Ticket(null, "billing", "Invoice not generated", 3, "Monthly invoice for customer 42 is missing."));
-		create(new Ticket(null, "backup", "Backup job failing", 10, "Nightly backup fails with timeout since Monday."));
-		create(new Ticket(null, "portal", "Typo on login page", 0, "'Pasword' instead of 'Password'."));
+		create(Ticket.builder().system("billing").title("Invoice not generated").views(3)
+			.description("Monthly invoice for customer 42 is missing.").build());
+		create(Ticket.builder().system("backup").title("Backup job failing").views(10)
+			.description("Nightly backup fails with timeout since Monday.").build());
+		create(Ticket.builder().system("portal").title("Typo on login page").views(0)
+			.description("'Pasword' instead of 'Password'.").build());
 	}
 
 	public List<Ticket> list()
 	{
 		return tickets.values().stream()
-			.sorted(Comparator.comparing(t -> t.id))
+			.sorted(Comparator.comparing(Ticket::getId))
 			.map(Ticket::copy)
 			.toList();
 	}
@@ -45,16 +48,17 @@ public class TicketRepository
 	public Optional<Ticket> view(long id)
 	{
 		return update(id, t -> {
-			++t.views;
+			t.setViews(t.getViews() + 1);
 			return t;
 		});
 	}
 
 	public Ticket create(Ticket ticket)
 	{
-		Ticket stored = ticket.copy();
-		stored.id = sequence.incrementAndGet();
-		tickets.put(stored.id, stored);
+		Ticket stored = ticket.toBuilder()
+			.id(sequence.incrementAndGet())
+			.build();
+		tickets.put(stored.getId(), stored);
 		return stored.copy();
 	}
 
@@ -66,7 +70,7 @@ public class TicketRepository
 	{
 		Ticket updated = tickets.computeIfPresent(id, (key, old) -> {
 			Ticket result = updater.apply(old.copy());
-			result.id = key;
+			result.setId(key);
 			return result;
 		});
 		return Optional.ofNullable(updated).map(Ticket::copy);

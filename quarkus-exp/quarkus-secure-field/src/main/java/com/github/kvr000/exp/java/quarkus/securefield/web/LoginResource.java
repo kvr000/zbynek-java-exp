@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
 import java.net.URI;
@@ -33,25 +34,26 @@ import java.util.TreeMap;
  */
 @Path("/login")
 @Produces(MediaType.TEXT_HTML)
+@RequiredArgsConstructor
 public class LoginResource
 {
 	public static final String DUMMY_USERNAME = "super";
 	public static final String DUMMY_PASSWORD = "super";
 
+	/** Templates are located by the injection point (field) name, so they stay field-injected. */
 	@Inject
 	Template login;
 
 	@Inject
 	Template roles;
 
-	@Inject
-	TokenService tokenService;
+	private final TokenService tokenService;
 
-	@Inject
-	SecurityIdentity identity;
+	/** Request scoped proxy, resolves identity of the current request. */
+	private final SecurityIdentity identity;
 
-	@Inject
-	JsonWebToken jwt;
+	/** Request scoped proxy, resolves token of the current request. */
+	private final JsonWebToken jwt;
 
 	@Context
 	UriInfo uriInfo;

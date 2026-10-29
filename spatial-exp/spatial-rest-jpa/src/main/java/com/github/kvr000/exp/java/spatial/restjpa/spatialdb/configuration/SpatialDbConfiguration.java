@@ -9,12 +9,13 @@ import lombok.extern.log4j.Log4j2;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
+import org.springframework.boot.jpa.autoconfigure.JpaProperties;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -34,9 +35,7 @@ import java.sql.SQLException;
 
 
 @Configuration
-@ComponentScan
 @EnableTransactionManagement
-@EnableAutoConfiguration
 @EntityScan(basePackageClasses = { PlaceDb.class })
 @EnableJpaRepositories(entityManagerFactoryRef = "spatialdb-EntityManagerFactory", transactionManagerRef = "spatialdb-TransactionManager", basePackageClasses = { PlaceRepository.class })
 @ComponentScan(basePackageClasses = { PlaceDb.class, PlaceRepository.class })
@@ -49,14 +48,14 @@ public class SpatialDbConfiguration
 	@Bean(name = "spatialdb-JpaProperties")
 	@Singleton
 	@ConfigurationProperties(prefix = "spatialdb.jpa")
-	public JpaProperties jpaProperties() {
+	public static JpaProperties jpaProperties() {
 		return new JpaProperties();
 	}
 
 	@SpatialDb
 	@Bean
 	@SneakyThrows
-	public DataSource spatialdbDataSource(
+	public static DataSource spatialdbDataSource(
 		@Value("${spatialdb.datasource.url}") String url,
 		@Value("${spatialdb.datasource.username}") String username,
 		@Value("${spatialdb.datasource.password}") String password
@@ -92,9 +91,9 @@ public class SpatialDbConfiguration
 	@Bean(name = "spatialdb-EntityManagerFactory")
 	@Singleton
 	@Inject
-	public LocalContainerEntityManagerFactoryBean spatialdbEntityManagerFactory(
+	public static LocalContainerEntityManagerFactoryBean spatialdbEntityManagerFactory(
 		@SpatialDb @Named("spatialdb-JpaProperties") JpaProperties jpaProperties,
-		@SpatialDb DataSource dataSource
+		@Lazy @SpatialDb DataSource dataSource
 	)
 	{
 		LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
@@ -109,7 +108,8 @@ public class SpatialDbConfiguration
 	@SpatialDb
 	@Bean(name = "spatialdb-TransactionManager")
 	@Singleton
-	public PlatformTransactionManager spatialdbTransactionManager(EntityManagerFactory emf) {
+	@Inject
+	public static PlatformTransactionManager spatialdbTransactionManager(EntityManagerFactory emf) {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
 		transactionManager.setEntityManagerFactory(emf);
 

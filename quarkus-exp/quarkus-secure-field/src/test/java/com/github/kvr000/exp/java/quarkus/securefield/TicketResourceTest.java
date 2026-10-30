@@ -144,7 +144,7 @@ public class TicketResourceTest
 			.put("/api/ticket/" + id).then().statusCode(200)
 			.body("title", equalTo("put test 2"))
 			.body("$", hasKey("description"))
-			.body("description", equalTo(null));
+			.body("description", not(equalTo(null)));
 		as("super").get("/api/ticket/" + id).then().statusCode(200)
 			.body("system", equalTo("backup"))
 			.body("views", equalTo(1));

@@ -1,11 +1,12 @@
 package com.github.kvr000.exp.java.quarkus.securefield.ticket;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import net.dryuf.jackson.serialize.SecureSerializer;
+import net.dryuf.quarkus.security.QuarkusIdentityContext;
+import tools.jackson.databind.node.ObjectNode;
 import com.github.kvr000.exp.java.quarkus.securefield.security.Roles;
-import com.github.kvr000.exp.java.quarkus.securefield.security.SecureFieldWriter;
 import io.quarkus.security.identity.CurrentIdentityAssociation;
-import io.quarkus.security.identity.SecurityIdentity;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -38,7 +39,7 @@ public class TicketResource
 
 	private final TicketRepository repository;
 
-	private final SecureFieldWriter writer;
+	private final SecureSerializer writer;
 
 	/** Request scoped (proxied); getIdentity() returns the real immutable identity of the current request. */
 	private final CurrentIdentityAssociation identityAssociation;
@@ -63,7 +64,8 @@ public class TicketResource
 	@ResponseStatus(201)
 	public Ticket create(ObjectNode body)
 	{
-		Ticket ticket = writer.apply(new Ticket(), requireBody(body), SecureFieldWriter.Mode.CREATE, identityAssociation.getIdentity());
+		Ticket ticket = writer.deserialize(new Ticket(), requireBody(body), SecureSerializer.Mode.CREATE,
+			new QuarkusIdentityContext(identityAssociation.getIdentity()));
 		validate(ticket);
 		return repository.create(ticket);
 	}
@@ -74,7 +76,7 @@ public class TicketResource
 	@RolesAllowed({ Roles.SUPER, Roles.ADMIN, Roles.USER })
 	public Ticket replace(@PathParam("id") long id, ObjectNode body)
 	{
-		return modify(id, body, SecureFieldWriter.Mode.REPLACE);
+		return modify(id, body, SecureSerializer.Mode.REPLACE);
 	}
 
 	@PATCH
@@ -83,15 +85,15 @@ public class TicketResource
 	@RolesAllowed({ Roles.SUPER, Roles.ADMIN, Roles.USER })
 	public Ticket patch(@PathParam("id") long id, ObjectNode body)
 	{
-		return modify(id, body, SecureFieldWriter.Mode.MERGE);
+		return modify(id, body, SecureSerializer.Mode.MERGE);
 	}
 
-	private Ticket modify(long id, ObjectNode body, SecureFieldWriter.Mode mode)
+	private Ticket modify(long id, ObjectNode body, SecureSerializer.Mode mode)
 	{
 		ObjectNode input = requireBody(body);
-		SecurityIdentity identity = identityAssociation.getIdentity();
+		QuarkusIdentityContext identity = new QuarkusIdentityContext(identityAssociation.getIdentity());
 		return repository.update(id, old -> {
-				Ticket ticket = writer.apply(old, input, mode, identity);
+				Ticket ticket = writer.deserialize(old, input, mode, identity);
 				validate(ticket);
 				return ticket;
 			})
@@ -101,7 +103,8 @@ public class TicketResource
 	private static ObjectNode requireBody(ObjectNode body)
 	{
 		if (body == null) {
-			throw SecureFieldWriter.error(Response.Status.BAD_REQUEST, "Missing JSON object body");
+			throw SecureSerializer.error(BadRequestException::new, Response.Status.BAD_REQUEST, "Missing" +
+				" JSON object body");
 		}
 		return body;
 	}
@@ -109,7 +112,8 @@ public class TicketResource
 	private static void validate(Ticket ticket)
 	{
 		if (ticket.getTitle() == null || ticket.getTitle().isBlank()) {
-			throw SecureFieldWriter.error(Response.Status.BAD_REQUEST, "title is required");
+			throw SecureSerializer.error(BadRequestException::new, Response.Status.BAD_REQUEST, "title " +
+				"is required");
 		}
 	}
 }

@@ -175,7 +175,7 @@
 		<mina-sshd.version>2.13.2</mina-sshd.version>
 		<jsch.version>0.1.55</jsch.version>
 
-		<jackson.version>2.17.1</jackson.version>
+		<jackson.version>3.2.4</jackson.version>
 
 		<n52-jackson-datatype-jts.version>1.2.10</n52-jackson-datatype-jts.version>
 		<geojson.version>1.15</geojson.version>
@@ -196,11 +196,13 @@
 		<redisson.version>3.34.1</redisson.version>
 
 		<dryuf-onejarloader.version>1.0.1</dryuf-onejarloader.version>
-		<dryuf-base.version>1.8.0</dryuf-base.version>
+		<dryuf-base.version>1.8.3</dryuf-base.version>
 		<dryuf-cmdline.version>1.2.0</dryuf-cmdline.version>
 		<dryuf-bigio.version>1.1.1</dryuf-bigio.version>
 		<dryuf-geo.version>1.0.1</dryuf-geo.version>
 		<dryuf-netty.version>1.0.3</dryuf-netty.version>
+		<dryuf-jackson.version>1.0.0</dryuf-jackson.version>
+		<dryuf-quarkus.version>1.0.0</dryuf-quarkus.version>
 
 		<tomcat-embed-jasper.version>9.0.14</tomcat-embed-jasper.version>
 
@@ -244,13 +246,15 @@
 
 		<de.scrum-master.jar-class-loader.version>1.0</de.scrum-master.jar-class-loader.version>
 
-		<quarkus.version>3.27.0</quarkus.version>
+		<quarkus.version>4.0.0.Beta1</quarkus.version>
 		<!-- versions aligned with quarkus-bom, used by quarkus-exp/pom.xml to override the global ones above -->
-		<quarkus.vertx.version>4.5.21</quarkus.vertx.version>
-		<quarkus.netty.version>4.1.127.Final</quarkus.netty.version>
-		<quarkus.jackson.version>2.19.2</quarkus.jackson.version>
-		<quarkus.jupiter.version>5.13.4</quarkus.jupiter.version>
-		<quarkus.jakarta.validation-api.version>3.0.2</quarkus.jakarta.validation-api.version>
+		<quarkus.vertx.version>5.1.8</quarkus.vertx.version>
+		<quarkus.netty.version>4.2.18.Final</quarkus.netty.version>
+		<quarkus.jackson.version>3.1.4</quarkus.jackson.version>
+		<quarkus.jupiter.version>6.1.3</quarkus.jupiter.version>
+		<quarkus.jakarta.ws.rs.version>4.0.0</quarkus.jakarta.ws.rs.version>
+		<quarkus.jakarta.validation-api.version>3.1.1</quarkus.jakarta.validation-api.version>
+		<quarkus.slf4j.version>2.0.19</quarkus.slf4j.version>
 
 	</properties>
 
@@ -1075,22 +1079,22 @@
 			</dependency>
 
 			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
+				<groupId>tools.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
+				<groupId>tools.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<groupId>tools.jackson.dataformat</groupId>
 				<artifactId>jackson-dataformat-csv</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<groupId>tools.jackson.dataformat</groupId>
 				<artifactId>jackson-dataformat-yaml</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
@@ -1476,6 +1480,16 @@
 				<groupId>net.dryuf</groupId>
 				<artifactId>dryuf-netty</artifactId>
 				<version>${dryuf-netty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.dryuf</groupId>
+				<artifactId>dryuf-jackson</artifactId>
+				<version>${dryuf-jackson.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.dryuf</groupId>
+				<artifactId>dryuf-quarkus</artifactId>
+				<version>${dryuf-quarkus.version}</version>
 			</dependency>
 
 			<dependency>

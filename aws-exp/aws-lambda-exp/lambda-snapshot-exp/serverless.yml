@@ -1,12 +1,16 @@
 service: zbynek-lambda-snapstart-exp
 frameworkVersion: '3'
 
+plugins:
+  - serverless-better-credentials
+
 provider:
   name: aws
-  runtime: java17
+  runtime: java25
   region: us-west-2
   memorySize: 256
   timeout: 30
+  architecture: arm64
 
 package:
   artifact: target/zbynek-lambda-snapstart.jar

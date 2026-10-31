@@ -1,0 +1,7 @@
+{
+  "devDependencies": {
+    "serverless": "^3",
+    "serverless-better-credentials": "",
+    "serverless-dependson-plugin": "^1.1.2"
+  }
+}

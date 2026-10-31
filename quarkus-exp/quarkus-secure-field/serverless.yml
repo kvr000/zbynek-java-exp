@@ -1,0 +1,35 @@
+# Serverless Framework v3 deployment of the Lambda package
+#
+# Build:   mvn package          (builds standalone jar and target/lambda/function.zip)
+# Deploy:  npx serverless deploy   (prints the HTTP API endpoint URL)
+# Remove:  npx serverless remove
+
+service: quarkus-secure-field
+frameworkVersion: '3'
+
+plugins:
+  - serverless-better-credentials
+
+provider:
+  name: aws
+  runtime: java25
+  region: us-east-1
+  # Quarkus JVM mode: more memory = more CPU = faster cold start / SnapStart restore
+  memorySize: 512
+  timeout: 30
+  architecture: arm64
+  httpApi:
+    payload: '2.0'
+
+package:
+  artifact: target/lambda/function.zip
+
+functions:
+  app:
+    # generic handler of quarkus-amazon-lambda-http, dispatches API Gateway events to the JAX-RS resources
+    handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+    snapStart: true
+    events:
+      # catch-all $default route (any method, any path including /), served on the $default stage, so the absolute
+      # paths used by the pages (/login, /api/ticket) and cookie Path=/ work
+      - httpApi: '*'

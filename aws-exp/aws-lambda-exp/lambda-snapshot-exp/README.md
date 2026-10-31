@@ -26,8 +26,8 @@ Java AWS Lambda, with SnapStart enabled to improve cold start.
 ### Initialization
 
 ```
-npx sls plugin install -n serverless-vpc-plugin
-serverless plugin install -n serverless-dependson-plugin
+npm install
+npx serverless deploy
 ```
 
 

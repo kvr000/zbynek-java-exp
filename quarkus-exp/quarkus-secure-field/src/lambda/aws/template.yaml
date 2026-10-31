@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: quarkus-secure-field experiment - Quarkus on AWS Lambda behind API Gateway HTTP API
+
+# Build first:  mvn package  (or mvn package -Plambda for the Lambda only)
+# Deploy:       sam deploy -g -t src/lambda/aws/template.yaml
+
+Resources:
+  SecureFieldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+      Runtime: java25
+      CodeUri: ../../../target/lambda/function.zip
+      MemorySize: 512
+      Timeout: 15
+      Architectures:
+        - arm64
+      SnapStart:
+        ApplyOn: PublishedVersions
+      AutoPublishAlias: live
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -XX:+TieredCompilation -XX:TieredStopAtLevel=1
+      Events:
+        # no properties: catch-all $default route on the $default stage, so absolute paths (/login, /api/ticket)
+        # and cookie Path=/ work without a stage prefix
+        HttpApiEvent:
+          Type: HttpApi
+
+Outputs:
+  SecureFieldApi:
+    Description: Application URL
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/"

@@ -4,6 +4,7 @@ import io.quarkus.jackson.JsonMapperBuilderCustomizer;
 import jakarta.inject.Singleton;
 import tools.jackson.core.json.JsonReadFeature;
 import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.json.JsonMapper;
 
 
@@ -18,8 +19,9 @@ public class JacksonConfig implements JsonMapperBuilderCustomizer
 	public void customize(JsonMapper.Builder builder)
 	{
 		builder
-			.configure(JsonReadFeature.ALLOW_TRAILING_COMMA, true)
-			.configure(JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES, true)
-			.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, false);
+			.enable(JsonReadFeature.ALLOW_TRAILING_COMMA,
+				JsonReadFeature.ALLOW_UNQUOTED_PROPERTY_NAMES)
+			.disable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS)
+			.disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY);
 	}
 }

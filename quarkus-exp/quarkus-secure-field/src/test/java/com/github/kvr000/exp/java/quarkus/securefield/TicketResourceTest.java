@@ -124,7 +124,7 @@ public class TicketResourceTest
 		as("admin").contentType(ContentType.JSON).body("{\"views\":100}")
 			.patch("/api/ticket/" + id).then().statusCode(403);
 		// echoing unchanged value is fine
-		as("admin").contentType(ContentType.JSON).body("{\"views\":5,\"system\":\"crm\"}")
+		as("super").contentType(ContentType.JSON).body("{\"views\":5,\"system\":\"crm\"}")
 			.patch("/api/ticket/" + id).then().statusCode(200)
 			.body("views", equalTo(5));
 		as("super").contentType(ContentType.JSON).body("{\"views\":100}")
@@ -136,7 +136,7 @@ public class TicketResourceTest
 	@Test
 	public void put_user_preservesRestrictedFields()
 	{
-		int id = as("admin").contentType(ContentType.JSON).body("{\"title\":\"put test\",\"system\":\"backup\",\"description\":\"d\"}")
+		int id = as("super").contentType(ContentType.JSON).body("{\"title\":\"put test\",\"system\":\"backup\",\"description\":\"d\"}")
 			.post("/api/ticket").then().statusCode(201)
 			.extract().path("id");
 

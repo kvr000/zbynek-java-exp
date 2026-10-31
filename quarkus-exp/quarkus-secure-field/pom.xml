@@ -15,6 +15,13 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
+	<properties>
+		<!-- standalone server: java -jar target/quarkus-secure-field-0.0.1-runner.jar ; lambda profile switches to fast-jar -->
+		<quarkus.package.jar.type>uber-jar</quarkus.package.jar.type>
+		<!-- -Dlambda.skip skips the nested Lambda build -->
+		<lambda.skip>false</lambda.skip>
+	</properties>
+
 	<build>
 		<plugins>
 
@@ -127,4 +134,100 @@
 		</dependency>
 
 	</dependencies>
+
+	<profiles>
+		<!--
+			Default build (no -P): standalone uber jar (target/quarkus-secure-field-0.0.1-runner.jar) and, via nested build
+			of the lambda profile, the Lambda package (target/lambda/function.zip).  Skip the Lambda part with -Dlambda.skip.
+			The Lambda needs a separate Quarkus build as quarkus-amazon-lambda-http replaces the HTTP server.
+		-->
+		<profile>
+			<id>standalone</id>
+			<activation>
+				<!-- deactivated automatically when -Plambda is given, so the nested build does not recurse -->
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>create-invoker-dir</id>
+								<phase>package</phase>
+								<configuration>
+									<target>
+										<mkdir dir="${project.build.directory}/invoker-reports"/>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-invoker-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>build-lambda</id>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<skipInvocation>${lambda.skip}</skipInvocation>
+									<projectsDirectory>${project.basedir}</projectsDirectory>
+									<reportsDirectory>${project.build.directory}/invoker-reports</reportsDirectory>
+									<pomIncludes>
+										<pomInclude>pom.xml</pomInclude>
+									</pomIncludes>
+									<goals>
+										<goal>package</goal>
+									</goals>
+									<profiles>
+										<profile>lambda</profile>
+									</profiles>
+									<properties>
+										<!-- same code, already tested by the outer build -->
+										<skipTests>true</skipTests>
+									</properties>
+									<streamLogs>true</streamLogs>
+									<noLog>true</noLog>
+									<disableReports>true</disableReports>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!--
+			AWS Lambda behind API Gateway HTTP API (payload v2), only:  mvn package -Plambda
+			Produces target/lambda/function.zip, handler (provided by the extension): io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest
+			Deploy: npx serverless deploy  (serverless.yml)  or  sam deploy -g -t src/lambda/aws/template.yaml
+		-->
+		<profile>
+			<id>lambda</id>
+			<properties>
+				<quarkus.package.jar.type>legacy-jar</quarkus.package.jar.type>
+			</properties>
+			<build>
+				<!-- separate output, so it does not clash with the standalone build -->
+				<directory>${project.basedir}/target/lambda</directory>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>io.quarkus</groupId>
+					<artifactId>quarkus-amazon-lambda-http</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 </project>

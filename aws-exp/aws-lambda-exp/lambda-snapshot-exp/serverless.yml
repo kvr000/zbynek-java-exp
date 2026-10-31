@@ -1,3 +1,9 @@
+# Serverless Framework v3 deployment of the Lambda package
+#
+# Build:   mvn package          (builds standalone jar and target/lambda/function.zip)
+# Deploy:  npx serverless deploy   (prints the HTTP API endpoint URL)
+# Remove:  npx serverless remove
+
 service: zbynek-lambda-snapstart-exp
 frameworkVersion: '3'
 

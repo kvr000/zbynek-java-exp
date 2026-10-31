@@ -19,6 +19,25 @@ From IDE, run `com.github.kvr000.exp.java.quarkus.securefield.SecureFieldServer`
 
 Open http://localhost:8080/ , log in as `super` / `super`, switch roles on `/login/roles`.
 
+## AWS Lambda (API Gateway HTTP API)
+
+`mvn package` builds both the standalone jar and the Lambda package `target/lambda/function.zip` (nested build of the
+`lambda` profile, skip it with `-Dlambda.skip`).  `mvn package -Plambda` builds the Lambda package only.
+
+```
+mvn package
+npx serverless deploy                              # serverless.yml
+# or
+sam deploy -g -t src/lambda/aws/template.yaml
+```
+
+The `lambda` profile adds `quarkus-amazon-lambda-http`, which provides the handler
+`io.quarkus.amazon.lambda.runtime.QuarkusStreamHandler::handleRequest` (a custom handler class must not exist
+alongside it).
+The same resources, pages and JWT cookie / Bearer security run inside Lambda.  `mvn quarkus:dev -Plambda` runs locally
+with the Lambda mock event server.  The API must be served on the `$default` stage (or a custom domain) as pages use
+absolute paths.
+
 ## Ticket fields
 
 | Field       | Read                | Write                          |
@@ -42,3 +61,28 @@ curl -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -X PA
 ```
 
 The JWT key pair in `src/main/resources/jwt/` is a demo key, never use it for anything real.
+
+# AWS Lambda Java SnapStart experiment
+
+## Setup
+
+### System
+
+```
+```
+
+### Initialization
+
+```
+npm install
+npx serverless deploy
+```
+
+
+### Manual Tests
+
+```
+export HOST=https://whatever
+
+curl -i -X GET $HOST/login/
+```

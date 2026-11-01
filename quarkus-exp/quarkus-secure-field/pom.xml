@@ -108,6 +108,10 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-smallrye-jwt-build</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.jboss.slf4j</groupId>
+			<artifactId>slf4j-jboss-logmanager</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>net.dryuf</groupId>

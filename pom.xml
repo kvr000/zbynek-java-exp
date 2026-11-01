@@ -248,7 +248,7 @@
 		<de.scrum-master.jar-class-loader.version>1.0</de.scrum-master.jar-class-loader.version>
 
 		<quarkus.version>4.0.0.Beta1</quarkus.version>
-
+		<slf4j-jboss-logmanager.version>2.1.0.Final</slf4j-jboss-logmanager.version>
 	</properties>
 
 	<build>
@@ -1447,6 +1447,11 @@
 				<version>${quarkus.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.slf4j</groupId>
+				<artifactId>slf4j-jboss-logmanager</artifactId>
+				<version>${slf4j-jboss-logmanager.version}</version>
 			</dependency>
 
 			<!-- dryuf -->

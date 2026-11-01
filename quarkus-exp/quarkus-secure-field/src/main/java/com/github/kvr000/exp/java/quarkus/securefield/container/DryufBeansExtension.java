@@ -3,6 +3,7 @@ package com.github.kvr000.exp.java.quarkus.securefield.container;
 import jakarta.enterprise.inject.build.compatible.spi.BuildCompatibleExtension;
 import jakarta.enterprise.inject.build.compatible.spi.Discovery;
 import jakarta.enterprise.inject.build.compatible.spi.ScannedClasses;
+import net.dryuf.quarkus.filter.IdentityContextFilter;
 import net.dryuf.quarkus.security.QuarkusIdentityContextHolder;
 import net.dryuf.quarkus.security.QuarkusIdentityContextResolver;
 
@@ -21,5 +22,6 @@ public class DryufBeansExtension implements BuildCompatibleExtension
 	{
 		scannedClasses.add(QuarkusIdentityContextHolder.class.getName());
 		scannedClasses.add(QuarkusIdentityContextResolver.class.getName());
+		scannedClasses.add(IdentityContextFilter.class.getName());
 	}
 }

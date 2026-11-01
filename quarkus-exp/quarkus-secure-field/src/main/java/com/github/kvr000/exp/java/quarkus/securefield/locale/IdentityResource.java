@@ -14,7 +14,7 @@ import java.util.Map;
 
 
 @Path("/identity")
-public class LocaleResource
+public class IdentityResource
 {
 	@Inject
 	IdentityContextHolder identityContextHolder;
@@ -25,12 +25,7 @@ public class LocaleResource
 	public Map<String, String> locale() {
 		IdentityContext identityContext = identityContextHolder.getIdentityContext();
 		LocaleContext localeContext = identityContext.getLocaleContext();
-		return ImmutableMap.of(
-			"locale", localeContext.locale().getDisplayName(),
-			"timeZone", localeContext.timeZone().getId(),
-			"currency", localeContext.currency().getCurrencyCode(),
-			"domain", localeContext.domain()
-		);
+		return localeContext.attributes();
 	}
 
 	@GET

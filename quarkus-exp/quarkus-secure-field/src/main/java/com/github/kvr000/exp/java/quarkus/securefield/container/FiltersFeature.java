@@ -6,6 +6,7 @@ import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.Provider;
 import net.dryuf.quarkus.filter.IdentityContextFilter;
+import net.dryuf.quarkus.filter.RequestLogFilter;
 
 
 /**
@@ -17,10 +18,13 @@ public class FiltersFeature implements DynamicFeature
 {
 	@Inject
 	IdentityContextFilter identityContextFilter;
+	@Inject
+	RequestLogFilter requestLogFilter;
 
 	@Override
 	public void configure(ResourceInfo resourceInfo, FeatureContext context)
 	{
+		context.register(requestLogFilter);
 		context.register(identityContextFilter);
 	}
 }

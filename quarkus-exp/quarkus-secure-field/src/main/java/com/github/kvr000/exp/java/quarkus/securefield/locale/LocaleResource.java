@@ -1,4 +1,4 @@
-package com.github.kvr000.exp.java.quarkus.securefield.ticket;
+package com.github.kvr000.exp.java.quarkus.securefield.locale;
 
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
@@ -13,7 +13,7 @@ import net.dryuf.base.security.identity.IdentityContextHolder;
 import java.util.Map;
 
 
-@Path("/static")
+@Path("/identity")
 public class LocaleResource
 {
 	@Inject
@@ -27,7 +27,21 @@ public class LocaleResource
 		LocaleContext localeContext = identityContext.getLocaleContext();
 		return ImmutableMap.of(
 			"locale", localeContext.locale().getDisplayName(),
-			"timeZone", localeContext.timeZone().getId()
+			"timeZone", localeContext.timeZone().getId(),
+			"currency", localeContext.currency().getCurrencyCode(),
+			"domain", localeContext.domain()
+		);
+	}
+
+	@GET
+	@Path("/identity")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Map<String, Object> identity() {
+		IdentityContext identityContext = identityContextHolder.getIdentityContext();
+		LocaleContext localeContext = identityContext.getLocaleContext();
+		return ImmutableMap.of(
+			"user", identityContext.getPrincipal().toString(),
+			"roles", identityContext.getRoles()
 		);
 	}
 }

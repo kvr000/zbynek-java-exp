@@ -47,9 +47,6 @@ public class TicketResource
 
 	private final SecureSerializer writer;
 
-	/** Request scoped (proxied); getIdentity() returns the real immutable identity of the current request. */
-	private final CurrentIdentityAssociation identityAssociation;
-
 	@GET
 	public List<Ticket> list()
 	{

@@ -1,5 +1,8 @@
 package com.github.kvr000.exp.java.quarkus.securefield.ticket;
 
+import jakarta.inject.Inject;
+import net.dryuf.base.security.identity.IdentityContext;
+import net.dryuf.base.security.identity.IdentityContextHolder;
 import net.dryuf.jackson.serialize.SecureSerializer;
 import net.dryuf.quarkus.security.QuarkusIdentityContext;
 import tools.jackson.databind.node.ObjectNode;
@@ -37,6 +40,9 @@ public class TicketResource
 {
 	public static final String MERGE_PATCH_JSON = "application/merge-patch+json";
 
+	@Inject
+	IdentityContextHolder identityContextHolder;
+
 	private final TicketRepository repository;
 
 	private final SecureSerializer writer;
@@ -65,7 +71,7 @@ public class TicketResource
 	public Ticket create(ObjectNode body)
 	{
 		Ticket ticket = writer.deserialize(new Ticket(), requireBody(body), SecureSerializer.Mode.CREATE,
-			new QuarkusIdentityContext(identityAssociation.getIdentity()));
+			identityContextHolder.getIdentityContext());
 		validate(ticket);
 		return repository.create(ticket);
 	}
@@ -91,7 +97,7 @@ public class TicketResource
 	private Ticket modify(long id, ObjectNode body, SecureSerializer.Mode mode)
 	{
 		ObjectNode input = requireBody(body);
-		QuarkusIdentityContext identity = new QuarkusIdentityContext(identityAssociation.getIdentity());
+		IdentityContext identity = identityContextHolder.getIdentityContext();
 		return repository.update(id, old -> {
 				Ticket ticket = writer.deserialize(old, input, mode, identity);
 				validate(ticket);

@@ -124,7 +124,7 @@ public class TicketResourceTest
 		as("admin").contentType(ContentType.JSON).body("{\"views\":100}")
 			.patch("/api/ticket/" + id).then().statusCode(403);
 		// echoing unchanged value is fine
-		as("super").contentType(ContentType.JSON).body("{\"views\":5,\"system\":\"crm\"}")
+		as("admin").contentType(ContentType.JSON).body("{\"views\":5}")
 			.patch("/api/ticket/" + id).then().statusCode(200)
 			.body("views", equalTo(5));
 		as("super").contentType(ContentType.JSON).body("{\"views\":100}")

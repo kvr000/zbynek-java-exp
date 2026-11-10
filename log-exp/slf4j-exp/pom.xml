@@ -24,6 +24,7 @@
 
 	<modules>
 		<module>slf4j-cmdline-exp</module>
+		<module>slf4j-throwing-exp/</module>
 	</modules>
 
 	<dependencyManagement>

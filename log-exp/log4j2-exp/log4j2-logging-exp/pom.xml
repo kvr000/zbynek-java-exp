@@ -13,6 +13,89 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<parameters>true</parameters>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<compilerArgs>
+						<arg>-Xlint:all,-processing</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+
+			<!-- the order matters - maven-shade-plugin somehow consumes the jar created by assembly-plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<finalName>${project.artifactId}-shade</finalName>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<filters>
+								<filter>
+									<artifact>*:${project.artifactId}-onejar</artifact>
+									<excludes>
+										<exclude>*</exclude>
+										<exclude>**/*</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>cz.znj.kvr.sw.exp.java.logexp.slf4j.throwing.Main</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>net.dryuf.maven.plugin</groupId>
+				<artifactId>dryuf-executable-jar-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>exec-shade</id>
+						<phase>package</phase>
+						<goals>
+							<goal>create-executable</goal>
+						</goals>
+						<configuration>
+							<vmParams>-Xmx256m</vmParams>
+							<sort>true</sort>
+							<resourceConfigs>
+								<resourceConfig>
+									<pattern>glob:*.jar</pattern>
+									<minimalCompress>10</minimalCompress>
+								</resourceConfig>
+							</resourceConfigs>
+							<input>${project.build.directory}/${project.artifactId}-shade.${project.packaging}</input>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

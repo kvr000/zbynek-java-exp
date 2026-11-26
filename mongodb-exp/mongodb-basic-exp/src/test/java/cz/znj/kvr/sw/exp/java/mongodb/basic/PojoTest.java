@@ -18,7 +18,6 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.InsertOneModel;
 import cz.znj.kvr.sw.exp.java.mongodb.basic.config.MongoEmbeddedConfig;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -204,7 +203,7 @@ public class PojoTest extends AbstractTestNGSpringContextTests
 		return Iterables.getOnlyElement(rs);
 	}
 
-	@Builder(builderClassName = "Builder", toBuilder = true)
+	@lombok.Builder(builderClassName = "Builder", toBuilder = true)
 	@Value
 	@JsonDeserialize(builder = PojoTable.Builder.class)
 	@BsonDiscriminator

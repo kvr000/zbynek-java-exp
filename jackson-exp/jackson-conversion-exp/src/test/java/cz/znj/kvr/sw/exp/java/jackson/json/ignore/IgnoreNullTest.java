@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.testng.Assert;
@@ -74,7 +73,7 @@ public class IgnoreNullTest
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@Data
-	@Builder()
+	@lombok.Builder()
 	public static class IgnoreNullClass
 	{
 		private String x;
@@ -83,7 +82,7 @@ public class IgnoreNullTest
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@Data
-	@Builder()
+	@lombok.Builder()
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class IgnoreAbsentClass
@@ -94,7 +93,7 @@ public class IgnoreNullTest
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
 	@Data
-	@Builder()
+	@lombok.Builder()
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class IgnoreEmptyClass

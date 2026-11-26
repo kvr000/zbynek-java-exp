@@ -2,7 +2,6 @@ package cz.znj.kvr.sw.exp.java.process.processwatcher.spec;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.Builder;
 import lombok.Value;
 
 import jakarta.annotation.Nullable;
@@ -15,7 +14,7 @@ import java.util.Set;
  * Process specification.
  */
 @Value
-@Builder(builderClassName = "Builder")
+@lombok.Builder(builderClassName = "Builder")
 @JsonDeserialize(builder = Process.Builder.class)
 public class Process
 {

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.databind.util.Converter;
-import lombok.Builder;
 import lombok.Value;
 import org.testng.annotations.Test;
 
@@ -34,7 +33,7 @@ public class CustomAdjustDeserializationTest
 	}
 
 	@Value
-	@Builder(builderClassName = "Builder", toBuilder = true)
+	@lombok.Builder(builderClassName = "Builder", toBuilder = true)
 	@JsonDeserialize(builder = TestObject.Builder.class, converter = TestObjectConverter.class, contentConverter = TestObjectConverter.class)
 	public static class TestObject
 	{

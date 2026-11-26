@@ -261,6 +261,8 @@
 				<configuration>
 					<source>${javac.version}</source>
 					<target>${javac.target.version}</target>
+					<!-- JDK 23+ no longer discovers annotation processors (lombok, jmh, dagger, ...) on classpath by default -->
+					<proc>full</proc>
 				</configuration>
 			</plugin>
 

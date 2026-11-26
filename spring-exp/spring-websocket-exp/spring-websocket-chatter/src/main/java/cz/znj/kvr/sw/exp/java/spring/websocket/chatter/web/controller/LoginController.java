@@ -3,7 +3,6 @@ package cz.znj.kvr.sw.exp.java.spring.websocket.chatter.web.controller;
 import com.google.common.collect.ImmutableMap;
 import cz.znj.kvr.sw.exp.java.spring.websocket.chatter.core.model.LoggedUser;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +58,7 @@ public class LoginController
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Data
-	@Builder
+	@lombok.Builder
 	public static class LoginForm
 	{
 		private String redirect;

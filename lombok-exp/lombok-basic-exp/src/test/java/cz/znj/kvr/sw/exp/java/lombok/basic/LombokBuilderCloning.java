@@ -1,6 +1,5 @@
 package cz.znj.kvr.sw.exp.java.lombok.basic;
 
-import lombok.Builder;
 import lombok.Getter;
 import org.junit.Assert;
 import org.testng.annotations.Test;
@@ -26,7 +25,7 @@ public class LombokBuilderCloning
 		Assert.assertEquals("Hello", tc.getTitle());
 	}
 
-	@Builder(toBuilder = true)
+	@lombok.Builder(toBuilder = true)
 	@Getter
 	public static class TestObject
 	{

@@ -2,7 +2,6 @@ package cz.znj.kvr.sw.exp.java.nio.socket.forward;
 
 import com.google.common.base.Ascii;
 import com.google.common.primitives.Bytes;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import net.dryuf.base.concurrent.future.FutureUtil;
@@ -433,7 +432,7 @@ public class HttpProxyFactory
 		return address;
 	}
 
-	@Builder
+	@lombok.Builder
 	@Value
 	public static class Config
 	{

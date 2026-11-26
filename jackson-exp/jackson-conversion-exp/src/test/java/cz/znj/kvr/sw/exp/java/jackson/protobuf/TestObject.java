@@ -1,11 +1,10 @@
 package cz.znj.kvr.sw.exp.java.jackson.protobuf;
 
-import lombok.Builder;
 import lombok.Data;
 
 
 @Data
-@Builder
+@lombok.Builder
 public class TestObject
 {
 	private int			testId;

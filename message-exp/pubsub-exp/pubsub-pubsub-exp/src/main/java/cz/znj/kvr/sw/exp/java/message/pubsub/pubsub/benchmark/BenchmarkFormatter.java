@@ -2,7 +2,6 @@ package cz.znj.kvr.sw.exp.java.message.pubsub.pubsub.benchmark;
 
 
 import com.google.common.base.Strings;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
@@ -63,7 +62,7 @@ public class BenchmarkFormatter implements AutoCloseable
 	}
 
 	@Value
-	@Builder(builderClassName = "Builder")
+	@lombok.Builder(builderClassName = "Builder")
 	public static class Benchmark
 	{
 		String name;

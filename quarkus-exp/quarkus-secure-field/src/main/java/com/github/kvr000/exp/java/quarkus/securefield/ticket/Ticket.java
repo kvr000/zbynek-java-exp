@@ -4,7 +4,6 @@ import com.github.kvr000.exp.java.quarkus.securefield.security.Roles;
 import io.quarkus.resteasy.reactive.jackson.SecureField;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.dryuf.base.security.annotation.SecureWrite;
@@ -18,7 +17,7 @@ import net.dryuf.base.security.annotation.SecureWrite;
  * (found by Jackson introspection on the field backing the getter / setter).
  */
 @Data
-@Builder(toBuilder = true)
+@lombok.Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @RegisterForReflection

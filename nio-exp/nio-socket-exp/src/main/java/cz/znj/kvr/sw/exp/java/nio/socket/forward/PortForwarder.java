@@ -1,7 +1,6 @@
 package cz.znj.kvr.sw.exp.java.nio.socket.forward;
 
 import com.google.common.base.Preconditions;
-import lombok.Builder;
 import lombok.SneakyThrows;
 import lombok.Value;
 import net.dryuf.base.concurrent.future.FutureUtil;
@@ -729,7 +728,7 @@ public class PortForwarder implements AutoCloseable
 		}
 	}
 
-	@Builder(builderClassName = "Builder")
+	@lombok.Builder(builderClassName = "Builder")
 	@Value
 	public static class ForwardConfig
 	{

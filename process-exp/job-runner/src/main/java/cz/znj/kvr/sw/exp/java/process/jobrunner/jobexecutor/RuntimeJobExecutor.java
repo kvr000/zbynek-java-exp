@@ -6,7 +6,6 @@ import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.JobTask;
 import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.Machine;
 import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.MachineGroup;
 import cz.znj.kvr.sw.exp.java.process.jobrunner.spec.Specification;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.base.concurrent.executor.FinishingSequencingExecutor;
@@ -369,7 +368,7 @@ public class RuntimeJobExecutor implements JobExecutor
 		TaskState firstFailed;
 	}
 
-	@Builder
+	@lombok.Builder
 	private static class MachineState
 	{
 		String id;
@@ -380,7 +379,7 @@ public class RuntimeJobExecutor implements JobExecutor
 		int availableMemory;
 	}
 
-	@Builder
+	@lombok.Builder
 	private static class TaskState
 	{
 		String id;

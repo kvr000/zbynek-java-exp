@@ -18,7 +18,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
@@ -105,7 +104,7 @@ public class DummyHttpServerFactory
 	}
 
 	@Value
-	@Builder(builderClassName = "Builder")
+	@lombok.Builder(builderClassName = "Builder")
 	public static class Config
 	{
 		AddressSpec listenAddress;

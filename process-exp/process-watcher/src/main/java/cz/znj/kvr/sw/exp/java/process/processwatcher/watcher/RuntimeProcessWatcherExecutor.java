@@ -8,7 +8,6 @@ import cz.znj.kvr.sw.exp.java.process.processwatcher.spec.Specification;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.Builder;
 import lombok.extern.log4j.Log4j2;
 import net.dryuf.base.concurrent.executor.FinishingSequencingExecutor;
 import org.apache.commons.lang3.SystemUtils;
@@ -359,7 +358,7 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 		(AtomicReferenceFieldUpdater<RuntimeContext, Pair<Specification, CompletableFuture<Void>>>)(Object)
 			AtomicReferenceFieldUpdater.newUpdater(RuntimeContext.class, Pair.class, "reloadRequest");
 
-	@Builder(builderClassName = "Builder")
+	@lombok.Builder(builderClassName = "Builder")
 	private static class ProcessState
 	{
 		public boolean isDesiredInactive()

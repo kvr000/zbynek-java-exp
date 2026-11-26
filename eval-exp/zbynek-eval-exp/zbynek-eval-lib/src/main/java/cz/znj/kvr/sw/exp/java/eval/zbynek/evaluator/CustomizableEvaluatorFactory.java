@@ -17,7 +17,6 @@
 package cz.znj.kvr.sw.exp.java.eval.zbynek.evaluator;
 
 import com.google.common.base.Preconditions;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -38,7 +37,7 @@ import java.util.function.Predicate;
 /**
  * Math expression evaluator.
  */
-@Builder(builderClassName = "Builder")
+@lombok.Builder(builderClassName = "Builder")
 public class CustomizableEvaluatorFactory<T> implements EvaluatorFactory<T>
 {
 	private final Type type;

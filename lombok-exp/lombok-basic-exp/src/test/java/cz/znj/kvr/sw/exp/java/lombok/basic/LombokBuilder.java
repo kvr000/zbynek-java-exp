@@ -1,6 +1,5 @@
 package cz.znj.kvr.sw.exp.java.lombok.basic;
 
-import lombok.Builder;
 import lombok.Generated;
 import lombok.Getter;
 import org.junit.Assert;
@@ -24,7 +23,7 @@ public class LombokBuilder
 		Assert.assertEquals("Hello", to.getTitle());
 	}
 
-	@Builder
+	@lombok.Builder
 	@Getter
 	public static class TestObject
 	{

@@ -3,7 +3,6 @@ package cz.znj.kvr.sw.exp.java.process.jobrunner.spec;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import cz.znj.kvr.sw.exp.java.process.jobrunner.JobRunner;
-import lombok.Builder;
 import lombok.Value;
 
 
@@ -11,7 +10,7 @@ import lombok.Value;
  * Machine specification.
  */
 @Value
-@Builder(builderClassName = "Builder")
+@lombok.Builder(builderClassName = "Builder")
 @JsonDeserialize(builder = Machine.Builder.class)
 public class Machine
 {

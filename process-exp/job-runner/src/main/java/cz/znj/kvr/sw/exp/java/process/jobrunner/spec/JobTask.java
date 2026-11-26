@@ -2,7 +2,6 @@ package cz.znj.kvr.sw.exp.java.process.jobrunner.spec;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
@@ -14,7 +13,7 @@ import java.util.List;
  * Job task.
  */
 @Value
-@Builder(builderClassName = "Builder")
+@lombok.Builder(builderClassName = "Builder")
 @JsonDeserialize(builder = JobTask.Builder.class)
 public class JobTask
 {

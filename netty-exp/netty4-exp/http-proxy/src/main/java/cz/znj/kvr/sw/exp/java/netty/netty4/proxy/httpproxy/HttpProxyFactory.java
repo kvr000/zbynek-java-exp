@@ -1,6 +1,5 @@
 package cz.znj.kvr.sw.exp.java.netty.netty4.proxy.httpproxy;
 
-import lombok.Builder;
 import lombok.Value;
 import net.dryuf.netty.address.AddressSpec;
 import net.dryuf.netty.core.Server;
@@ -16,7 +15,7 @@ public interface HttpProxyFactory
 {
 	CompletableFuture<Server> runProxy(Config config);
 
-	@Builder
+	@lombok.Builder
 	@Value
 	class Config
 	{

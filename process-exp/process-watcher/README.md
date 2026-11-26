@@ -21,6 +21,8 @@ ProcessRunner - runs and controls processes
 Options:
 -s,--spec          definition file of processes
 -p,--properties    definition file of tasks
+--auto-reload      reload automatically when the spec or properties file changes
+--pid-file         file to write the process-watcher PID to at start, removed on exit
 ```
 
 ## Example

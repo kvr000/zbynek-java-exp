@@ -169,12 +169,18 @@ public class RuntimeProcessWatcherExecutor implements ProcessWatcherExecutor
 	private void handleReload(RuntimeContext context)
 	{
 		Pair<Specification, CompletableFuture<Void>> request = RELOAD_REQUEST_UPDATER.getAndSet(context, null);
+		if (request == null) {
+			// already handled by a preceding reload step, which consumed the latest request
+			return;
+		}
 		Specification specification = request.getLeft();
 		if (context.cancelling) {
 			request.getRight().completeExceptionally(new IllegalStateException("Terminate in progress"));
+			return;
 		}
 		try {
 			validateSpec(specification);
+			context.properties = specification.getProperties();
 			for (ProcessState state: context.processes.values()) {
 				Process process = specification.getProcesses().get(state.id);
 				if (process == null) {

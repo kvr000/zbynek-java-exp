@@ -63,7 +63,7 @@
 		<dryuf-executable-jar-maven-plugin.version>1.2.5</dryuf-executable-jar-maven-plugin.version>
 		<dryuf-jmh-review-maven-plugin.version>1.2.0</dryuf-jmh-review-maven-plugin.version>
 
-		<lombok.version>1.18.42</lombok.version>
+		<lombok.version>1.18.48</lombok.version>
 		<vavr.version>0.10.7</vavr.version>
 
 		<maven-core.version>3.8.6</maven-core.version>
